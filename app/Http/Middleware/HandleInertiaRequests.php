@@ -35,12 +35,17 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        // TODO:: Only show route name for public routes for navigation bar purposes
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => fn () => $request->user(),
             ],
+            'currentRoute' => fn () => request()->route()?->getName(),
+            'currentLocale' => fn () => app()->getLocale(),
+            'localesAvailable' => fn () => config('app.locales'),
+            'localesLabels' => fn () => config('app.locales_labels'),
         ];
     }
 }
