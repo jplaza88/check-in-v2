@@ -91,9 +91,9 @@ return [
     ],
 
     'locales_labels' => [
-        'en' => "English",
-        'es' => "Español",
-        'fr' => "Français",
+        'en' => 'English',
+        'es' => 'Español',
+        'fr' => 'Français',
     ],
 
     /*

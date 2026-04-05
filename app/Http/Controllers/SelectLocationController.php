@@ -11,7 +11,7 @@ class SelectLocationController extends Controller
     {
         return Inertia::render('SelectLocation', [
             'locations' => [],
-            'context'   => $request->route('context')
+            'context' => $request->route('context'),
         ]);
     }
 }

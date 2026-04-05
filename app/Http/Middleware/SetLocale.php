@@ -48,7 +48,7 @@ class SetLocale
     private function fetchTranslations(string $routeName, array $allTranslations): array
     {
         $routeTranslationMap = [
-            'checkIn.selectLocation'     => ['publicNavigation', 'checkInSelectLocation', 'locationRequiredModal'],
+            'checkIn.selectLocation' => ['publicNavigation', 'checkInSelectLocation', 'locationRequiredModal'],
             'appointment.selectLocation' => ['publicNavigation', 'appointmentSelectLocation'],
         ];
 
