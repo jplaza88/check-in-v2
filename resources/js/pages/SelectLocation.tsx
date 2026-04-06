@@ -23,6 +23,7 @@ interface Translations {
 }
 
 interface PageProps {
+    locations: [];
     translations: Translations;
     context: Context;
     [key: string]: unknown;
@@ -44,7 +45,10 @@ type LocationTexts = {
     nearest: string;
 };
 
-function getSelectLocationTexts(props: PageProps): LocationTexts {
+function getSelectLocationTexts(props: {
+    translations: Translations;
+    context: Context;
+}): LocationTexts {
     const { context, translations } = props;
 
     if (context === 'checkin') {
@@ -144,7 +148,9 @@ const STATIC_LOCATIONS: Location[] = [
 ];
 
 export default function SelectLocation() {
-    const { translations, context } = usePage<PageProps>().props;
+    const { translations, context, locations } = usePage<PageProps>().props;
+
+    //console.log(locations)
 
     // Get all context-specific texts
     const pageTranslations = getSelectLocationTexts({ translations, context });

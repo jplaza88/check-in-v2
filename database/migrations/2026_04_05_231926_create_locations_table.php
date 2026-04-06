@@ -1,0 +1,33 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('locations', function (Blueprint $table) {
+            $table->id();
+            $table->uuid()->unique();
+            $table->foreignId('address_id')->constrained('addresses');
+            $table->integer('distance');
+            $table->string('name');
+            $table->string('abbreviation')->unique();
+            $table->string('timezone');
+            $table->string('phone');
+            $table->string('phone_ext')->nullable();
+            $table->string('email');
+            $table->boolean('is_active')->default(false);
+            $table->boolean('is_checkins_enabled')->default(false);
+            $table->boolean('is_appointments_enabled')->default(false);
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('locations');
+    }
+};

@@ -51,19 +51,19 @@ class AppServiceProvider extends ServiceProvider
         $this->unguardModels();
     }
 
-    public function immutableDates(): void
+    private function immutableDates(): void
     {
         Date::use(CarbonImmutable::class);
     }
 
-    public function prohibitDestructiveCommands(): void
+    private function prohibitDestructiveCommands(): void
     {
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
         );
     }
 
-    public function setPasswordDefault(): void
+    private function setPasswordDefault(): void
     {
         Password::defaults(fn (): ?Password => app()->isProduction()
             ? Password::min(12)
@@ -76,31 +76,31 @@ class AppServiceProvider extends ServiceProvider
         );
     }
 
-    public function aggressivePrefetching(): void
+    private function aggressivePrefetching(): void
     {
         Vite::useAggressivePrefetching();
     }
 
-    public function autoEagerLoadRelationships(): void
+    private function autoEagerLoadRelationships(): void
     {
         Model::automaticallyEagerLoadRelationships();
     }
 
-    public function forceHttps(): void
+    private function forceHttps(): void
     {
         if (app()->isProduction()) {
             URL::forceHttps();
         }
     }
 
-    public function strictModels(): void
+    private function strictModels(): void
     {
         if (! app()->isProduction()) {
             Model::shouldBeStrict();
         }
     }
 
-    public function unguardModels(): void
+    private function unguardModels(): void
     {
         Model::unguard();
     }
