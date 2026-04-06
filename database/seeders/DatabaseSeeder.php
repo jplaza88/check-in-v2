@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             AddressSeeder::class,
             LocationSeeder::class,
             ScheduleSeeder::class,
+            ScheduleExceptionSeeder::class,
         ]);
     }
 }

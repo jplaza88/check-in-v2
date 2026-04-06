@@ -150,7 +150,7 @@ const STATIC_LOCATIONS: Location[] = [
 export default function SelectLocation() {
     const { translations, context, locations } = usePage<PageProps>().props;
 
-    //console.log(locations)
+    console.log(locations)
 
     // Get all context-specific texts
     const pageTranslations = getSelectLocationTexts({ translations, context });

@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property int $id
- * @property string $name
- * @property int $state_id
- * @property CarbonImmutable $created_at
- * @property CarbonImmutable $updated_at
+ * @property-read int $id
+ * @property-read string $name
+ * @property-read int $state_id
+ * @property-read CarbonImmutable $created_at
+ * @property-read CarbonImmutable $updated_at
  * @property-read State $state
  */
+#[Fillable(['name', 'state_id'])]
 class City extends Model {}

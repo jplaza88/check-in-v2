@@ -3,50 +3,34 @@
 namespace App\Models;
 
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @property int $id
- * @property int $location_id
- * @property string|null $sunday_open
- * @property string|null $sunday_close
- * @property string|null $monday_open
- * @property string|null $monday_close
- * @property string|null $tuesday_open
- * @property string|null $tuesday_close
- * @property string|null $wednesday_open
- * @property string|null $wednesday_close
- * @property string|null $thursday_open
- * @property string|null $thursday_close
- * @property string|null $friday_open
- * @property string|null $friday_close
- * @property string|null $saturday_open
- * @property string|null $saturday_close
- * @property CarbonImmutable $created_at
- * @property CarbonImmutable $updated_at
+ * @property-read int $id
+ * @property-read int $location_id
+ * @property-read string|null $sunday_open
+ * @property-read string|null $sunday_close
+ * @property-read string|null $monday_open
+ * @property-read string|null $monday_close
+ * @property-read string|null $tuesday_open
+ * @property-read string|null $tuesday_close
+ * @property-read string|null $wednesday_open
+ * @property-read string|null $wednesday_close
+ * @property-read string|null $thursday_open
+ * @property-read string|null $thursday_close
+ * @property-read string|null $friday_open
+ * @property-read string|null $friday_close
+ * @property-read string|null $saturday_open
+ * @property-read string|null $saturday_close
+ * @property-read CarbonImmutable $created_at
+ * @property-read CarbonImmutable $updated_at
  * @property-read Location $location
  */
+#[Fillable(['location_id', 'sunday_open', 'sunday_close', 'monday_open', 'monday_close', 'tuesday_open', 'tuesday_close', 'wednesday_open', 'wednesday_close', 'thursday_open', 'thursday_close', 'friday_open', 'friday_close', 'saturday_open', 'saturday_close'])]
 class Schedule extends Model
 {
-    protected $fillable = [
-        'location_id',
-        'sunday_open',
-        'sunday_close',
-        'monday_open',
-        'monday_close',
-        'tuesday_open',
-        'tuesday_close',
-        'wednesday_open',
-        'wednesday_close',
-        'thursday_open',
-        'thursday_close',
-        'friday_open',
-        'friday_close',
-        'saturday_open',
-        'saturday_close',
-    ];
-
     protected function casts(): array
     {
         return [
