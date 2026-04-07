@@ -17,11 +17,10 @@ class BrowserService
         // The first language in the array is usually the preferred language
         $browserLanguage = reset($preferredLanguages);
 
-        // Use a regular expression to extract only the language code
-        if (preg_match('/^([a-z]+)/i', $browserLanguage, $matches)) {
-            $languageCode = strtolower($matches[1]);
+        // Use a regular expression to extract only the language code, eg: 'es', or 'fr'
+        if (preg_match('/^([a-z]+)/i', $browserLanguage ?: 'en', $matches)) {
 
-            return $languageCode;
+            return strtolower($matches[1]);
         }
 
         return null;

@@ -6,10 +6,6 @@ namespace App\DTOs;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 
-
-/**
- * @template TItem
- */
 final readonly class LocationDTO
 {
     public function __construct(
@@ -23,8 +19,8 @@ final readonly class LocationDTO
 
 
     /**
-     * @param array<string, TItem> $location
-     * @return self<TItem>
+     * @param array<string, mixed> $location
+     * @return self
      */
     public static function fromArray(array $location): self
     {
@@ -43,16 +39,19 @@ final readonly class LocationDTO
     }
 
     /**
-     * @param array<string, TItem> $location
-     * @return array<TItem>
+     * @param array<string, mixed> $location
+     * @return array{bool, Carbon|null, Carbon|null, string|null}
      */
     private static function resolveOpenCloseTime(array $location): array
     {
         $timezone = $location['timezone'];
         $now = now()->setTimezone($timezone);
 
-        $exception = collect($location['schedule_exceptions'] ?? [])
-            ->firstWhere('date', $now->toDateString());
+        $exceptions = $location['schedule_exceptions'] ?? [];
+        $exception  = array_values(array_filter(
+            $exceptions,
+            fn (array $e) => $e['date'] === $now->toDateString()
+        ))[0] ?? null;
 
         if ($exception) {
             return self::resolveFromException($exception, $timezone, $now);
@@ -62,8 +61,8 @@ final readonly class LocationDTO
     }
 
     /**
-     * @param array<string, TItem> $exception
-     * @return array<TItem>
+     * @param array<string, mixed> $exception
+     * @return array{bool, Carbon|null, Carbon|null, string|null}
      */
     private static function resolveFromException(array $exception, string $timezone, CarbonInterface $now): array
     {
@@ -83,8 +82,8 @@ final readonly class LocationDTO
     }
 
     /**
-     * @param ?array<string, TItem> $schedule
-     * @return array<TItem>
+     * @param ?array<string, mixed> $schedule
+     * @return array{bool, Carbon|null, Carbon|null, string|null}
      */
     private static function resolveFromSchedule(?array $schedule, string $timezone, CarbonInterface $now): array
     {
@@ -102,7 +101,7 @@ final readonly class LocationDTO
     }
 
     /**
-     * @param array<string, TItem> $address
+     * @param array<string, mixed> $address
      * @return string
      */
     private static function buildAddress(array $address): string
