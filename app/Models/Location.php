@@ -42,16 +42,25 @@ class Location extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<Address, $this>
+     */
     public function address(): BelongsTo
     {
         return $this->belongsTo(Address::class);
     }
 
+    /**
+     * @return HasOne<Schedule, $this>
+     */
     public function schedule(): HasOne
     {
         return $this->hasOne(Schedule::class);
     }
 
+    /**
+     * @return HasMany<ScheduleException, $this>
+     */
     public function scheduleExceptions(): HasMany
     {
         return $this->hasMany(ScheduleException::class);

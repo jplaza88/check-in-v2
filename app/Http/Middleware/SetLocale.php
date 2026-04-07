@@ -45,6 +45,12 @@ class SetLocale
         return $next($request);
     }
 
+
+    /**
+     * @param string $routeName
+     * @param array<string, string> $allTranslations
+     * @return array<string, string>
+     */
     private function fetchTranslations(string $routeName, array $allTranslations): array
     {
         $routeTranslationMap = [

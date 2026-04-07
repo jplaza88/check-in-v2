@@ -22,6 +22,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['location_id', 'date', 'open', 'close', 'is_closed', 'reason'])]
 class ScheduleException extends Model
 {
+    /**
+     * @return BelongsTo<Location, $this>
+     */
     public function location(): BelongsTo
     {
         return $this->belongsTo(Location::class);

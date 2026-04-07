@@ -1,10 +1,15 @@
 <?php
+declare(strict_types=1);
 
 namespace App\DTOs;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 
+
+/**
+ * @template TItem
+ */
 final readonly class LocationDTO
 {
     public function __construct(
@@ -16,6 +21,11 @@ final readonly class LocationDTO
         public ?string $reason,
     ) {}
 
+
+    /**
+     * @param array<string, TItem> $location
+     * @return self<TItem>
+     */
     public static function fromArray(array $location): self
     {
         [$isOpen, $openTime, $closeTime, $reason] = self::resolveOpenCloseTime($location);
@@ -32,6 +42,10 @@ final readonly class LocationDTO
         );
     }
 
+    /**
+     * @param array<string, TItem> $location
+     * @return array<TItem>
+     */
     private static function resolveOpenCloseTime(array $location): array
     {
         $timezone = $location['timezone'];
@@ -47,6 +61,10 @@ final readonly class LocationDTO
         return self::resolveFromSchedule($location['schedule'] ?? null, $timezone, $now);
     }
 
+    /**
+     * @param array<string, TItem> $exception
+     * @return array<TItem>
+     */
     private static function resolveFromException(array $exception, string $timezone, CarbonInterface $now): array
     {
         if ($exception['is_closed']) {
@@ -64,6 +82,10 @@ final readonly class LocationDTO
         ];
     }
 
+    /**
+     * @param ?array<string, TItem> $schedule
+     * @return array<TItem>
+     */
     private static function resolveFromSchedule(?array $schedule, string $timezone, CarbonInterface $now): array
     {
         $day = strtolower($now->englishDayOfWeek);
@@ -79,6 +101,10 @@ final readonly class LocationDTO
         ];
     }
 
+    /**
+     * @param array<string, TItem> $address
+     * @return string
+     */
     private static function buildAddress(array $address): string
     {
         $parts = array_filter([
