@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\DTOs;
@@ -12,35 +13,46 @@ final readonly class LocationDTO
         public string $id,
         public string $name,
         public string $address,
-        public bool $is_open,
-        public ?string $today_open_close_time,
+        public bool $isOpen,
+        public ?string $todayOpenCloseTime,
         public ?string $reason,
+        public bool $hasException,
+        public bool $isExceptionClosure,
+        public bool $isClosingSoon,
     ) {}
 
+    // TODO:: Convert to this to a feature for the DB
+    private const int CLOSING_SOON_THRESHOLD_MINUTES = 30;
 
     /**
-     * @param array<string, mixed> $location
-     * @return self
+     * @param  array<string, mixed>  $location
      */
     public static function fromArray(array $location): self
     {
-        [$isOpen, $openTime, $closeTime, $reason] = self::resolveOpenCloseTime($location);
+        [$isOpen, $openTime, $closeTime, $reason, $hasException, $isExceptionClosure] = self::resolveOpenCloseTime($location);
+
+        $isClosingSoon = $isOpen
+            && $closeTime !== null
+            && now()->setTimezone($location['timezone'])->diffInMinutes($closeTime) <= self::CLOSING_SOON_THRESHOLD_MINUTES;
 
         return new self(
             id: $location['uuid'],
             name: $location['name'],
             address: self::buildAddress($location['address']),
-            is_open: $isOpen,
-            today_open_close_time: $openTime && $closeTime
+            isOpen: $isOpen,
+            todayOpenCloseTime: $openTime && $closeTime
                 ? $openTime->format('g:i A').' - '.$closeTime->format('g:i A T')
                 : null,
             reason: $reason,
+            hasException: $hasException,
+            isExceptionClosure: $isExceptionClosure,
+            isClosingSoon: $isClosingSoon,
         );
     }
 
     /**
-     * @param array<string, mixed> $location
-     * @return array{bool, Carbon|null, Carbon|null, string|null}
+     * @param  array<string, mixed>  $location
+     * @return array{bool, Carbon|null, Carbon|null, string|null, bool, bool}
      */
     private static function resolveOpenCloseTime(array $location): array
     {
@@ -48,7 +60,7 @@ final readonly class LocationDTO
         $now = now()->setTimezone($timezone);
 
         $exceptions = $location['schedule_exceptions'] ?? [];
-        $exception  = array_values(array_filter(
+        $exception = array_values(array_filter(
             $exceptions,
             fn (array $e) => $e['date'] === $now->toDateString()
         ))[0] ?? null;
@@ -61,29 +73,31 @@ final readonly class LocationDTO
     }
 
     /**
-     * @param array<string, mixed> $exception
-     * @return array{bool, Carbon|null, Carbon|null, string|null}
+     * @param  array<string, mixed>  $exception
+     * @return array{bool, Carbon|null, Carbon|null, string|null, bool, bool}
      */
     private static function resolveFromException(array $exception, string $timezone, CarbonInterface $now): array
     {
-        if ($exception['is_closed']) {
-            return [false, null, null, $exception['reason']];
-        }
-
         $openTime = $exception['open'] ? Carbon::parse($exception['open'], $timezone) : null;
         $closeTime = $exception['close'] ? Carbon::parse($exception['close'], $timezone) : null;
+
+        if ($exception['is_closed']) {
+            return [false, $openTime, $closeTime, $exception['reason'], true, true];
+        }
 
         return [
             $openTime && $closeTime && $now->between($openTime, $closeTime),
             $openTime,
             $closeTime,
             $exception['reason'],
+            true,
+            false,
         ];
     }
 
     /**
-     * @param ?array<string, mixed> $schedule
-     * @return array{bool, Carbon|null, Carbon|null, string|null}
+     * @param  ?array<string, mixed>  $schedule
+     * @return array{bool, Carbon|null, Carbon|null, string|null, bool, bool}
      */
     private static function resolveFromSchedule(?array $schedule, string $timezone, CarbonInterface $now): array
     {
@@ -97,12 +111,13 @@ final readonly class LocationDTO
             $openTime,
             $closeTime,
             null,
+            false,
+            false,
         ];
     }
 
     /**
-     * @param array<string, mixed> $address
-     * @return string
+     * @param  array<string, mixed>  $address
      */
     private static function buildAddress(array $address): string
     {

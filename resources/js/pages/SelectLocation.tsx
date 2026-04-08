@@ -34,8 +34,12 @@ interface Location {
     locationName: string;
     address: string;
     userDistance: number;
-    schedule: string;
+    todayOpenCloseTime: string | null;
     isOpen: boolean;
+    hasException: boolean;
+    reason: string | null;
+    isExceptionClosure: boolean;
+    isClosingSoon: boolean;
 }
 
 type LocationTexts = {
@@ -78,72 +82,108 @@ const STATIC_LOCATIONS: Location[] = [
         locationName: 'Eddystone, PA - Penn Terminals',
         address: '1 Saville Avenue, Eddystone, PA 19022',
         userDistance: 155.0,
-        schedule: '07:00 AM - 11:00 PM EDT',
+        todayOpenCloseTime: null,
         isOpen: false,
+        hasException: true,
+        reason: 'New Year',
+        isExceptionClosure: true,
+        isClosingSoon: false,
     },
     {
         id: 'pompano-sol-group',
         locationName: 'Pompano Beach, FL - Sol Group Marketing',
         address: '1751 SW 8th Street, Pompano Beach, FL 33069',
         userDistance: 1117.2,
-        schedule: '07:00 AM - 07:00 AM EDT',
+        todayOpenCloseTime: '07:00 AM - 07:00 AM EDT',
         isOpen: false,
+        hasException: false,
+        reason: null,
+        isExceptionClosure: false,
+        isClosingSoon: false,
     },
     {
         id: 'oxnard-channel-islands',
         locationName: 'Oxnard Beach, CA - Channel Islands Logistics',
         address: '5655 Arcturus Avenue, Oxnard Beach, CA 93033',
         userDistance: 2536.0,
-        schedule: '07:00 AM - 07:00 AM PDT',
-        isOpen: false,
+        todayOpenCloseTime: '07:00 AM - 12:00 AM PDT',
+        isOpen: true,
+        hasException: false,
+        reason: null,
+        isExceptionClosure: false,
+        isClosingSoon: true,
     },
     {
         id: 'baytown-foremost-fresh-direct',
         locationName: 'Baytown, TX - Foremost Fresh Direct',
         address: '4203 Cedar Boulevard, Baytown, TX 77523',
         userDistance: 0,
-        schedule: '07:00 AM - 07:00 AM CDT',
+        todayOpenCloseTime: '07:00 AM - 07:00 AM CDT',
         isOpen: false,
+        hasException: false,
+        reason: null,
+        isExceptionClosure: false,
+        isClosingSoon: false,
     },
     {
         id: 'firebaugh-ca',
         locationName: 'Firebaugh, CA',
         address: '6879 N. Washoe Avenue, Firebaugh, CA 93622',
         userDistance: 0,
-        schedule: '07:00 AM - 07:00 AM PDT',
+        todayOpenCloseTime: '07:00 AM - 07:00 AM PDT',
         isOpen: false,
+        hasException: false,
+        reason: null,
+        isExceptionClosure: false,
+        isClosingSoon: false,
     },
     {
         id: 'aguila-az',
         locationName: 'Aguila, AZ',
         address: '51240 Valley Road, Aguila, AZ 85320',
         userDistance: 0,
-        schedule: '07:00 AM - 07:00 AM MST',
+        todayOpenCloseTime: '07:00 AM - 07:00 AM MST',
         isOpen: false,
+        hasException: false,
+        reason: null,
+        isExceptionClosure: false,
+        isClosingSoon: false,
     },
     {
         id: 'maricopa-az',
         locationName: 'Maricopa, AZ',
         address: '9254 N. Ralston Road, Maricopa, AZ 85139',
         userDistance: 0,
-        schedule: '07:00 AM - 07:00 AM MST',
+        todayOpenCloseTime: '07:00 AM - 07:00 AM MST',
         isOpen: false,
+        hasException: false,
+        reason: null,
+        isExceptionClosure: false,
+        isClosingSoon: false,
     },
     {
         id: 'tonopah-az-court-house',
         locationName: 'Tonopah, AZ - Court House',
         address: '53931 W. Lower Buckey Road, Tonopah, AZ 85354',
         userDistance: 0,
-        schedule: '07:00 AM - 07:00 AM MST',
+        todayOpenCloseTime: '07:00 AM - 07:00 AM MST',
         isOpen: false,
+        hasException: false,
+        reason: null,
+        isExceptionClosure: false,
+        isClosingSoon: false,
     },
     {
         id: 'salinas-ca',
         locationName: 'Salinas, CA',
         address: '850 Work Street, Salinas, CA 93901',
         userDistance: 0,
-        schedule: '07:00 AM - 07:00 AM PDT',
+        todayOpenCloseTime: '07:00 AM - 07:00 AM PDT',
         isOpen: false,
+        hasException: false,
+        reason: null,
+        isExceptionClosure: false,
+        isClosingSoon: false,
     },
 ];
 
@@ -162,7 +202,7 @@ export default function SelectLocation() {
             <div className="px-4 py-3">
                 <div className="mx-auto max-w-md">
                     <h1 className="mb-6 text-3xl font-bold text-brand-grey dark:text-gray-100">
-                        { pageTranslations.selectLocation }:
+                        {pageTranslations.selectLocation}:
                     </h1>
 
                     <div className="space-y-3">
@@ -171,9 +211,7 @@ export default function SelectLocation() {
                             Array.from({ length: 3 }).map((_, i) => (
                                 <div
                                     key={i}
-                                    className="mb-3 flex animate-pulse items-start justify-between space-x-4 rounded-lg
-                                        border border-gray-200 bg-white p-4 shadow dark:border-gray-700/60
-                                        dark:bg-gray-800"
+                                    className="mb-3 flex animate-pulse items-start justify-between space-x-4 rounded-lg border border-gray-200 bg-white p-4 shadow dark:border-gray-700/60 dark:bg-gray-800"
                                 >
                                     <div className="mr-6 flex w-6 flex-col items-center">
                                         <div className="h-6 w-6 rounded-full bg-gray-300 dark:bg-gray-700" />
@@ -228,6 +266,66 @@ export default function SelectLocation() {
 
                                     {/* Text */}
                                     <div className="flex flex-1 flex-col justify-center gap-0.5 text-left">
+                                        {/* Exception / Closing Soon badge — mutually exclusive, above name */}
+                                        {location.isExceptionClosure ? (
+                                            <div className="mb-3">
+                                                <span
+                                                    title={
+                                                        location.reason ??
+                                                        'Closed today'
+                                                    }
+                                                    aria-label={`Closed today: ${location.reason ?? 'Closed today'}`}
+                                                    className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-700 dark:text-red-400"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 16 16"
+                                                        className="h-3 w-3 fill-current"
+                                                    >
+                                                        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
+                                                    </svg>
+                                                    {location.reason ??
+                                                        'Closed today'}
+                                                </span>
+                                            </div>
+                                        ) : location.hasException ? (
+                                            <div className="mb-3">
+                                                <span
+                                                    title={
+                                                        location.reason ??
+                                                        'Special hours today'
+                                                    }
+                                                    aria-label={`Schedule exception: ${location.reason ?? 'Special hours today'}`}
+                                                    className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-400"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 16 16"
+                                                        className="h-3 w-3 fill-current"
+                                                    >
+                                                        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
+                                                    </svg>
+                                                    Special hours
+                                                </span>
+                                            </div>
+                                        ) : location.isClosingSoon ? (
+                                            <div className="mb-3">
+                                                <span
+                                                    aria-label="Closing soon"
+                                                    className="inline-flex items-center gap-1 rounded-full bg-orange-500/15 px-2.5 py-1 text-xs font-medium text-orange-700 dark:text-orange-400"
+                                                >
+                                                    <svg
+                                                        xmlns="http://www.w3.org/2000/svg"
+                                                        viewBox="0 0 16 16"
+                                                        className="h-3 w-3 fill-current"
+                                                    >
+                                                        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 2a.75.75 0 0 1 .75.75V8a.75.75 0 0 1-.22.53l-2 2a.75.75 0 1 1-1.06-1.06L7.25 7.69V3.75A.75.75 0 0 1 8 3z" />
+                                                    </svg>
+                                                    Closing soon
+                                                </span>
+                                            </div>
+                                        ) : null}
+
                                         <div
                                             className={`font-semibold ${idx === 0 ? 'text-gray-900 dark:text-gray-100' : 'text-gray-800 dark:text-gray-100'}`}
                                         >
@@ -236,41 +334,36 @@ export default function SelectLocation() {
                                         <div className="text-sm text-gray-600 dark:text-gray-300">
                                             {location.address}
                                         </div>
-                                        <div className="mt-1 flex items-center text-xs text-gray-500 dark:text-gray-400">
-                                            <div className="flex items-center space-x-3">
-                                                <span
-                                                    aria-label={`Hours of operation: ${location.schedule}`}
-                                                >
-                                                    {location.schedule}
+
+                                        {/* Hours + Open/Closed + Nearest */}
+                                        <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                            <span
+                                                aria-label={`Hours of operation: ${location.todayOpenCloseTime}`}
+                                            >
+                                                {location.todayOpenCloseTime ??
+                                                    (location.hasException
+                                                        ? 'Closed today'
+                                                        : 'Hours unavailable')}
+                                            </span>
+
+                                            {location.isOpen ? (
+                                                <span className="inline-flex rounded-full bg-green-500/20 px-2.5 py-1 text-xs font-medium text-green-700">
+                                                    {pageTranslations.open}
                                                 </span>
-                                                {location.isOpen ? (
-                                                    <span
-                                                        aria-label="Location is open"
-                                                        className="inline-flex rounded-full bg-green-500/20 px-2.5 py-1 text-xs font-medium text-green-700"
-                                                    >
-                                                        {pageTranslations.open}
-                                                    </span>
-                                                ) : (
-                                                    <span
-                                                        aria-label="Location is closed"
-                                                        className="inline-flex rounded-full bg-red-500/20 px-2.5 py-1 text-xs font-medium text-red-700"
-                                                    >
-                                                        {
-                                                            pageTranslations.closed
-                                                        }
-                                                    </span>
-                                                )}
-                                                {idx === 0 && (
-                                                    <span
-                                                        aria-label="Nearest location"
-                                                        className="inline-flex rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-brand-green"
-                                                    >
-                                                        {
-                                                            pageTranslations.nearest
-                                                        }
-                                                    </span>
-                                                )}
-                                            </div>
+                                            ) : (
+                                                <span className="inline-flex rounded-full bg-red-500/20 px-2.5 py-1 text-xs font-medium text-red-700">
+                                                    {pageTranslations.closed}
+                                                </span>
+                                            )}
+
+                                            {idx === 0 && (
+                                                <span
+                                                    aria-label="Nearest location"
+                                                    className="inline-flex rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-brand-green"
+                                                >
+                                                    {pageTranslations.nearest}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
