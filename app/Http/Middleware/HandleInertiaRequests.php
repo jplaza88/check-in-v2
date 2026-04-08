@@ -16,6 +16,13 @@ class HandleInertiaRequests extends Middleware
      */
     protected $rootView = 'app';
 
+    private const array PUBLIC_NAV_ROUTES = [
+        'appointment.selectLocation',
+        'checkin.selectLocation',
+        //'checkin.*',
+        //'appointment.*',
+    ];
+
     /**
      * Determines the current asset version.
      *
@@ -42,7 +49,11 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => fn () => $request->user(),
             ],
-            'currentRoute' => fn () => request()->route()?->getName(),
+            'currentRoute' => fn () => in_array(
+                request()->route()?->getName(),
+                self::PUBLIC_NAV_ROUTES,
+                strict: true
+            ) ? request()->route()?->getName() : null,
             'currentLocale' => fn () => app()->getLocale(),
             'localesAvailable' => fn () => config('app.locales'),
             'localesLabels' => fn () => config('app.locales_labels'),

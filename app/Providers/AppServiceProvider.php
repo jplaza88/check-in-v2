@@ -36,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->immutableDates();
 
+        $this->defaultTimezone();
+
         $this->prohibitDestructiveCommands();
 
         $this->setPasswordDefault();
@@ -103,5 +105,10 @@ class AppServiceProvider extends ServiceProvider
     private function unguardModels(): void
     {
         Model::unguard();
+    }
+
+    private function defaultTimezone(): void
+    {
+        date_default_timezone_set(config('app.timezone'));
     }
 }

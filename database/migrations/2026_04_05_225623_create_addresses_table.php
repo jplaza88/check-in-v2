@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('country');
             $table->decimal('latitude', 9, 6)->nullable();
             $table->decimal('longitude', 9, 6)->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->unique(['street1', 'city', 'state', 'zip_code']);
         });

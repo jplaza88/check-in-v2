@@ -25,7 +25,7 @@ return new class extends Migration
             $table->time('friday_close')->nullable();
             $table->time('saturday_open')->nullable();
             $table->time('saturday_close')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
         });
     }
 

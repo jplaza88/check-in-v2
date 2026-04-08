@@ -16,7 +16,7 @@ return new class extends Migration
             $table->time('close')->nullable();
             $table->boolean('is_closed')->default(false);
             $table->string('reason')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
         });
     }
 

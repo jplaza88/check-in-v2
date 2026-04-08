@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('short_name', 2)->nullable();
             $table->string('name', 150);
             $table->foreignId('country_id')->constrained('countries')->cascadeOnDelete();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->unique(['short_name', 'country_id']);
             $table->unique(['name', 'country_id']);
