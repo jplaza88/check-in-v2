@@ -19,8 +19,8 @@ class HandleInertiaRequests extends Middleware
     private const array PUBLIC_NAV_ROUTES = [
         'appointment.selectLocation',
         'checkin.selectLocation',
-        //'checkin.*',
-        //'appointment.*',
+        // 'checkin.*',
+        // 'appointment.*',
     ];
 
     /**
@@ -53,7 +53,7 @@ class HandleInertiaRequests extends Middleware
                 request()->route()?->getName(),
                 self::PUBLIC_NAV_ROUTES,
                 strict: true
-            ) ? request()->route()?->getName() : null,
+            ) ? request()->route()->getName() : null,
             'currentLocale' => fn () => app()->getLocale(),
             'localesAvailable' => fn () => config('app.locales'),
             'localesLabels' => fn () => config('app.locales_labels'),
