@@ -6,6 +6,9 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class LocationDistanceRequest extends FormRequest
 {
+    /**
+     * @return array<string, array<string>>
+     */
     public function rules(): array
     {
         return [

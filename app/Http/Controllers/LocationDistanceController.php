@@ -29,7 +29,7 @@ class LocationDistanceController extends Controller
             })
             ->map(fn ($location) => new LocationDistanceDTO(
                 id: $location->uuid,
-                distance: $this->haversine(
+                userDistance: $this->haversine(
                     $userLat, $userLng,
                     (float) $location->address->latitude,
                     (float) $location->address->longitude,

@@ -6,7 +6,7 @@ namespace App\DTOs;
 
 final readonly class LocationDistanceDTO implements \JsonSerializable
 {
-    public function __construct(public string $id, public float $distance) {}
+    public function __construct(public string $id, public float $userDistance) {}
 
     /**
      * @return array<string, mixed>
@@ -15,7 +15,7 @@ final readonly class LocationDistanceDTO implements \JsonSerializable
     {
         return [
             'id' => $this->id,
-            'distance' => $this->distance,
+            'userDistance' => $this->userDistance,
         ];
     }
 }

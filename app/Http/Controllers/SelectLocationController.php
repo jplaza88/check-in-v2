@@ -18,7 +18,9 @@ class SelectLocationController extends Controller
         $locations = $service->getActiveLocationsWithAddressAndSchedule($context)
             ->map(fn (Location $location) => LocationDTO::fromArray($location->toArray()));
 
-        return Inertia::render('SelectLocation', [
+        $page = $context === 'checkin' ? 'CheckInSelectLocation' : 'AppointmentSelectLocation';
+
+        return Inertia::render($page, [
             'locations' => $locations,
             'context' => $context,
         ]);

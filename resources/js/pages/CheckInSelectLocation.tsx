@@ -5,31 +5,20 @@ import LocationDistanceController from '@/actions/App/Http/Controllers/LocationD
 import { useGeolocation } from '@/hooks/useGeolocation';
 import PublicLayout from '@/layouts/PublicLayout';
 
-type Context = 'checkin' | 'appointment';
-
-interface CheckInSelectLocation {
+interface CheckInTranslations {
     selectACheckInLocation: string;
     closed: string;
     open: string;
     nearest: string;
 }
 
-interface AppointmentSelectLocation {
-    selectAnAppointmentLocation: string;
-    closed: string;
-    open: string;
-    nearest: string;
-}
-
 interface Translations {
-    checkInSelectLocation: CheckInSelectLocation;
-    appointmentSelectLocation: AppointmentSelectLocation;
+    checkInSelectLocation: CheckInTranslations;
 }
 
 interface PageProps {
     locations: Location[];
     translations: Translations;
-    context: Context;
     [key: string]: unknown;
 }
 
@@ -43,48 +32,14 @@ interface Location {
     reason: string | null;
     isExceptionClosure: boolean;
     isClosingSoon: boolean;
-    distance?: number | null; // Retrieved after page render
-}
-
-type LocationTexts = {
-    selectLocation: string;
-    closed: string;
-    open: string;
-    nearest: string;
-};
-
-function getSelectLocationTexts(props: {
-    translations: Translations;
-    context: Context;
-}): LocationTexts {
-    const { context, translations } = props;
-
-    if (context === 'checkin') {
-        const translation = translations.checkInSelectLocation;
-
-        return {
-            selectLocation: translation.selectACheckInLocation,
-            closed: translation.closed,
-            open: translation.open,
-            nearest: translation.nearest,
-        };
-    } else {
-        const translation = translations.appointmentSelectLocation;
-
-        return {
-            selectLocation: translation.selectAnAppointmentLocation,
-            closed: translation.closed,
-            open: translation.open,
-            nearest: translation.nearest,
-        };
-    }
+    userDistance?: number | null; // Retrieved after page render
 }
 
 export default function SelectLocation() {
-    const { translations, context, locations } = usePage<PageProps>().props;
-    const pageTranslations = getSelectLocationTexts({ translations, context });
+    const { translations, locations } = usePage<PageProps>().props;
+    const pageTranslations: CheckInTranslations = translations.checkInSelectLocation;
     const [sortedLocations, setSortedLocations] = useState<Location[] | null>(null);
-    const { coords, loading } = useGeolocation({ enabled: context === 'checkin' });
+    const { coords, loading } = useGeolocation();
 
     useEffect(() => {
         if (!coords) {
@@ -97,17 +52,16 @@ export default function SelectLocation() {
                 longitude: coords.longitude,
             })
             .then(({ data }) => {
-
                 // Attach the user distance to locations and keep the same sort order
                 const distanceMap = new Map(
                     data.locations.map(
                         ({
                             id,
-                            distance,
+                            userDistance,
                         }: {
                             id: string;
-                            distance: number;
-                        }) => [id, distance],
+                            userDistance: number;
+                        }) => [id, userDistance],
                     ),
                 );
 
@@ -118,7 +72,7 @@ export default function SelectLocation() {
                         return location
                             ? {
                                   ...location,
-                                  distance: distanceMap.get(id) ?? null,
+                                  userDistance: distanceMap.get(id) ?? null,
                               }
                             : null;
                     })
@@ -135,7 +89,7 @@ export default function SelectLocation() {
             <div className="px-4 py-3">
                 <div className="mx-auto max-w-md">
                     <h1 className="mb-6 text-3xl font-bold text-brand-grey dark:text-gray-100">
-                        {pageTranslations.selectLocation}:
+                        {pageTranslations.selectACheckInLocation}:
                     </h1>
 
                     <div className="space-y-3">
@@ -184,11 +138,11 @@ export default function SelectLocation() {
                                                 <path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z" />
                                             </svg>
                                             <span
-                                                aria-label={`Distance: ${location.distance} miles`}
+                                                aria-label={`Distance: ${location.userDistance} miles`}
                                                 className="mt-1 min-w-13 text-center text-xs text-gray-500 dark:text-gray-400"
                                             >
-                                                {location.distance != null
-                                                    ? location.distance.toLocaleString(
+                                                {location.userDistance != null
+                                                    ? location.userDistance.toLocaleString(
                                                           'en-US',
                                                           {
                                                               minimumFractionDigits: 1,

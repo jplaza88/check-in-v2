@@ -12,34 +12,22 @@ interface GeolocationState {
     error: GeolocationPositionError | null;
 }
 
-interface GeolocationOptions extends PositionOptions {
-    enabled?: boolean;
-}
-
-const DEFAULT_OPTIONS: GeolocationOptions = {
-    enabled: true,
+const DEFAULT_OPTIONS: PositionOptions = {
     enableHighAccuracy: false,
     timeout: 10_000,
     maximumAge: 60_000,
 };
 
 export function useGeolocation(
-    options: GeolocationOptions = DEFAULT_OPTIONS,
+    options: PositionOptions = DEFAULT_OPTIONS,
 ): GeolocationState {
-    const { enabled = true, ...positionOptions } = options;
-
     const [state, setState] = useState<GeolocationState>({
         coords: null,
-        loading: enabled,
+        loading: true,
         error: null,
     });
 
     useEffect(() => {
-        if (!enabled) {
-            return;
-        }
-
-        // Use cached coords if still valid
         const cached = getDriverCoords();
 
         if (cached) {
@@ -79,12 +67,8 @@ export function useGeolocation(
             setState({ coords: null, loading: false, error: err });
         };
 
-        navigator.geolocation.getCurrentPosition(
-            success,
-            error,
-            positionOptions,
-        );
-    }, [enabled]);
+        navigator.geolocation.getCurrentPosition(success, error, options);
+    }, []);
 
     return state;
 }

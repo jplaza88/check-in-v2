@@ -38,7 +38,6 @@ return [
         'closed' => 'Closed',
         'open' => 'Open',
         'nearest' => 'Nearest',
-        'showMoreLocations' => 'Show more locations',
     ],
 
     'appointmentSelectLocation' => [

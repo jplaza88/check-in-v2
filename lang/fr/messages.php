@@ -32,7 +32,6 @@ return [
         'closed' => 'Fermé',
         'open' => 'Ouvert',
         'nearest' => 'Le plus proche',
-        'showMoreLocations' => 'Afficher plus de lieux',
     ],
 
     'appointmentSelectLocation' => [
