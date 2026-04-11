@@ -20,6 +20,12 @@ return [
         'logout' => 'Déconnexion',
         'schedule' => 'Horaire',
         'contact' => 'Contact',
+        'services' => 'Services',
+        'company' => 'Entreprise',
+        'legal' => 'Mentions légales',
+        'privacyPolicy' => 'Politique de confidentialité',
+        'termsOfService' => 'Conditions d’utilisation',
+        'allRightsReserved' => 'Tous droits réservés',
     ],
 
     'locationRequiredModal' => [

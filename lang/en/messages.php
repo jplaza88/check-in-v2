@@ -21,6 +21,12 @@ return [
         'logout' => 'Logout',
         'schedule' => 'Schedule',
         'contact' => 'Contact',
+        'services' => 'Services',
+        'company' => 'Company',
+        'legal' => 'Legal',
+        'privacyPolicy' => 'Privacy Policy',
+        'termsOfService' => 'Terms of Service',
+        'allRightsReserved' => 'All Rights Reserved',
     ],
 
     // Modal displayed when selecting location for either check-in or appointment

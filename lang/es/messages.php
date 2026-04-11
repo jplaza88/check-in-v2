@@ -20,6 +20,12 @@ return [
         'logout' => 'Cerrar sesión',
         'schedule' => 'Horario',
         'contact' => 'Contacto',
+        'services' => 'Servicios',
+        'company' => 'Empresa',
+        'legal' => 'Aviso legal',
+        'privacyPolicy' => 'Política de privacidad',
+        'termsOfService' => 'Términos del servicio',
+        'allRightsReserved' => 'Todos los derechos reservados',
     ],
 
     'locationRequiredModal' => [

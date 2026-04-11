@@ -4,6 +4,15 @@ import Logo from '@/components/Logo';
 interface PublicNavigation {
     checkIn: string;
     appointment: string;
+    services: string;
+    company: string;
+    termsOfService: string;
+    privacyPolicy: string;
+    schedule: string;
+    contact: string;
+    allRightsReserved: string;
+    legal: string;
+    login: string;
 }
 
 interface Translations {
@@ -20,29 +29,88 @@ export default function Footer() {
 
     const { translations } = usePage<PageProps>().props;
 
+    const pageTranslations: PublicNavigation = translations.publicNavigation;
+
     return (
         <footer className="w-full border-t border-gray-200/80 bg-white/95 dark:border-gray-700/50 dark:bg-gray-900/95">
-            <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6 text-sm">
-                <Logo size="sm" />
+            <div className="mx-auto max-w-7xl px-6 py-8">
+                <div className="mb-8 grid grid-cols-2 gap-8 sm:grid-cols-3">
+                    <div>
+                        <p className="mb-3 text-xs font-medium tracking-widest text-gray-400 uppercase">
+                            {pageTranslations.services}
+                        </p>
+                        <div className="flex flex-col gap-2.5">
+                            <Link
+                                href="#"
+                                className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                            >
+                                {translations.publicNavigation.checkIn}
+                            </Link>
+                            <Link
+                                href="#"
+                                className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                            >
+                                {translations.publicNavigation.appointment}
+                            </Link>
+                        </div>
+                    </div>
 
-                <div className="flex items-center gap-6 text-gray-400 dark:text-gray-500">
-                    <Link
-                        href="#"
-                        className="transition-colors hover:text-brand-green"
-                    >
-                        {translations.publicNavigation.checkIn}
-                    </Link>
-                    <Link
-                        href="#"
-                        className="transition-colors hover:text-brand-green"
-                    >
-                        { translations.publicNavigation.appointment }
-                    </Link>
+                    <div>
+                        <p className="mb-3 text-xs font-medium tracking-widest text-gray-400 uppercase">
+                            {pageTranslations.company}
+                        </p>
+                        <div className="flex flex-col gap-2.5">
+                            <Link
+                                href="#"
+                                className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                            >
+                                {pageTranslations.schedule}
+                            </Link>
+                            <Link
+                                href="#"
+                                className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                            >
+                                {pageTranslations.contact}
+                            </Link>
+                            <Link
+                                href="#"
+                                className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                            >
+                                {pageTranslations.login}
+                            </Link>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p className="mb-3 text-xs font-medium tracking-widest text-gray-400 uppercase">
+                            {pageTranslations.legal}
+                        </p>
+                        <div className="flex flex-col gap-2.5">
+                            <Link
+                                href="#"
+                                className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                            >
+                                {pageTranslations.privacyPolicy}
+                            </Link>
+                            <Link
+                                href="#"
+                                className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                            >
+                                {pageTranslations.termsOfService}
+                            </Link>
+                        </div>
+                    </div>
                 </div>
 
-                <span className="text-xs text-gray-400 dark:text-gray-500">
-                    © {new Date().getFullYear()} {appName} All Rights Reserved.
-                </span>
+                <div className="flex items-center justify-between border-t border-gray-200/80 pt-4 dark:border-gray-700/50">
+                    {/* Logo links home */}
+                    <Link href="/">
+                        <Logo size="sm" />
+                    </Link>
+                    <span className="text-xs text-gray-400">
+                        © {new Date().getFullYear()} {appName}. {pageTranslations.allRightsReserved}.
+                    </span>
+                </div>
             </div>
         </footer>
     );
