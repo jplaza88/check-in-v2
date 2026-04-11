@@ -10,6 +10,9 @@ interface CheckInTranslations {
     closed: string;
     open: string;
     nearest: string;
+    closingSoon: string;
+    specialHoursToday: string;
+    closedToday: string;
 }
 
 interface Translations {
@@ -161,9 +164,9 @@ export default function SelectLocation() {
                                                     <span
                                                         title={
                                                             location.reason ??
-                                                            'Closed today'
+                                                            pageTranslations.closedToday
                                                         }
-                                                        aria-label={`Closed today: ${location.reason ?? 'Closed today'}`}
+                                                        aria-label={`Closed today: ${location.reason ?? pageTranslations.closedToday}`}
                                                         className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-700 dark:text-red-400"
                                                     >
                                                         <svg
@@ -174,7 +177,7 @@ export default function SelectLocation() {
                                                             <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
                                                         </svg>
                                                         {location.reason ??
-                                                            'Closed today'}
+                                                            pageTranslations.closedToday}
                                                     </span>
                                                 </div>
                                             ) : location.hasException ? (
@@ -182,9 +185,9 @@ export default function SelectLocation() {
                                                     <span
                                                         title={
                                                             location.reason ??
-                                                            'Special hours today'
+                                                            pageTranslations.specialHoursToday
                                                         }
-                                                        aria-label={`Schedule exception: ${location.reason ?? 'Special hours today'}`}
+                                                        aria-label={`Special Hours: ${location.reason ?? pageTranslations.specialHoursToday}`}
                                                         className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-400"
                                                     >
                                                         <svg
@@ -194,14 +197,14 @@ export default function SelectLocation() {
                                                         >
                                                             <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
                                                         </svg>
-                                                        Special hours
+                                                        {location.reason ?? pageTranslations.specialHoursToday }
                                                     </span>
                                                 </div>
                                             ) : location.isClosingSoon ? (
                                                 <div className="mb-3">
                                                     <span
                                                         aria-label="Closing soon"
-                                                        className="inline-flex items-center gap-1 rounded-full bg-orange-500/15 px-2.5 py-1 text-xs font-medium text-orange-700 dark:text-orange-400"
+                                                        className="inline-flex items-center gap-1 rounded-full bg-purple-500/15 px-2.5 py-1 text-xs font-medium text-purple-700 dark:text-purple-400"
                                                     >
                                                         <svg
                                                             xmlns="http://www.w3.org/2000/svg"
@@ -210,7 +213,7 @@ export default function SelectLocation() {
                                                         >
                                                             <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 2a.75.75 0 0 1 .75.75V8a.75.75 0 0 1-.22.53l-2 2a.75.75 0 1 1-1.06-1.06L7.25 7.69V3.75A.75.75 0 0 1 8 3z" />
                                                         </svg>
-                                                        Closing soon
+                                                        { pageTranslations.closingSoon }
                                                     </span>
                                                 </div>
                                             ) : null}
@@ -231,12 +234,13 @@ export default function SelectLocation() {
                                                 >
                                                     {location.todayOpenCloseTime ??
                                                         (location.hasException
-                                                            ? 'Closed today'
-                                                            : 'Hours unavailable')}
+                                                            ? pageTranslations.closedToday
+                                                            : '')}
                                                 </span>
 
+                                                {/* Open/Closed badge */}
                                                 {location.isOpen ? (
-                                                    <span className="inline-flex rounded-full bg-green-500/20 px-2.5 py-1 text-xs font-medium text-green-700">
+                                                    <span className="inline-flex rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-brand-green">
                                                         {pageTranslations.open}
                                                     </span>
                                                 ) : (
@@ -247,10 +251,11 @@ export default function SelectLocation() {
                                                     </span>
                                                 )}
 
+                                                {/* Nearest badge */}
                                                 {idx === 0 && (
                                                     <span
                                                         aria-label="Nearest location"
-                                                        className="inline-flex rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-brand-green"
+                                                        className="inline-flex rounded-full bg-blue-500/10 px-2.5 py-1 text-xs font-medium text-blue-600 dark:text-blue-400"
                                                     >
                                                         {
                                                             pageTranslations.nearest

@@ -38,6 +38,9 @@ return [
         'closed' => 'Closed',
         'open' => 'Open',
         'nearest' => 'Nearest',
+        'specialHoursToday' => 'Special hours today',
+        'closingSoon' => 'Closing soon',
+        'closedToday' => 'Closed today',
     ],
 
     'appointmentSelectLocation' => [
@@ -45,5 +48,8 @@ return [
         'closed' => 'Closed',
         'open' => 'Open',
         'nearest' => 'Nearest',
+        'specialHoursToday' => 'Special hours today',
+        'closingSoon' => 'Closing soon',
+        'closedToday' => 'Closed today',
     ],
 ];

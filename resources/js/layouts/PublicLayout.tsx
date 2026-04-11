@@ -38,7 +38,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                             <Navbar />
                         </div>
 
-                        <div className="flex flex-1 items-center px-4 py-0 sm:py-8">
+                        <div className="flex flex-1 items-center px-4 py-4">
                             <div className="mx-auto w-full max-w-md">
                                 {children}
                             </div>

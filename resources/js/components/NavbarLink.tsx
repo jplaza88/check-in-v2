@@ -15,6 +15,8 @@ export default function NavbarLink({ href, name, activeRoute
 }: NavbarLinkProps) {
     const { currentRoute } = usePage<PageProps>().props;
 
+    console.log(currentRoute)
+
     const isActive = currentRoute === activeRoute;
 
     return (

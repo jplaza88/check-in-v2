@@ -18,8 +18,8 @@ class HandleInertiaRequests extends Middleware
 
     private const array PUBLIC_NAV_ROUTES = [
         'appointment.selectLocation',
-        'checkin.selectLocation',
-        // 'checkin.*',
+        'checkIn.selectLocation',
+        // 'checkIn.*',
         // 'appointment.*',
     ];
 

@@ -32,9 +32,18 @@ return [
         'closed' => 'Fermé',
         'open' => 'Ouvert',
         'nearest' => 'Le plus proche',
+        'specialHoursToday' => 'Horaires spéciaux aujourd’hui',
+        'closingSoon' => 'Ferme bientôt',
+        'closedToday' => 'Fermé aujourd’hui',
     ],
 
     'appointmentSelectLocation' => [
         'selectAnAppointmentLocation' => 'Sélectionnez un lieu de rendez-vous',
+        'closed' => 'Fermé',
+        'open' => 'Ouvert',
+        'nearest' => 'Le plus proche',
+        'specialHoursToday' => 'Horaires spéciaux aujourd’hui',
+        'closingSoon' => 'Ferme bientôt',
+        'closedToday' => 'Fermé aujourd’hui',
     ],
 ];
