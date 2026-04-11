@@ -1,4 +1,8 @@
 import { Head, usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import LocationDistanceController from '@/actions/App/Http/Controllers/LocationDistanceController';
+import { useGeolocation } from '@/hooks/useGeolocation';
 import PublicLayout from '@/layouts/PublicLayout';
 
 type Context = 'checkin' | 'appointment';
@@ -23,7 +27,7 @@ interface Translations {
 }
 
 interface PageProps {
-    locations: [];
+    locations: Location[];
     translations: Translations;
     context: Context;
     [key: string]: unknown;
@@ -31,15 +35,15 @@ interface PageProps {
 
 interface Location {
     id: number | string;
-    locationName: string;
+    name: string;
     address: string;
-    userDistance: number;
     todayOpenCloseTime: string | null;
     isOpen: boolean;
     hasException: boolean;
     reason: string | null;
     isExceptionClosure: boolean;
     isClosingSoon: boolean;
+    distance?: number | null; // Retrieved after page render
 }
 
 type LocationTexts = {
@@ -76,124 +80,53 @@ function getSelectLocationTexts(props: {
     }
 }
 
-const STATIC_LOCATIONS: Location[] = [
-    {
-        id: 'eddystone-penn-terminals',
-        locationName: 'Eddystone, PA - Penn Terminals',
-        address: '1 Saville Avenue, Eddystone, PA 19022',
-        userDistance: 155.0,
-        todayOpenCloseTime: null,
-        isOpen: false,
-        hasException: true,
-        reason: 'New Year',
-        isExceptionClosure: true,
-        isClosingSoon: false,
-    },
-    {
-        id: 'pompano-sol-group',
-        locationName: 'Pompano Beach, FL - Sol Group Marketing',
-        address: '1751 SW 8th Street, Pompano Beach, FL 33069',
-        userDistance: 1117.2,
-        todayOpenCloseTime: '07:00 AM - 07:00 AM EDT',
-        isOpen: false,
-        hasException: false,
-        reason: null,
-        isExceptionClosure: false,
-        isClosingSoon: false,
-    },
-    {
-        id: 'oxnard-channel-islands',
-        locationName: 'Oxnard Beach, CA - Channel Islands Logistics',
-        address: '5655 Arcturus Avenue, Oxnard Beach, CA 93033',
-        userDistance: 2536.0,
-        todayOpenCloseTime: '07:00 AM - 12:00 AM PDT',
-        isOpen: true,
-        hasException: false,
-        reason: null,
-        isExceptionClosure: false,
-        isClosingSoon: true,
-    },
-    {
-        id: 'baytown-foremost-fresh-direct',
-        locationName: 'Baytown, TX - Foremost Fresh Direct',
-        address: '4203 Cedar Boulevard, Baytown, TX 77523',
-        userDistance: 0,
-        todayOpenCloseTime: '07:00 AM - 07:00 AM CDT',
-        isOpen: false,
-        hasException: false,
-        reason: null,
-        isExceptionClosure: false,
-        isClosingSoon: false,
-    },
-    {
-        id: 'firebaugh-ca',
-        locationName: 'Firebaugh, CA',
-        address: '6879 N. Washoe Avenue, Firebaugh, CA 93622',
-        userDistance: 0,
-        todayOpenCloseTime: '07:00 AM - 07:00 AM PDT',
-        isOpen: false,
-        hasException: false,
-        reason: null,
-        isExceptionClosure: false,
-        isClosingSoon: false,
-    },
-    {
-        id: 'aguila-az',
-        locationName: 'Aguila, AZ',
-        address: '51240 Valley Road, Aguila, AZ 85320',
-        userDistance: 0,
-        todayOpenCloseTime: '07:00 AM - 07:00 AM MST',
-        isOpen: false,
-        hasException: false,
-        reason: null,
-        isExceptionClosure: false,
-        isClosingSoon: false,
-    },
-    {
-        id: 'maricopa-az',
-        locationName: 'Maricopa, AZ',
-        address: '9254 N. Ralston Road, Maricopa, AZ 85139',
-        userDistance: 0,
-        todayOpenCloseTime: '07:00 AM - 07:00 AM MST',
-        isOpen: false,
-        hasException: false,
-        reason: null,
-        isExceptionClosure: false,
-        isClosingSoon: false,
-    },
-    {
-        id: 'tonopah-az-court-house',
-        locationName: 'Tonopah, AZ - Court House',
-        address: '53931 W. Lower Buckey Road, Tonopah, AZ 85354',
-        userDistance: 0,
-        todayOpenCloseTime: '07:00 AM - 07:00 AM MST',
-        isOpen: false,
-        hasException: false,
-        reason: null,
-        isExceptionClosure: false,
-        isClosingSoon: false,
-    },
-    {
-        id: 'salinas-ca',
-        locationName: 'Salinas, CA',
-        address: '850 Work Street, Salinas, CA 93901',
-        userDistance: 0,
-        todayOpenCloseTime: '07:00 AM - 07:00 AM PDT',
-        isOpen: false,
-        hasException: false,
-        reason: null,
-        isExceptionClosure: false,
-        isClosingSoon: false,
-    },
-];
-
 export default function SelectLocation() {
     const { translations, context, locations } = usePage<PageProps>().props;
-
-    console.log(locations)
-
-    // Get all context-specific texts
     const pageTranslations = getSelectLocationTexts({ translations, context });
+    const [sortedLocations, setSortedLocations] = useState<Location[] | null>(null);
+    const { coords, loading } = useGeolocation({ enabled: context === 'checkin' });
+
+    useEffect(() => {
+        if (!coords) {
+            return;
+        }
+
+        axios
+            .post(LocationDistanceController().url, {
+                latitude: coords.latitude,
+                longitude: coords.longitude,
+            })
+            .then(({ data }) => {
+
+                // Attach the user distance to locations and keep the same sort order
+                const distanceMap = new Map(
+                    data.locations.map(
+                        ({
+                            id,
+                            distance,
+                        }: {
+                            id: string;
+                            distance: number;
+                        }) => [id, distance],
+                    ),
+                );
+
+                const merged = data.locations
+                    .map(({ id }: { id: string }) => {
+                        const location = locations.find((l) => l.id === id);
+
+                        return location
+                            ? {
+                                  ...location,
+                                  distance: distanceMap.get(id) ?? null,
+                              }
+                            : null;
+                    })
+                    .filter(Boolean);
+
+                setSortedLocations(merged);
+            });
+    }, [coords]);
 
     return (
         <PublicLayout>
@@ -207,7 +140,7 @@ export default function SelectLocation() {
 
                     <div className="space-y-3">
                         {/* Skeleton */}
-                        {STATIC_LOCATIONS.length === 0 &&
+                        {(loading || sortedLocations === null) &&
                             Array.from({ length: 3 }).map((_, i) => (
                                 <div
                                     key={i}
@@ -227,148 +160,154 @@ export default function SelectLocation() {
                             ))}
 
                         {/* Locations List */}
-                        {STATIC_LOCATIONS.map((location, idx) => (
-                            <button
-                                key={location.id}
-                                className="relative block w-full focus:outline-none"
-                                aria-label={`Check-in at ${location.locationName}, ${location.address}`}
-                            >
-                                <div
-                                    className={`flex min-h-22 items-stretch rounded-lg border p-4 text-sm font-medium shadow-sm transition ${
-                                        idx === 0
-                                            ? 'border-brand-green/40 bg-white dark:border-brand-green/30 dark:bg-gray-800'
-                                            : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700/60 dark:bg-gray-800 dark:hover:border-gray-600'
-                                    }`}
+                        {sortedLocations !== null &&
+                            sortedLocations.map((location, idx) => (
+                                <button
+                                    key={location.id}
+                                    className="relative block w-full focus:outline-none"
+                                    aria-label={`Check-in at ${location.name}, ${location.address}`}
                                 >
-                                    {/* Icon + Distance */}
-                                    <div className="mr-4 flex w-10 shrink-0 flex-col items-center justify-center">
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            viewBox="0 0 384 512"
-                                            className={`h-6 w-6 fill-current ${idx === 0 ? 'text-brand-green' : 'text-gray-400 dark:text-gray-500'}`}
-                                        >
-                                            <path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z" />
-                                        </svg>
-                                        <span
-                                            aria-label={`Distance: ${location.userDistance} miles`}
-                                            className="mt-1 min-w-13 text-center text-xs text-gray-500 dark:text-gray-400"
-                                        >
-                                            {location.userDistance.toLocaleString(
-                                                'en-US',
-                                                {
-                                                    minimumFractionDigits: 1,
-                                                    maximumFractionDigits: 1,
-                                                },
-                                            )}{' '}
-                                            mi
-                                        </span>
-                                    </div>
-
-                                    {/* Text */}
-                                    <div className="flex flex-1 flex-col justify-center gap-0.5 text-left">
-                                        {/* Exception / Closing Soon badge — mutually exclusive, above name */}
-                                        {location.isExceptionClosure ? (
-                                            <div className="mb-3">
-                                                <span
-                                                    title={
-                                                        location.reason ??
-                                                        'Closed today'
-                                                    }
-                                                    aria-label={`Closed today: ${location.reason ?? 'Closed today'}`}
-                                                    className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-700 dark:text-red-400"
-                                                >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        viewBox="0 0 16 16"
-                                                        className="h-3 w-3 fill-current"
-                                                    >
-                                                        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
-                                                    </svg>
-                                                    {location.reason ??
-                                                        'Closed today'}
-                                                </span>
-                                            </div>
-                                        ) : location.hasException ? (
-                                            <div className="mb-3">
-                                                <span
-                                                    title={
-                                                        location.reason ??
-                                                        'Special hours today'
-                                                    }
-                                                    aria-label={`Schedule exception: ${location.reason ?? 'Special hours today'}`}
-                                                    className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-400"
-                                                >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        viewBox="0 0 16 16"
-                                                        className="h-3 w-3 fill-current"
-                                                    >
-                                                        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
-                                                    </svg>
-                                                    Special hours
-                                                </span>
-                                            </div>
-                                        ) : location.isClosingSoon ? (
-                                            <div className="mb-3">
-                                                <span
-                                                    aria-label="Closing soon"
-                                                    className="inline-flex items-center gap-1 rounded-full bg-orange-500/15 px-2.5 py-1 text-xs font-medium text-orange-700 dark:text-orange-400"
-                                                >
-                                                    <svg
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                        viewBox="0 0 16 16"
-                                                        className="h-3 w-3 fill-current"
-                                                    >
-                                                        <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 2a.75.75 0 0 1 .75.75V8a.75.75 0 0 1-.22.53l-2 2a.75.75 0 1 1-1.06-1.06L7.25 7.69V3.75A.75.75 0 0 1 8 3z" />
-                                                    </svg>
-                                                    Closing soon
-                                                </span>
-                                            </div>
-                                        ) : null}
-
-                                        <div
-                                            className={`font-semibold ${idx === 0 ? 'text-gray-900 dark:text-gray-100' : 'text-gray-800 dark:text-gray-100'}`}
-                                        >
-                                            {location.locationName}
-                                        </div>
-                                        <div className="text-sm text-gray-600 dark:text-gray-300">
-                                            {location.address}
-                                        </div>
-
-                                        {/* Hours + Open/Closed + Nearest */}
-                                        <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                            <span
-                                                aria-label={`Hours of operation: ${location.todayOpenCloseTime}`}
+                                    <div
+                                        className={`flex min-h-22 items-stretch rounded-lg border p-4 text-sm font-medium shadow-sm transition ${
+                                            idx === 0
+                                                ? 'border-brand-green/40 bg-white dark:border-brand-green/30 dark:bg-gray-800'
+                                                : 'border-gray-200 bg-white hover:border-gray-300 dark:border-gray-700/60 dark:bg-gray-800 dark:hover:border-gray-600'
+                                        }`}
+                                    >
+                                        {/* Icon + Distance */}
+                                        <div className="mr-4 flex w-10 shrink-0 flex-col items-center justify-center">
+                                            <svg
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                viewBox="0 0 384 512"
+                                                className={`h-6 w-6 fill-current ${idx === 0 ? 'text-brand-green' : 'text-gray-400 dark:text-gray-500'}`}
                                             >
-                                                {location.todayOpenCloseTime ??
-                                                    (location.hasException
-                                                        ? 'Closed today'
-                                                        : 'Hours unavailable')}
+                                                <path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z" />
+                                            </svg>
+                                            <span
+                                                aria-label={`Distance: ${location.distance} miles`}
+                                                className="mt-1 min-w-13 text-center text-xs text-gray-500 dark:text-gray-400"
+                                            >
+                                                {location.distance != null
+                                                    ? location.distance.toLocaleString(
+                                                          'en-US',
+                                                          {
+                                                              minimumFractionDigits: 1,
+                                                              maximumFractionDigits: 1,
+                                                          },
+                                                      ) + ' mi'
+                                                    : '- mi'}
                                             </span>
+                                        </div>
 
-                                            {location.isOpen ? (
-                                                <span className="inline-flex rounded-full bg-green-500/20 px-2.5 py-1 text-xs font-medium text-green-700">
-                                                    {pageTranslations.open}
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex rounded-full bg-red-500/20 px-2.5 py-1 text-xs font-medium text-red-700">
-                                                    {pageTranslations.closed}
-                                                </span>
-                                            )}
+                                        {/* Text */}
+                                        <div className="flex flex-1 flex-col justify-center gap-0.5 text-left">
+                                            {/* Exception / Closing Soon badge — mutually exclusive, above name */}
+                                            {location.isExceptionClosure ? (
+                                                <div className="mb-3">
+                                                    <span
+                                                        title={
+                                                            location.reason ??
+                                                            'Closed today'
+                                                        }
+                                                        aria-label={`Closed today: ${location.reason ?? 'Closed today'}`}
+                                                        className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-700 dark:text-red-400"
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 16 16"
+                                                            className="h-3 w-3 fill-current"
+                                                        >
+                                                            <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
+                                                        </svg>
+                                                        {location.reason ??
+                                                            'Closed today'}
+                                                    </span>
+                                                </div>
+                                            ) : location.hasException ? (
+                                                <div className="mb-3">
+                                                    <span
+                                                        title={
+                                                            location.reason ??
+                                                            'Special hours today'
+                                                        }
+                                                        aria-label={`Schedule exception: ${location.reason ?? 'Special hours today'}`}
+                                                        className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-400"
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 16 16"
+                                                            className="h-3 w-3 fill-current"
+                                                        >
+                                                            <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
+                                                        </svg>
+                                                        Special hours
+                                                    </span>
+                                                </div>
+                                            ) : location.isClosingSoon ? (
+                                                <div className="mb-3">
+                                                    <span
+                                                        aria-label="Closing soon"
+                                                        className="inline-flex items-center gap-1 rounded-full bg-orange-500/15 px-2.5 py-1 text-xs font-medium text-orange-700 dark:text-orange-400"
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            viewBox="0 0 16 16"
+                                                            className="h-3 w-3 fill-current"
+                                                        >
+                                                            <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 2a.75.75 0 0 1 .75.75V8a.75.75 0 0 1-.22.53l-2 2a.75.75 0 1 1-1.06-1.06L7.25 7.69V3.75A.75.75 0 0 1 8 3z" />
+                                                        </svg>
+                                                        Closing soon
+                                                    </span>
+                                                </div>
+                                            ) : null}
 
-                                            {idx === 0 && (
+                                            <div
+                                                className={`font-semibold ${idx === 0 ? 'text-gray-900 dark:text-gray-100' : 'text-gray-800 dark:text-gray-100'}`}
+                                            >
+                                                {location.name}
+                                            </div>
+                                            <div className="text-sm text-gray-600 dark:text-gray-300">
+                                                {location.address}
+                                            </div>
+
+                                            {/* Hours + Open/Closed + Nearest */}
+                                            <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                                                 <span
-                                                    aria-label="Nearest location"
-                                                    className="inline-flex rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-brand-green"
+                                                    aria-label={`Hours of operation: ${location.todayOpenCloseTime}`}
                                                 >
-                                                    {pageTranslations.nearest}
+                                                    {location.todayOpenCloseTime ??
+                                                        (location.hasException
+                                                            ? 'Closed today'
+                                                            : 'Hours unavailable')}
                                                 </span>
-                                            )}
+
+                                                {location.isOpen ? (
+                                                    <span className="inline-flex rounded-full bg-green-500/20 px-2.5 py-1 text-xs font-medium text-green-700">
+                                                        {pageTranslations.open}
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex rounded-full bg-red-500/20 px-2.5 py-1 text-xs font-medium text-red-700">
+                                                        {
+                                                            pageTranslations.closed
+                                                        }
+                                                    </span>
+                                                )}
+
+                                                {idx === 0 && (
+                                                    <span
+                                                        aria-label="Nearest location"
+                                                        className="inline-flex rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-brand-green"
+                                                    >
+                                                        {
+                                                            pageTranslations.nearest
+                                                        }
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </button>
-                        ))}
+                                </button>
+                            ))}
                     </div>
                 </div>
             </div>

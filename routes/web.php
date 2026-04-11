@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\LocationDistanceController;
 use App\Http\Controllers\SelectLocationController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,3 +35,6 @@ Route::middleware(['setLocale'])
             ->defaults('context', 'appointment')
             ->name('appointment.selectLocation');
     });
+
+Route::post('/check-in/location-distance', LocationDistanceController::class)
+    ->name('checkIn.locationDistance');
