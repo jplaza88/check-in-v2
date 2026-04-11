@@ -77,10 +77,14 @@ export default function AppointmentSelectLocation() {
                                     aria-label={`Book appointment at ${location.name}, ${location.address}`}
                                 >
                                     <div
-                                        className={`'border-gray-200 dark:hover:border-gray-600'} flex min-h-22 items-stretch rounded-lg border bg-white p-4 text-sm font-medium shadow-sm transition hover:border-gray-300 dark:border-gray-700/60 dark:bg-gray-800`}
+                                        className={`flex min-h-22 items-stretch rounded-lg border bg-white text-sm font-medium shadow-sm transition hover:border-gray-300 dark:border-gray-700/60 dark:bg-gray-800 dark:hover:border-gray-600 ${
+                                            location.isOpen
+                                                ? 'border-l-4 border-l-brand-green'
+                                                : 'border-l-4 border-l-red-400'
+                                        }`}
                                     >
                                         {/* Text */}
-                                        <div className="flex flex-1 flex-col justify-center gap-0.5 text-left">
+                                        <div className="flex flex-1 flex-col justify-center gap-0.5 p-4 text-left">
                                             {/* Exception / Closing Soon badge — mutually exclusive, above name */}
                                             {location.isExceptionClosure ? (
                                                 <div className="mb-3">
@@ -120,7 +124,8 @@ export default function AppointmentSelectLocation() {
                                                         >
                                                             <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
                                                         </svg>
-                                                        { location.reason ?? pageTranslations.specialHoursToday }
+                                                        {location.reason ??
+                                                            pageTranslations.specialHoursToday}
                                                     </span>
                                                 </div>
                                             ) : location.isClosingSoon ? (
