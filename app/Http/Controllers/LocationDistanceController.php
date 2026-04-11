@@ -35,7 +35,7 @@ class LocationDistanceController extends Controller
                     (float) $location->address->longitude,
                 ),
             ))
-            ->sortBy('distance')
+            ->sortBy('userDistance')
             ->values();
 
         return response()->json(['locations' => $distances]);
