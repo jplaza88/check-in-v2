@@ -41,6 +41,10 @@ return [
         'specialHoursToday' => 'Horario especial hoy',
         'closingSoon' => 'Cierra pronto',
         'closedToday' => 'Cerrado hoy',
+        'geolocationErrorMessage' => 'No se pudo obtener tu ubicación. Por favor, habilita el acceso a la ubicación en la configuración de tu navegador y actualiza la página.',
+        'geolocationErrorTitle' => 'Acceso a la ubicación denegado',
+        'geolocationNotSupportedMessage' => 'La geolocalización no es compatible con este navegador.',
+        'geolocationNotSupportedTitle' => 'Navegador no compatible',
     ],
 
     'appointmentSelectLocation' => [

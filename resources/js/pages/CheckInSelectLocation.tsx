@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import LocationDistanceController from '@/actions/App/Http/Controllers/LocationDistanceController';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import PublicLayout from '@/layouts/PublicLayout';
+import AlertBanner from '@/components/AlertBanner';
 
 interface CheckInTranslations {
     selectACheckInLocation: string;
@@ -13,6 +14,10 @@ interface CheckInTranslations {
     closingSoon: string;
     specialHoursToday: string;
     closedToday: string;
+    geolocationErrorMessage: string;
+    geolocationErrorTitle: string;
+    geolocationNotSupportedMessage: string;
+    geolocationNotSupportedTitle: string;
 }
 
 interface Translations {
@@ -42,10 +47,23 @@ export default function SelectLocation() {
     const { translations, locations } = usePage<PageProps>().props;
     const pageTranslations: CheckInTranslations = translations.checkInSelectLocation;
     const [sortedLocations, setSortedLocations] = useState<Location[] | null>(null);
-    const { coords, loading } = useGeolocation();
+    const { coords, loading, error, warning } = useGeolocation();
 
+    // Alert banners
+    const [geoLocationErrorBannerOpen, setGeoLocationErrorBannerOpen] = useState(false);
+    const [geoLocationNotSupportedBannerOpen, setGeooLocationNotSupportedBannerOpen] = useState(false);
+    const [checkInBannerOpen, setCheckInBannerOpen] = useState(false);
+
+    // Hook to retrieve user geolocation coordinates
     useEffect(() => {
         if (!coords) {
+            if (error) {
+                // eslint-disable-next-line react-hooks/set-state-in-effect
+                setGeoLocationErrorBannerOpen(true);
+
+                return;
+            }
+
             return;
         }
 
@@ -83,7 +101,7 @@ export default function SelectLocation() {
 
                 setSortedLocations(merged);
             });
-    }, [coords]);
+    }, [coords, error]);
 
     return (
         <PublicLayout>
@@ -96,6 +114,41 @@ export default function SelectLocation() {
                     </h1>
 
                     <div className="space-y-3">
+                        {/* Alert Banner for errors, warning and etc. */}
+
+                        {/* Geolocation error */}
+                        <AlertBanner
+                            type="error"
+                            title={pageTranslations.geolocationErrorTitle}
+                            open={geoLocationErrorBannerOpen}
+                            onClose={() => setGeoLocationErrorBannerOpen(false)}
+                        >
+                            {pageTranslations.geolocationErrorMessage}
+                        </AlertBanner>
+
+                        {/* Geolocation warning */}
+                        <AlertBanner
+                            type="warning"
+                            title={
+                                pageTranslations.geolocationNotSupportedTitle
+                            }
+                            open={!!warning}
+                            onClose={() => setGeooLocationNotSupportedBannerOpen(false)}
+                        >
+                            {pageTranslations.geolocationNotSupportedMessage}
+                        </AlertBanner>
+
+                        {/* Check-in exception */}
+                        <AlertBanner
+                            type="error"
+                            title="Unable to complete check-in"
+                            open={checkInBannerOpen}
+                            onClose={() => setCheckInBannerOpen(false)}
+                        >
+                            Something went wrong processing your check-in.
+                            Please try again or contact support.
+                        </AlertBanner>
+
                         {/* Skeleton */}
                         {(loading || sortedLocations === null) &&
                             Array.from({ length: 3 }).map((_, i) => (
@@ -115,7 +168,6 @@ export default function SelectLocation() {
                                     <div className="h-5 w-14 self-start rounded-full bg-gray-300 dark:bg-gray-700" />
                                 </div>
                             ))}
-
                         {/* Locations List */}
                         {sortedLocations !== null &&
                             sortedLocations.map((location, idx) => (
@@ -197,7 +249,8 @@ export default function SelectLocation() {
                                                         >
                                                             <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
                                                         </svg>
-                                                        {location.reason ?? pageTranslations.specialHoursToday }
+                                                        {location.reason ??
+                                                            pageTranslations.specialHoursToday}
                                                     </span>
                                                 </div>
                                             ) : location.isClosingSoon ? (
@@ -213,7 +266,9 @@ export default function SelectLocation() {
                                                         >
                                                             <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 2a.75.75 0 0 1 .75.75V8a.75.75 0 0 1-.22.53l-2 2a.75.75 0 1 1-1.06-1.06L7.25 7.69V3.75A.75.75 0 0 1 8 3z" />
                                                         </svg>
-                                                        { pageTranslations.closingSoon }
+                                                        {
+                                                            pageTranslations.closingSoon
+                                                        }
                                                     </span>
                                                 </div>
                                             ) : null}

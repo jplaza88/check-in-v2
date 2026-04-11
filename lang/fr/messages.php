@@ -41,6 +41,10 @@ return [
         'specialHoursToday' => 'Horaires spéciaux aujourd’hui',
         'closingSoon' => 'Ferme bientôt',
         'closedToday' => 'Fermé aujourd’hui',
+        'geolocationErrorMessage' => 'Impossible de récupérer votre position. Veuillez activer l’accès à la localisation dans les paramètres de votre navigateur et actualiser la page.',
+        'geolocationErrorTitle' => 'Accès à la localisation refusé',
+        'geolocationNotSupportedMessage' => 'La géolocalisation n’est pas prise en charge par ce navigateur.',
+        'geolocationNotSupportedTitle' => 'Navigateur non pris en charge',
     ],
 
     'appointmentSelectLocation' => [

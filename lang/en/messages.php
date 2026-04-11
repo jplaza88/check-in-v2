@@ -47,6 +47,10 @@ return [
         'specialHoursToday' => 'Special hours today',
         'closingSoon' => 'Closing soon',
         'closedToday' => 'Closed today',
+        'geolocationErrorMessage' => 'Unable to retrieve your location. Please enable location access in your browser settings and refresh the page.',
+        'geolocationErrorTitle' => 'Location access denied',
+        'geolocationNotSupportedMessage' => 'Geolocation is not supported by this browser.',
+        'geolocationNotSupportedTitle' => 'Browser not supported',
     ],
 
     'appointmentSelectLocation' => [

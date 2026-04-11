@@ -10,6 +10,7 @@ interface GeolocationState {
     coords: Coords | null;
     loading: boolean;
     error: GeolocationPositionError | null;
+    warning: string | null;
 }
 
 const DEFAULT_OPTIONS: PositionOptions = {
@@ -25,6 +26,7 @@ export function useGeolocation(
         coords: null,
         loading: true,
         error: null,
+        warning: null,
     });
 
     useEffect(() => {
@@ -39,14 +41,21 @@ export function useGeolocation(
                 },
                 loading: false,
                 error: null,
+                warning: null,
             });
 
             return;
         }
 
         if (!navigator.geolocation) {
-            console.warn('Geolocation is not supported by this browser.');
-            setState((prev) => ({ ...prev, loading: false }));
+            const message = 'Geolocation is not supported by this browser.';
+            console.warn(message);
+            setState({
+                coords: null,
+                loading: false,
+                error: null,
+                warning: message,
+            });
 
             return;
         }
@@ -60,11 +69,13 @@ export function useGeolocation(
                 },
                 loading: false,
                 error: null,
+                warning: null,
             });
         };
 
         const error = (err: GeolocationPositionError) => {
-            setState({ coords: null, loading: false, error: err });
+            setState({ coords: null, loading: false, error: err, warning: null });
+            console.error(err);
         };
 
         navigator.geolocation.getCurrentPosition(success, error, options);
