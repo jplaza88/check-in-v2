@@ -10,6 +10,7 @@ import checkIn from "@/routes/checkIn";
 interface PublicNavigation {
     checkIn: string;
     appointment: string;
+    login: string;
 }
 
 interface Translations {
@@ -54,6 +55,7 @@ export default function Navbar() {
 
                     <div className="hidden h-5 w-px bg-gray-200 lg:block dark:bg-gray-700" />
 
+                    {/* Desktop links */}
                     <div className="hidden items-center gap-6 text-sm lg:flex">
                         <NavbarLink
                             href={checkIn.selectLocation().url}
@@ -64,6 +66,11 @@ export default function Navbar() {
                             href={appointment.selectLocation().url}
                             name={nav.appointment}
                             activeRoute="appointment.selectLocation"
+                        />
+                        <NavbarLink
+                            href="#"
+                            name={nav.login}
+                            activeRoute="login"
                         />
                     </div>
                 </div>
@@ -100,61 +107,48 @@ export default function Navbar() {
                     {/* Theme toggle — moved to the right of lang */}
                     <ThemeToggle />
 
+                    {/* Animated hamburger */}
                     <button
                         onClick={() => setIsOpen(!isOpen)}
                         className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-brand-grey-link hover:bg-gray-100 focus:outline-none lg:hidden dark:hover:bg-gray-800"
                         aria-label="Toggle navigation menu"
                     >
-                        {isOpen ? (
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="1.5"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
-                        ) : (
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="1.5"
-                                    d="M4 6h16M4 12h16M4 18h16"
-                                />
-                            </svg>
-                        )}
+                        <div className="relative h-4 w-5">
+                            <span
+                                className={`absolute left-0 h-0.5 w-full bg-current transition-all duration-300 ease-in-out ${isOpen ? 'top-1.5 rotate-45' : 'top-0'}`}
+                            />
+                            <span
+                                className={`absolute top-1.5 left-0 h-0.5 w-full bg-current transition-all duration-300 ease-in-out ${isOpen ? 'translate-x-2 opacity-0' : 'opacity-100'}`}
+                            />
+                            <span
+                                className={`w-current absolute left-0 h-0.5 bg-current transition-all duration-300 ease-in-out ${isOpen ? 'top-1.5 w-full -rotate-45' : 'top-3 w-full'}`}
+                            />
+                        </div>
                     </button>
                 </div>
             </div>
 
             {/* Mobile menu */}
             {isOpen && (
-                <div className="border-t border-gray-100 px-6 py-3 lg:hidden dark:border-gray-800">
-                    <div className="flex flex-col gap-1">
-                        <NavbarLink
-                            href={checkIn.selectLocation().url}
-                            name={nav.checkIn}
-                            activeRoute="checkIn.selectLocation"
-                        />
-                        <NavbarLink
-                            href={appointment.selectLocation().url}
-                            name={nav.appointment}
-                            activeRoute="appointment.selectLocation"
-                        />
-                    </div>
+                <div className="flex flex-col border-t border-gray-100 px-6 py-4 dark:border-gray-800">
+                    <NavbarLink
+                        href={checkIn.selectLocation().url}
+                        name={nav.checkIn}
+                        activeRoute="checkIn.selectLocation"
+                        variant="mobile"
+                    />
+                    <NavbarLink
+                        href={appointment.selectLocation().url}
+                        name={nav.appointment}
+                        activeRoute="appointment.selectLocation"
+                        variant="mobile"
+                    />
+                    <NavbarLink
+                        href="/login"
+                        name={nav.login}
+                        activeRoute="login"
+                        variant="mobile"
+                    />
                 </div>
             )}
         </nav>
