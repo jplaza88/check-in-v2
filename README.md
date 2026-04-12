@@ -26,11 +26,23 @@ A web application that manages truck drivers' check-in's across Martori Farms lo
 | Octane | High-performance application server (FrankenPHP)           |
 | Pint | PHP code style fixer (Wrapper built ontop of PHP-CS-Fixer) |
 | Larastan | Static analysis (PHPStan for Laravel)                      |
+| Nginx | Local reverse proxy for SSL termination |
+| mkcert | Local SSL certificate generation |
 
 ## Requirements
 
 - [Composer](https://getcomposer.org/)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+- [mkcert](https://github.com/FiloSottile/mkcert) — for local SSL certificates
+
+```bash
+# Install Composer (macOS)
+brew install composer
+
+# Install mkcert (macOS)
+brew install mkcert
+mkcert -install
+```
 
 ## Installation
 
@@ -44,14 +56,28 @@ composer install
 # 3. Copy environment file
 cp .env.example .env
 
-# 4. Start Docker containers
+# 4. Add local hostname — macOS/Linux only
+echo "127.0.0.1 martori.vm" | sudo tee -a /etc/hosts
+
+# 5. Generate local SSL certificate
+mkdir -p environments/local/certs
+mkcert -key-file environments/local/certs/martori.vm.key \
+       -cert-file environments/local/certs/martori.vm.crt martori.vm
+
+# 6. Trust the certificate
+# macOS:
+sudo security add-trusted-cert -d -r trustRoot \
+     -k /Library/Keychains/System.keychain \
+     environments/local/certs/martori.vm.crt
+
+# 7. Start Docker containers
 ./vendor/bin/sail up -d
 
-# 5. Install and build frontend dependencies
+# 8. Install and build frontend dependencies
 ./vendor/bin/sail npm install
 ./vendor/bin/sail npm run dev   # or: npm run build
 
-# 6. Run migrations and seeders
+# 9. Run migrations and seeders
 ./vendor/bin/sail artisan migrate --seed
 ```
 
@@ -59,7 +85,7 @@ cp .env.example .env
 
 | Service | URL |
 |---|---|
-| Web application | https://localhost |
+| Web application | https://martori.vm |
 | Mailpit inbox | http://localhost:8025 |
 
 ## Development
@@ -79,4 +105,5 @@ cp .env.example .env
 ./vendor/bin/sail artisan test                                                             # via Artisan
 ./vendor/bin/sail php vendor/bin/pest                                                      # via Pest directly
 ./vendor/bin/sail php vendor/bin/pest --filter "switches locale when locale is available"  # run a specific test
+./vendor/bin/sail php vendor/bin/pest tests/Unit/LocaleSwitchTest.php                      # run a specific test
 ```
