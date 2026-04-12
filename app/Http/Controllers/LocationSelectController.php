@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class SelectLocationController extends Controller
+class LocationSelectController extends Controller
 {
     public function __invoke(Request $request, LocationService $service): Response
     {

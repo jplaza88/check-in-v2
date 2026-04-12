@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\LocationDistanceController;
-use App\Http\Controllers\SelectLocationController;
+use App\Http\Controllers\LocationSelectController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -27,11 +27,11 @@ Route::prefix('locale')->group(function () use ($locales) {
 Route::middleware(['setLocale'])
     ->group(function () {
 
-        Route::get('/check-in/select-location', SelectLocationController::class)
+        Route::get('/check-in/select-location', LocationSelectController::class)
             ->defaults('context', 'checkin')
             ->name('checkIn.selectLocation');
 
-        Route::get('/appointment/select-location', SelectLocationController::class)
+        Route::get('/appointment/select-location', LocationSelectController::class)
             ->defaults('context', 'appointment')
             ->name('appointment.selectLocation');
     });
