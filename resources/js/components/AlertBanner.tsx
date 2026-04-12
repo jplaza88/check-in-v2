@@ -78,7 +78,7 @@ export default function AlertBanner({
             {/* Close */}
             <button
                 onClick={onClose}
-                className={`mt-0.5 shrink-0 opacity-50 transition-opacity hover:opacity-75 ${styles.icon}`}
+                className={`mt-0.5 shrink-0 opacity-50 transition-opacity hover:opacity-75 cursor-pointer ${styles.icon}`}
             >
                 <span className="sr-only">Close</span>
                 <svg className="h-3.5 w-3.5 fill-current" viewBox="0 0 16 16">

@@ -2,9 +2,9 @@ import { Head, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import LocationDistanceController from '@/actions/App/Http/Controllers/LocationDistanceController';
+import AlertBanner from '@/components/AlertBanner';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import PublicLayout from '@/layouts/PublicLayout';
-import AlertBanner from '@/components/AlertBanner';
 
 interface CheckInTranslations {
     selectACheckInLocation: string;
@@ -51,7 +51,7 @@ export default function SelectLocation() {
 
     // Alert banners
     const [geoLocationErrorBannerOpen, setGeoLocationErrorBannerOpen] = useState(false);
-    const [geoLocationNotSupportedBannerOpen, setGeooLocationNotSupportedBannerOpen] = useState(false);
+    const [geoLocationNotSupportedBannerOpen, setGeoLocationNotSupportedBannerOpen,] = useState(false);
     const [checkInBannerOpen, setCheckInBannerOpen] = useState(false);
 
     // Hook to retrieve user geolocation coordinates
@@ -60,6 +60,12 @@ export default function SelectLocation() {
             if (error) {
                 // eslint-disable-next-line react-hooks/set-state-in-effect
                 setGeoLocationErrorBannerOpen(true);
+
+                return;
+            }
+
+            if (warning) {
+                setGeoLocationNotSupportedBannerOpen(true);
 
                 return;
             }
@@ -132,8 +138,10 @@ export default function SelectLocation() {
                             title={
                                 pageTranslations.geolocationNotSupportedTitle
                             }
-                            open={!!warning}
-                            onClose={() => setGeooLocationNotSupportedBannerOpen(false)}
+                            open={geoLocationNotSupportedBannerOpen}
+                            onClose={() =>
+                                setGeoLocationNotSupportedBannerOpen(false)
+                            }
                         >
                             {pageTranslations.geolocationNotSupportedMessage}
                         </AlertBanner>
