@@ -135,4 +135,49 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Location Closing Soon Threshold
+    |--------------------------------------------------------------------------
+    |
+    | Defines how many minutes before closing a location is considered
+    | "closing soon". When a location falls within this threshold, a
+    | "Closing soon" indicator will be displayed in the check-in UI.
+    |
+    | Default: 30 minutes
+    |
+    */
+
+    'location_closing_soon_threshold' => 30,
+
+    /*
+    |--------------------------------------------------------------------------
+    | User Coordinates Session Time-to-Live
+    |--------------------------------------------------------------------------
+    |
+    | Specifies how long (in seconds) the user's coordinates are stored
+    | in the server-side session. After this duration, the coordinates
+    | will expire and may need to be re-acquired.
+    |
+    | Default: 1800 seconds (30 minutes)
+    |
+    */
+
+    'user_coordinates_session_ttl' => 1800,
+
+    /*
+    |--------------------------------------------------------------------------
+    | User Coordinates Browser Time-to-Live
+    |--------------------------------------------------------------------------
+    |
+    | Specifies how long (in minutes) the user's coordinates are cached
+    | in the browser (e.g., localStorage). Once expired, the browser
+    | should request fresh location data.
+    |
+    | Default: 30 minutes
+    |
+    */
+
+    'user_coordinates_browser_ttl' => 30,
+
 ];

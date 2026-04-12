@@ -45,6 +45,8 @@ return [
         'geolocationErrorTitle' => 'Accès à la localisation refusé',
         'geolocationNotSupportedMessage' => 'La géolocalisation n’est pas prise en charge par ce navigateur.',
         'geolocationNotSupportedTitle' => 'Navigateur non pris en charge',
+        'fetchDistancesErrorTitle' => 'Impossible de charger les emplacements',
+        'fetchDistancesErrorMessage' => 'Une erreur est survenue lors du calcul des distances. Veuillez actualiser la page et réessayer.',
     ],
 
     'appointmentSelectLocation' => [

@@ -51,6 +51,8 @@ return [
         'geolocationErrorTitle' => 'Location access denied',
         'geolocationNotSupportedMessage' => 'Geolocation is not supported by this browser.',
         'geolocationNotSupportedTitle' => 'Browser not supported',
+        'fetchDistancesErrorTitle' => 'Unable to load locations',
+        'fetchDistancesErrorMessage' => 'Something went wrong while calculating distances. Please refresh the page and try again.',
     ],
 
     'appointmentSelectLocation' => [

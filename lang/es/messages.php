@@ -45,6 +45,8 @@ return [
         'geolocationErrorTitle' => 'Acceso a la ubicación denegado',
         'geolocationNotSupportedMessage' => 'La geolocalización no es compatible con este navegador.',
         'geolocationNotSupportedTitle' => 'Navegador no compatible',
+        'fetchDistancesErrorTitle' => 'No se pudieron cargar las ubicaciones',
+        'fetchDistancesErrorMessage' => 'Ocurrió un error al calcular las distancias. Por favor, actualiza la página e inténtalo de nuevo.',
     ],
 
     'appointmentSelectLocation' => [

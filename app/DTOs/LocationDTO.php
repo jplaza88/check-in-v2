@@ -13,6 +13,7 @@ final readonly class LocationDTO
         public string $id,
         public string $name,
         public string $address,
+        public int $distance,
         public bool $isOpen,
         public ?string $todayOpenCloseTime,
         public ?string $reason,
@@ -21,9 +22,6 @@ final readonly class LocationDTO
         public bool $isClosingSoon,
     ) {}
 
-    // TODO:: Convert to this to a feature for the DB
-    private const int CLOSING_SOON_THRESHOLD_MINUTES = 30;
-
     /**
      * @param  array<string, mixed>  $location
      */
@@ -31,14 +29,16 @@ final readonly class LocationDTO
     {
         [$isOpen, $openTime, $closeTime, $reason, $hasException, $isExceptionClosure] = self::resolveOpenCloseTime($location);
 
+        // TODO:: Convert to this to a feature for the DB
         $isClosingSoon = $isOpen
             && $closeTime !== null
-            && now()->setTimezone($location['timezone'])->diffInMinutes($closeTime) <= self::CLOSING_SOON_THRESHOLD_MINUTES;
+            && now()->setTimezone($location['timezone'])->diffInMinutes($closeTime) <= config('location_closing_soon_threshold');
 
         return new self(
             id: $location['uuid'],
             name: $location['name'],
             address: self::buildAddress($location['address']),
+            distance: $location['distance'],
             isOpen: $isOpen,
             todayOpenCloseTime: $openTime && $closeTime
                 ? $openTime->format('g:i A').' - '.$closeTime->format('g:i A T')

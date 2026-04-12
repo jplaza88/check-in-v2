@@ -1,6 +1,6 @@
 import { Head, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import LocationDistanceController from '@/actions/App/Http/Controllers/LocationDistanceController';
 import AlertBanner from '@/components/AlertBanner';
 import { useGeolocation } from '@/hooks/useGeolocation';
@@ -18,10 +18,18 @@ interface CheckInTranslations {
     geolocationErrorTitle: string;
     geolocationNotSupportedMessage: string;
     geolocationNotSupportedTitle: string;
+    fetchDistancesErrorTitle: string;
+    fetchDistancesErrorMessage: string;
 }
 
 interface Translations {
     checkInSelectLocation: CheckInTranslations;
+}
+
+interface Alert {
+    type: 'error' | 'warning' | 'success';
+    title: string;
+    message: string;
 }
 
 interface PageProps {
@@ -44,70 +52,84 @@ interface Location {
 }
 
 export default function SelectLocation() {
+    // Translations
     const { translations, locations } = usePage<PageProps>().props;
     const pageTranslations: CheckInTranslations = translations.checkInSelectLocation;
+
+    // User coordinates
     const [sortedLocations, setSortedLocations] = useState<Location[] | null>(null);
     const { coords, loading, error, warning } = useGeolocation();
 
-    // Alert banners
-    const [geoLocationErrorBannerOpen, setGeoLocationErrorBannerOpen] = useState(false);
-    const [geoLocationNotSupportedBannerOpen, setGeoLocationNotSupportedBannerOpen,] = useState(false);
-    const [checkInBannerOpen, setCheckInBannerOpen] = useState(false);
+    // Alert banner
+    const getAlert = (): Alert | null => {
+        if (error) {
+            return {
+                type: 'error',
+                title: pageTranslations.geolocationErrorTitle,
+                message: pageTranslations.geolocationErrorMessage,
+            };
+        }
 
-    // Hook to retrieve user geolocation coordinates
-    useEffect(() => {
+        if (warning) {
+            return {
+                type: 'warning',
+                title: pageTranslations.geolocationNotSupportedTitle,
+                message: pageTranslations.geolocationNotSupportedMessage,
+            };
+        }
+
+        if (fetchError) {
+            return {
+                type: 'error',
+                title: pageTranslations.fetchDistancesErrorTitle,
+                message: pageTranslations.fetchDistancesErrorMessage,
+            };
+        }
+
+        return null;
+    };
+
+    const [fetchError, setFetchError] = useState(false);
+    const [dismissed, setDismissed] = useState(false);
+    const alert = dismissed ? null : getAlert();
+
+    // Fetch location distances so that we can render the locations
+    const fetchLocationDistances = async () => {
         if (!coords) {
-            if (error) {
-                // eslint-disable-next-line react-hooks/set-state-in-effect
-                setGeoLocationErrorBannerOpen(true);
-
-                return;
-            }
-
-            if (warning) {
-                setGeoLocationNotSupportedBannerOpen(true);
-
-                return;
-            }
-
             return;
         }
 
-        axios
-            .post(LocationDistanceController().url, {
-                latitude: coords.latitude,
-                longitude: coords.longitude,
+        const { data } = await axios.post(LocationDistanceController().url, {
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+        });
+
+        const distanceMap = new Map(
+            data.locations.map(
+                ({
+                    id,
+                    userDistance,
+                }: {
+                    id: string;
+                    userDistance: number;
+                }) => [id, userDistance],
+            ),
+        );
+
+        const merged = data.locations
+            .map(({ id }: { id: string }) => {
+                const location = locations.find((loc) => loc.id === id);
+
+                return location
+                    ? { ...location, userDistance: distanceMap.get(id) ?? null }
+                    : null;
             })
-            .then(({ data }) => {
-                // Attach the user distance to locations and keep the same sort order
-                const distanceMap = new Map(
-                    data.locations.map(
-                        ({
-                            id,
-                            userDistance,
-                        }: {
-                            id: string;
-                            userDistance: number;
-                        }) => [id, userDistance],
-                    ),
-                );
+            .filter(Boolean);
 
-                const merged = data.locations
-                    .map(({ id }: { id: string }) => {
-                        const location = locations.find((l) => l.id === id);
+        setSortedLocations(merged);
+    };
 
-                        return location
-                            ? {
-                                  ...location,
-                                  userDistance: distanceMap.get(id) ?? null,
-                              }
-                            : null;
-                    })
-                    .filter(Boolean);
-
-                setSortedLocations(merged);
-            });
-    }, [coords, error]);
+    fetchLocationDistances().catch(() => setFetchError(true));
 
     return (
         <PublicLayout>
@@ -121,40 +143,13 @@ export default function SelectLocation() {
 
                     <div className="space-y-3">
                         {/* Alert Banner for errors, warning and etc. */}
-
-                        {/* Geolocation error */}
                         <AlertBanner
-                            type="error"
-                            title={pageTranslations.geolocationErrorTitle}
-                            open={geoLocationErrorBannerOpen}
-                            onClose={() => setGeoLocationErrorBannerOpen(false)}
+                            type={alert?.type ?? 'error'}
+                            title={alert?.title}
+                            open={alert !== null}
+                            onClose={() => setDismissed(true)}
                         >
-                            {pageTranslations.geolocationErrorMessage}
-                        </AlertBanner>
-
-                        {/* Geolocation warning */}
-                        <AlertBanner
-                            type="warning"
-                            title={
-                                pageTranslations.geolocationNotSupportedTitle
-                            }
-                            open={geoLocationNotSupportedBannerOpen}
-                            onClose={() =>
-                                setGeoLocationNotSupportedBannerOpen(false)
-                            }
-                        >
-                            {pageTranslations.geolocationNotSupportedMessage}
-                        </AlertBanner>
-
-                        {/* Check-in exception */}
-                        <AlertBanner
-                            type="error"
-                            title="Unable to complete check-in"
-                            open={checkInBannerOpen}
-                            onClose={() => setCheckInBannerOpen(false)}
-                        >
-                            Something went wrong processing your check-in.
-                            Please try again or contact support.
+                            {alert?.message}
                         </AlertBanner>
 
                         {/* Skeleton */}

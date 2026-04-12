@@ -1,3 +1,4 @@
+import { usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { getDriverCoords, saveDriverCoords } from '@/utils/driverCoords';
 
@@ -28,6 +29,9 @@ export function useGeolocation(
         error: null,
         warning: null,
     });
+
+    const { userCoordsBrowserTtl } = usePage<{ userCoordsBrowserTtl: number }>()
+        .props;
 
     useEffect(() => {
         const cached = getDriverCoords();
@@ -61,7 +65,11 @@ export function useGeolocation(
         }
 
         const success = (pos: GeolocationPosition) => {
-            saveDriverCoords(pos.coords.latitude, pos.coords.longitude);
+            saveDriverCoords(
+                pos.coords.latitude,
+                pos.coords.longitude,
+                userCoordsBrowserTtl,
+            );
             setState({
                 coords: {
                     latitude: pos.coords.latitude,

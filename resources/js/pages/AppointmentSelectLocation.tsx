@@ -33,9 +33,9 @@ interface Location {
 }
 
 export default function AppointmentSelectLocation() {
+    // Translations
     const { translations, locations } = usePage<PageProps>().props;
     const pageTranslations: AppointmentSelectLocation = translations.appointmentSelectLocation;
-
 
     return (
         <PublicLayout>

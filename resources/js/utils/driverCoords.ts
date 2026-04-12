@@ -1,17 +1,20 @@
 const STORAGE_KEY = 'driver_coords';
-const TTL_MINUTES = 30;
 
 interface StoredCoords {
     latitude: number;
     longitude: number;
-    expiresAt: number; // Unix ms
+    expiresAt: number;
 }
 
-export function saveDriverCoords(latitude: number, longitude: number): void {
+export function saveDriverCoords(
+    latitude: number,
+    longitude: number,
+    ttlMinutes: number,
+): void {
     const payload: StoredCoords = {
         latitude,
         longitude,
-        expiresAt: Date.now() + TTL_MINUTES * 60 * 1000,
+        expiresAt: Date.now() + ttlMinutes * 60 * 1000,
     };
 
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));

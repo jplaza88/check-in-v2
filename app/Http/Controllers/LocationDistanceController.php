@@ -5,12 +5,16 @@ namespace App\Http\Controllers;
 use App\DTOs\LocationDistanceDTO;
 use App\Http\Requests\LocationDistanceRequest;
 use App\Services\LocationService;
+use App\Services\SessionService;
 use Illuminate\Http\JsonResponse;
 
 class LocationDistanceController extends Controller
 {
-    public function __invoke(LocationDistanceRequest $request, LocationService $service): JsonResponse
-    {
+    public function __invoke(
+        LocationDistanceRequest $request,
+        LocationService $service,
+        SessionService $session
+    ): JsonResponse {
         $userLat = $request->float('latitude');
         $userLng = $request->float('longitude');
 
@@ -37,6 +41,8 @@ class LocationDistanceController extends Controller
             ))
             ->sortBy('userDistance')
             ->values();
+
+        $session->setUserCoords($userLat, $userLng);
 
         return response()->json(['locations' => $distances]);
     }

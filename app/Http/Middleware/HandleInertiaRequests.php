@@ -54,6 +54,7 @@ class HandleInertiaRequests extends Middleware
                 self::PUBLIC_NAV_ROUTES,
                 strict: true
             ) ? request()->route()->getName() : null,
+            'userCoordsBrowserTtl' => fn () => request()->route()?->getName() === 'checkIn.selectLocation' ? config('user_coordinates_browser_ttl') : null,
             'currentLocale' => fn () => app()->getLocale(),
             'localesAvailable' => fn () => config('app.locales'),
             'localesLabels' => fn () => config('app.locales_labels'),
