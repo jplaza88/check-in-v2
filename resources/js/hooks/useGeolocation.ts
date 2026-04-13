@@ -1,12 +1,10 @@
 import { usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { getDriverCoords, saveDriverCoords } from '@/utils/driverCoords';
-
 interface Coords {
     latitude: number;
     longitude: number;
 }
-
 interface GeolocationState {
     coords: Coords | null;
     loading: boolean;
@@ -19,7 +17,6 @@ const DEFAULT_OPTIONS: PositionOptions = {
     timeout: 10_000,
     maximumAge: 60_000,
 };
-
 export function useGeolocation(
     options: PositionOptions = DEFAULT_OPTIONS,
 ): GeolocationState {
@@ -50,6 +47,9 @@ export function useGeolocation(
 
             return;
         }
+
+        // For testing purposes
+        //Object.defineProperty(navigator, 'geolocation', { get: () => undefined });
 
         if (!navigator.geolocation) {
             const message = 'Geolocation is not supported by this browser.';

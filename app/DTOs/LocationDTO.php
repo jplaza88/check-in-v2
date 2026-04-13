@@ -33,7 +33,7 @@ final readonly class LocationDTO
         // TODO:: Convert to this to a feature for the DB
         $isClosingSoon = $isOpen
             && $closeTime !== null
-            && now()->setTimezone($location['timezone'])->diffInMinutes($closeTime) <= config('location_closing_soon_threshold');
+            && now()->setTimezone($location['timezone'])->diffInMinutes($closeTime) <= config('app.location_closing_soon_threshold');
 
         return new self(
             id: $location['uuid'],

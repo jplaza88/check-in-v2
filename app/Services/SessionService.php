@@ -21,7 +21,7 @@ class SessionService
         }
 
         // Expire after 30 minutes - mirrors the localStorage browser TTL
-        if (now()->timestamp - $coords['storedAt'] > config('user_coordinates_session_ttl')) {
+        if (now()->timestamp - $coords['storedAt'] > config('app.user_coordinates_session_ttl')) {
             session()->forget('userCoords');
 
             return null;

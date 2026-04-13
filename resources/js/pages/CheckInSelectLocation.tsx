@@ -1,6 +1,7 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import { gate } from '@/actions/App/Http/Controllers/CheckInController';
 import LocationDistanceController from '@/actions/App/Http/Controllers/LocationDistanceController';
 import AlertBanner from '@/components/AlertBanner';
 import { useGeolocation } from '@/hooks/useGeolocation';
@@ -39,7 +40,7 @@ interface PageProps {
 }
 
 interface Location {
-    id: number | string;
+    id: string;
     name: string;
     address: string;
     distance: number;
@@ -87,12 +88,47 @@ export default function SelectLocation() {
             };
         }
 
+        if (checkInError) {
+            return {
+                type: 'error',
+                title: 'Check-In Error',
+                message: checkInError,
+            };
+        }
+
         return null;
     };
 
     const [fetchError, setFetchError] = useState(false);
+    const [checkInError, setCheckInError] = useState<string | null>(null);
+
+    const [submittingLocationId, setSubmittingLocationId] = useState<string | null>(null);
+
     const [dismissed, setDismissed] = useState(false);
     const alert = dismissed ? null : getAlert();
+
+    const handleSelectLocation = (locationId: string) => {
+        setCheckInError(null);
+        setDismissed(false);
+        setSubmittingLocationId(locationId);
+
+        router.post(
+            gate.url({ uuid: String(locationId) }),
+            {},
+            {
+                onError: (errors) => {
+                    setCheckInError(
+                        errors[Object.keys(errors)[0]] ?? 'Something went wrong. Please try again.'
+                    );
+                    console.log(errors)
+                    setSubmittingLocationId(null);
+                },
+                onFinish: () => {
+                    setSubmittingLocationId(null);
+                },
+            },
+        );
+    };
 
     useEffect(() => {
         if (!coords) {
@@ -189,7 +225,13 @@ export default function SelectLocation() {
                                 return (
                                     <button
                                         key={location.id}
-                                        className="relative block w-full focus:outline-none"
+                                        onClick={() =>
+                                            handleSelectLocation(location.id)
+                                        }
+                                        disabled={
+                                            submittingLocationId !== null
+                                        }
+                                        className="relative block w-full focus:outline-none disabled:opacity-60"
                                         aria-label={`Check-in at ${location.name}, ${location.address}`}
                                     >
                                         <div

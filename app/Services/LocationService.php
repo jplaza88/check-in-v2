@@ -34,7 +34,7 @@ class LocationService
     }
 
     /**
-     * @param  array{latitude: float, longitude: float}  $userCoords
+     * @param  array<mixed, mixed>  $userCoords
      * @return array<string, mixed>
      */
     public function canCheckIn(Location $location, array $userCoords): array
@@ -47,6 +47,7 @@ class LocationService
             $location->longitude
         );
 
+        // Is user close enough?
         if ($distance > $location->distance) {
             return [
                 'allowed' => false,
@@ -54,7 +55,7 @@ class LocationService
             ];
         }
 
-        // Schedule
+        // Schedule & schedule exceptions
         if (! $this->isOpen($location)) {
             return [
                 'allowed' => false,

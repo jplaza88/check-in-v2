@@ -49,27 +49,31 @@ composer install
 # 3. Copy environment file
 cp .env.example .env
 
-# 4. Start Docker containers
+# 4. Generate application key
+./vendor/bin/sail artisan key:generate
+
+# 5. Start Docker containers
 ./vendor/bin/sail up -d
 
-# 5. Install and build frontend dependencies
+# 6. Install and build frontend dependencies
 ./vendor/bin/sail npm install
 ./vendor/bin/sail npm run dev   # or: npm run build
 
-# 6. Run migrations and seeders
+# 7. Run migrations and seeders
 ./vendor/bin/sail artisan migrate --seed
 ```
 
 ## Accessing the Application
 
-| Service | URL |
-|---|---|
-| Web application | https://martori.vm |
-| Mailpit inbox | http://localhost:8025 |
+| Service | URL                       |
+|---|---------------------------|
+| Web application | https://martori.localhost |
+| Mailpit inbox | http://localhost:8025     |
 
 ## Development
 
 > 💡 Octane is configured to run in watch mode - backend changes are picked up automatically with no server restart needed.
+
 ```bash
 # Frontend (watch mode)
 ./vendor/bin/sail npm run dev

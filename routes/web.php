@@ -32,9 +32,6 @@ Route::middleware(['setLocale'])
             ->defaults('context', 'checkin')
             ->name('checkIn.selectLocation');
 
-        Route::post('/check-in/location-distance', LocationDistanceController::class)
-            ->name('checkIn.locationDistance');
-
         Route::middleware(['coords'])
             ->post('/check-in/{uuid}', [CheckInController::class, 'gate'])
             ->whereUuid('uuid')
@@ -44,3 +41,6 @@ Route::middleware(['setLocale'])
             ->defaults('context', 'appointment')
             ->name('appointment.selectLocation');
     });
+
+Route::post('/check-in/location-distance', LocationDistanceController::class)
+    ->name('checkIn.locationDistance');
