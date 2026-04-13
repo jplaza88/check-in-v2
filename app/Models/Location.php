@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Carbon\CarbonImmutable;
+use Database\Factories\LocationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -21,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read string $phone
  * @property-read string|null $phone_ext
  * @property-read string $email
+ * @property-read float $latitude
+ * @property-read float $longitude
  * @property-read bool $is_active
  * @property-read bool $is_checkins_enabled
  * @property-read bool $is_appointments_enabled
@@ -31,10 +37,13 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read Schedule $schedule
  * @property-read ScheduleException $scheduleExceptions
  */
-#[Fillable(['uuid', 'address_id', 'name', 'abbreviation', 'timezone', 'phone', 'phone_ext', 'email', 'is_active', 'is_checkins_enabled', 'is_appointments_enabled', 'additional_fields'])]
+#[Fillable(['uuid', 'address_id', 'distance', 'name', 'abbreviation', 'timezone', 'phone', 'phone_ext', 'email', 'latitude', 'longitude', 'is_active', 'is_checkins_enabled', 'is_appointments_enabled', 'additional_fields'])]
 #[Hidden(['id'])]
 class Location extends Model
 {
+    /** @use HasFactory<LocationFactory> */
+    use HasFactory;
+
     protected function casts(): array
     {
         return [
@@ -43,6 +52,8 @@ class Location extends Model
             'is_checkins_enabled' => 'boolean',
             'is_appointments_enabled' => 'boolean',
             'additional_fields' => 'boolean',
+            'latitude' => 'float',
+            'longitude' => 'float',
         ];
     }
 
@@ -68,5 +79,10 @@ class Location extends Model
     public function scheduleExceptions(): HasMany
     {
         return $this->hasMany(ScheduleException::class);
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
     }
 }

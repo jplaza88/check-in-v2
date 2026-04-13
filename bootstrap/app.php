@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureUserHasCoordinatesMiddleware;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'setLocale' => SetLocale::class,
+            'coords' => EnsureUserHasCoordinatesMiddleware::class,
         ]);
     })
 

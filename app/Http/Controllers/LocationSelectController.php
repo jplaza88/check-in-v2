@@ -1,12 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\DTOs\LocationDTO;
 use App\Models\Location;
 use App\Services\LocationService;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
 use Inertia\Response;
 
 class LocationSelectController extends Controller
@@ -20,7 +21,7 @@ class LocationSelectController extends Controller
 
         $page = $context === 'checkin' ? 'CheckInSelectLocation' : 'AppointmentSelectLocation';
 
-        return Inertia::render($page, [
+        return inertia($page, [
             'locations' => $locations,
             'context' => $context,
         ]);

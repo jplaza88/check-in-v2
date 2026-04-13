@@ -29,4 +29,3 @@ yarn-error.log
 **/caddy
 frankenphp
 frankenphp-worker.php
-/environments/local/certs/

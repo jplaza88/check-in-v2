@@ -1,6 +1,6 @@
 import { Head, usePage } from '@inertiajs/react';
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LocationDistanceController from '@/actions/App/Http/Controllers/LocationDistanceController';
 import AlertBanner from '@/components/AlertBanner';
 import { useGeolocation } from '@/hooks/useGeolocation';
@@ -94,43 +94,49 @@ export default function SelectLocation() {
     const [dismissed, setDismissed] = useState(false);
     const alert = dismissed ? null : getAlert();
 
-    // Fetch location distances so that we can render the locations
-    const fetchLocationDistances = async () => {
+    useEffect(() => {
         if (!coords) {
             return;
         }
 
-        const { data } = await axios.post(LocationDistanceController().url, {
-            latitude: coords.latitude,
-            longitude: coords.longitude,
-        });
-
-        const distanceMap = new Map(
-            data.locations.map(
-                ({
-                    id,
-                    userDistance,
-                }: {
-                    id: string;
-                    userDistance: number;
-                }) => [id, userDistance],
-            ),
-        );
-
-        const merged = data.locations
-            .map(({ id }: { id: string }) => {
-                const location = locations.find((loc) => loc.id === id);
-
-                return location
-                    ? { ...location, userDistance: distanceMap.get(id) ?? null }
-                    : null;
+        axios
+            .post(LocationDistanceController().url, {
+                latitude: coords.latitude,
+                longitude: coords.longitude,
             })
-            .filter(Boolean);
+            .then(({ data }) => {
+                const distanceMap = new Map(
+                    data.locations.map(
+                        ({
+                            id,
+                            userDistance,
+                        }: {
+                            id: string;
+                            userDistance: number;
+                        }) => [id, userDistance],
+                    ),
+                );
 
-        setSortedLocations(merged);
-    };
+                const merged = data.locations
+                    .map(({ id }: { id: string }) => {
+                        const location = locations.find(
+                            (loc) => loc.id === id,
+                        );
 
-    fetchLocationDistances().catch(() => setFetchError(true));
+                        return location
+                            ? {
+                                  ...location,
+                                  userDistance:
+                                      distanceMap.get(id) ?? null,
+                              }
+                            : null;
+                    })
+                    .filter(Boolean);
+
+                setSortedLocations(merged);
+            })
+            .catch(() => setFetchError(true));
+    }, [coords]);
 
     return (
         <PublicLayout>

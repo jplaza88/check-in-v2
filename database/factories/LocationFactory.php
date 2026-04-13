@@ -1,0 +1,54 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Address;
+use App\Models\Location;
+use App\Models\Schedule;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+
+/**
+ * @extends Factory<Location>
+ */
+class LocationFactory extends Factory
+{
+    /**
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        return [
+            'uuid' => (string) Str::uuid(),
+            'address_id' => Address::factory(),
+            'distance' => 50,
+            'name' => fake()->company(),
+            'abbreviation' => fake()->unique()->lexify('???'),
+            'timezone' => 'UTC',
+            'phone' => fake()->phoneNumber(),
+            'phone_ext' => null,
+            'email' => fake()->safeEmail(),
+            'latitude' => 40.7128,
+            'longitude' => -74.006,
+            'is_active' => true,
+            'is_checkins_enabled' => true,
+            'is_appointments_enabled' => false,
+            'additional_fields' => false,
+        ];
+    }
+
+    public function configure(): static
+    {
+        return $this->afterCreating(function (Location $location): void {
+            Schedule::factory()->for($location)->create();
+        });
+    }
+
+    public function appointmentsOnly(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_checkins_enabled' => false,
+            'is_appointments_enabled' => true,
+        ]);
+    }
+}
