@@ -19,7 +19,11 @@ final readonly class BrowserService
         // The first language in the array is usually the preferred language
         $browserLanguage = reset($preferredLanguages);
 
-        // Use a regular expression to extract only the language code, eg: 'es', or 'fr'
+        /**
+         * Use a regular expression to extract only the language code, eg: 'es', or 'fr'.
+         * Do not default to 'en' if $browserLangue evaluates to false, let the LocaleService
+         * decide what locale to use.
+         **/
         if (preg_match('/^([a-z]+)/i', $browserLanguage ?: '', $matches)) {
 
             return strtolower($matches[1]);
