@@ -27,6 +27,8 @@ final readonly class LocaleService
     }
 
     /**
+     * Translations are stored in config/translations.php and are keyed by route name.
+     *
      * @return array<string, array<string, string>>
      */
     public function getTranslationsForRoute(string $routeName, string $locale): array
