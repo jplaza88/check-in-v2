@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use Illuminate\Http\Request;
 
-class BrowserService
+final readonly class BrowserService
 {
     /*
      * Detect users default language set in their browser.
@@ -18,7 +20,7 @@ class BrowserService
         $browserLanguage = reset($preferredLanguages);
 
         // Use a regular expression to extract only the language code, eg: 'es', or 'fr'
-        if (preg_match('/^([a-z]+)/i', $browserLanguage ?: 'en', $matches)) {
+        if (preg_match('/^([a-z]+)/i', $browserLanguage ?: '', $matches)) {
 
             return strtolower($matches[1]);
         }
