@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read int $id
  * @property-read string $uuid
  * @property-read int $address_id
- * @property-read int $distance
+ * @property-read int $max_distance_allowed
  * @property-read string $name
  * @property-read string $abbreviation
  * @property-read string $timezone
@@ -37,7 +37,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read Schedule $schedule
  * @property-read ScheduleException $scheduleExceptions
  */
-#[Fillable(['uuid', 'address_id', 'distance', 'name', 'abbreviation', 'timezone', 'phone', 'phone_ext', 'email', 'latitude', 'longitude', 'is_active', 'is_checkins_enabled', 'is_appointments_enabled', 'additional_fields'])]
+#[Fillable(['uuid', 'address_id', 'max_distance_allowed', 'name', 'abbreviation', 'timezone', 'phone', 'phone_ext', 'email', 'latitude', 'longitude', 'is_active', 'is_checkins_enabled', 'is_appointments_enabled', 'additional_fields'])]
 #[Hidden(['id'])]
 class Location extends Model
 {

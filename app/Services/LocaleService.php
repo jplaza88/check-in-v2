@@ -35,7 +35,7 @@ final readonly class LocaleService
     {
         $allTranslations = $this->loadTranslations($locale);
 
-        $keys = config('translations.' . $routeName, []);
+        $keys = config('translations.'.$routeName, []);
 
         $routeTranslations = [];
         foreach ($keys as $key) {

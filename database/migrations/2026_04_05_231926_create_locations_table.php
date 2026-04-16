@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->uuid()->unique();
             $table->foreignId('address_id')->constrained('addresses');
-            $table->integer('distance');
+            $table->integer('max_distance_allowed');
             $table->string('name');
             $table->string('abbreviation')->unique();
             $table->string('timezone');

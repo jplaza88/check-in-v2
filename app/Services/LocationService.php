@@ -48,7 +48,7 @@ class LocationService
         );
 
         // Is user close enough?
-        if ($distance > $location->distance) {
+        if ($distance > $location->max_distance_allowed) {
             return [
                 'allowed' => false,
                 'reason' => 'You are too far from this location.',
