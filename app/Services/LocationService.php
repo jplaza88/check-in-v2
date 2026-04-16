@@ -13,7 +13,7 @@ class LocationService
 {
     public function getActiveCheckInLocationsWithScheduleByUuid(string $uuid): ?Location
     {
-        return Location::with(['address', 'schedule', 'scheduleExceptions'])
+        return Location::with(['address', 'checkInSchedule', 'checkInScheduleExceptions'])
             ->where('uuid', $uuid)
             ->where('is_active', true)
             ->where('is_checkins_enabled', true)
@@ -27,7 +27,7 @@ class LocationService
     {
         $whereClause = $context === 'checkin' ? 'is_checkins_enabled' : 'is_appointments_enabled';
 
-        return Location::with(['address', 'schedule', 'scheduleExceptions'])
+        return Location::with(['address', 'checkInSchedule', 'checkInScheduleExceptions'])
             ->where('is_active', true)
             ->where($whereClause, true)
             ->get();

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\ScheduleType;
 use Carbon\CarbonImmutable;
 use Database\Factories\LocationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -68,21 +69,32 @@ class Location extends Model
     /**
      * @return HasOne<Schedule, $this>
      */
-    public function schedule(): HasOne
+    public function checkInSchedule(): HasOne
     {
-        return $this->hasOne(Schedule::class);
+        return $this->hasOne(Schedule::class)->where('type', ScheduleType::CheckIn);
+    }
+
+    /**
+     * @return HasOne<Schedule, $this>
+     */
+    public function appointmentSchedule(): HasOne
+    {
+        return $this->hasOne(Schedule::class)->where('type', ScheduleType::Appointment);
     }
 
     /**
      * @return HasMany<ScheduleException, $this>
      */
-    public function scheduleExceptions(): HasMany
+    public function checkInScheduleExceptions(): HasMany
     {
-        return $this->hasMany(ScheduleException::class);
+        return $this->hasMany(ScheduleException::class)->where('type', ScheduleType::CheckIn);
     }
 
-    public function getRouteKeyName(): string
+    /**
+     * @return HasMany<ScheduleException, $this>
+     */
+    public function appointmentScheduleExceptions(): HasMany
     {
-        return 'uuid';
+        return $this->hasMany(ScheduleException::class)->where('type', ScheduleType::Appointment);
     }
 }
