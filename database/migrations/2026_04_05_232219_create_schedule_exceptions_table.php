@@ -17,6 +17,8 @@ return new class extends Migration
             $table->boolean('is_closed');
             $table->string('reason')->nullable();
             $table->timestampsTz();
+
+            $table->unique(['location_id', 'date', 'type']);
         });
     }
 
