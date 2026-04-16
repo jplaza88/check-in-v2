@@ -21,10 +21,10 @@ return new class extends Migration
             $table->string('email');
             $table->string('latitude');
             $table->string('longitude');
-            $table->boolean('is_active')->default(false);
-            $table->boolean('is_checkins_enabled')->default(false);
-            $table->boolean('is_appointments_enabled')->default(false);
-            $table->boolean('additional_fields')->default(false);
+            $table->boolean('is_active');
+            $table->boolean('is_checkins_enabled');
+            $table->boolean('is_appointments_enabled');
+            $table->boolean('additional_fields');
             $table->timestampsTz();
         });
     }
