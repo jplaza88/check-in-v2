@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LocationSelectRequest;
-use App\Services\LocationService;
 use Inertia\Response;
 
 class CheckInController extends Controller
@@ -13,7 +12,7 @@ class CheckInController extends Controller
         $validated = $request->validated();
 
         return inertia('CheckInForm', [
-            'location' => $request->getLocation(app(LocationService::class)),
+            'location' => $request->getLocation(),
         ]);
     }
 }

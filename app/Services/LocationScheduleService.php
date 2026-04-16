@@ -9,7 +9,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 
-class LocationService
+final readonly class LocationScheduleService
 {
     public function getActiveCheckInLocationsWithScheduleByUuid(string $uuid): ?Location
     {
@@ -34,76 +34,16 @@ class LocationService
     }
 
     /**
-     * @param  array<mixed, mixed>  $userCoords
-     * @return array<string, mixed>
-     */
-    public function canCheckIn(Location $location, array $userCoords): array
-    {
-        // User Distance
-        $distance = $this->distance(
-            $userCoords['latitude'],
-            $userCoords['longitude'],
-            $location->latitude,
-            $location->longitude
-        );
-
-        // Is user close enough?
-        if ($distance > $location->max_distance_allowed) {
-            return [
-                'allowed' => false,
-                'reason' => 'You are too far from this location.',
-            ];
-        }
-
-        // Schedule & schedule exceptions
-        if (! $this->isOpen($location)) {
-            return [
-                'allowed' => false,
-                'reason' => 'This location is currently closed.',
-            ];
-        }
-
-        return [
-            'allowed' => true,
-            'reason' => null,
-        ];
-    }
-
-    public function isOpen(Location $location): bool
-    {
-        [$isOpen] = $this->resolveOpenCloseTime($location->toArray());
-
-        return $isOpen;
-    }
-
-    /**
-     * Haversine distance formula
-     */
-    public function distance(float $lat1, float $lng1, float $lat2, float $lng2, int $decimalPlaces = 1): float
-    {
-        $earthRadius = 3958.8; // miles
-        // $earthRadius = 6371; //km
-
-        $dlat = deg2rad($lat2 - $lat1);
-        $dlng = deg2rad($lng2 - $lng1);
-        $lat1 = deg2rad($lat1);
-        $lat2 = deg2rad($lat2);
-
-        $a = sin($dlat / 2) ** 2 + cos($lat1) * cos($lat2) * sin($dlng / 2) ** 2;
-
-        return round($earthRadius * 2 * asin(sqrt($a)), $decimalPlaces);
-    }
-
-    /**
-     * @param  array<string, mixed>  $location
+     * @param  array<string, array<string, string>>  $schedule
+     * @param  array<string, array<string, string>>  $exceptions
      * @return array{bool, Carbon|null, Carbon|null, string|null, bool, bool}
      */
-    public function resolveOpenCloseTime(array $location): array
+    public function resolveOpenCloseTime(array $schedule, array $exceptions, string $timezone, ?CarbonInterface $targetDateTime = null): array
     {
-        $timezone = $location['timezone'];
+        // TODO:: Handle $targetDateTime for appointments
+
         $now = now()->setTimezone($timezone);
 
-        $exceptions = $location['schedule_exceptions'] ?? [];
         $exception = array_values(array_filter(
             $exceptions,
             fn (array $e) => $e['date'] === $now->toDateString()
@@ -113,22 +53,7 @@ class LocationService
             return $this->resolveFromException($exception, $timezone, $now);
         }
 
-        return $this->resolveFromSchedule($location['schedule'] ?? null, $timezone, $now);
-    }
-
-    /**
-     * @param  array<string, mixed>  $address
-     */
-    public function buildAddress(array $address): string
-    {
-        $parts = array_filter([
-            $address['street1'],
-            $address['street2'] ?? null,
-            $address['city'],
-            $address['state'],
-        ]);
-
-        return implode(', ', $parts).' '.$address['zip_code'];
+        return $this->resolveFromSchedule($schedule, $timezone, $now);
     }
 
     /**

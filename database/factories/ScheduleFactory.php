@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\ScheduleType;
 use App\Models\Schedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -17,7 +18,9 @@ class ScheduleFactory extends Factory
      */
     public function definition(): array
     {
-        $hours = [];
+        $hours = [
+            'type' => ScheduleType::CheckIn,
+        ];
 
         foreach (['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as $day) {
             $hours["{$day}_open"] = '00:00:00';
@@ -27,6 +30,13 @@ class ScheduleFactory extends Factory
         return $hours;
     }
 
+    public function forAppointments(): static
+    {
+        return $this->state(fn (): array => [
+            'type' => ScheduleType::Appointment,
+        ]);
+    }
+
     /**
      * No open hours on any day (distribution center appears closed for check-in).
      */
@@ -34,7 +44,6 @@ class ScheduleFactory extends Factory
     {
         return $this->state(function (): array {
             $hours = [];
-
             foreach (['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as $day) {
                 $hours["{$day}_open"] = null;
                 $hours["{$day}_close"] = null;
@@ -51,12 +60,10 @@ class ScheduleFactory extends Factory
     {
         return $this->state(function (): array {
             $hours = [];
-
             foreach (['sunday', 'saturday'] as $day) {
                 $hours["{$day}_open"] = null;
                 $hours["{$day}_close"] = null;
             }
-
             foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day) {
                 $hours["{$day}_open"] = '09:00:00';
                 $hours["{$day}_close"] = '17:00:00';

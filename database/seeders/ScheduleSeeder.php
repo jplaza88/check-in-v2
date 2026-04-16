@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ScheduleType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -32,6 +33,15 @@ class ScheduleSeeder extends Seeder
             DB::table('schedules')->insert([
                 ...$default,
                 'location_id' => $locationId,
+                'type' => ScheduleType::CheckIn,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::table('schedules')->insert([
+                ...$default,
+                'location_id' => $locationId,
+                'type' => ScheduleType::Appointment,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

@@ -41,6 +41,10 @@ class LocationFactory extends Factory
     {
         return $this->afterCreating(function (Location $location): void {
             Schedule::factory()->for($location)->create();
+
+            if ($location->is_appointments_enabled) {
+                Schedule::factory()->forAppointments()->for($location)->create();
+            }
         });
     }
 
