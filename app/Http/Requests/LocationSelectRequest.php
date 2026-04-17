@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Enums\ScheduleType;
 use App\Models\Location;
-use App\Services\LocationService;
+use App\Services\CheckInAvailabilityService;
+use App\Services\LocationScheduleService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -55,11 +57,11 @@ class LocationSelectRequest extends FormRequest
     /**
      * @return array<mixed>
      */
-    public function after(LocationService $service): array
+    public function after(CheckInAvailabilityService $service): array
     {
         return [
             function (Validator $validator) use ($service) {
-                $location = $this->getLocation($service);
+                $location = $this->getLocation();
                 $coords = $this->attributes->get('userCoords');
 
                 if (! $location) {
@@ -83,7 +85,7 @@ class LocationSelectRequest extends FormRequest
         ];
     }
 
-    public function getLocation(LocationService $service): ?Location
+    public function getLocation(): ?Location
     {
         if (! is_null($this->location)) {
             return $this->location;
@@ -95,6 +97,6 @@ class LocationSelectRequest extends FormRequest
             return $this->location = null;
         }
 
-        return $this->location = $service->getActiveCheckInLocationsWithScheduleByUuid($uuid);
+        return $this->location = app(LocationScheduleService::class)->getActiveLocationByUuid($uuid, ScheduleType::CheckIn);
     }
 }

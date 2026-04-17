@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\DTOs;
 
-use App\Services\LocationService;
+use App\Enums\ScheduleType;
+use App\Services\AddressService;
+use App\Services\LocationScheduleService;
 
 final readonly class LocationDTO
 {
@@ -12,7 +14,7 @@ final readonly class LocationDTO
         public string $id,
         public string $name,
         public string $address,
-        public int $distance,
+        public int $maxDistanceAllowed,
         public bool $isOpen,
         public ?string $todayOpenCloseTime,
         public ?string $reason,
@@ -24,11 +26,13 @@ final readonly class LocationDTO
     /**
      * @param  array<string, mixed>  $location
      */
-    public static function fromArray(array $location): self
+    public static function fromArray(array $location, ScheduleType $scheduleType): self
     {
-        $service = app(LocationService::class);
+        $locationService = app(LocationScheduleService::class);
+        $addressService = app(AddressService::class);
 
-        [$isOpen, $openTime, $closeTime, $reason, $hasException, $isExceptionClosure] = $service->resolveOpenCloseTime($location);
+        [$isOpen, $openTime, $closeTime, $reason, $hasException, $isExceptionClosure] =
+            $locationService->resolveOpenCloseTime($location, $scheduleType);
 
         // TODO:: Convert to this to a feature for the DB
         $isClosingSoon = $isOpen
@@ -38,8 +42,8 @@ final readonly class LocationDTO
         return new self(
             id: $location['uuid'],
             name: $location['name'],
-            address: $service->buildAddress($location['address']),
-            distance: $location['distance'],
+            address: $addressService->buildAddress($location['address']),
+            maxDistanceAllowed: $location['max_distance_allowed'],
             isOpen: $isOpen,
             todayOpenCloseTime: $openTime && $closeTime
                 ? $openTime->format('g:i A').' - '.$closeTime->format('g:i A T')

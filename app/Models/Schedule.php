@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ScheduleType;
 use Carbon\CarbonImmutable;
 use Database\Factories\ScheduleFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property-read int $id
  * @property-read int $location_id
+ * @property-read string $type
  * @property-read string|null $sunday_open
  * @property-read string|null $sunday_close
  * @property-read string|null $monday_open
@@ -30,7 +32,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read CarbonImmutable $updated_at
  * @property-read Location $location
  */
-#[Fillable(['location_id', 'sunday_open', 'sunday_close', 'monday_open', 'monday_close', 'tuesday_open', 'tuesday_close', 'wednesday_open', 'wednesday_close', 'thursday_open', 'thursday_close', 'friday_open', 'friday_close', 'saturday_open', 'saturday_close'])]
+#[Fillable(['location_id', 'type', 'sunday_open', 'sunday_close', 'monday_open', 'monday_close', 'tuesday_open', 'tuesday_close', 'wednesday_open', 'wednesday_close', 'thursday_open', 'thursday_close', 'friday_open', 'friday_close', 'saturday_open', 'saturday_close'])]
 class Schedule extends Model
 {
     /** @use HasFactory<ScheduleFactory> */
@@ -39,6 +41,7 @@ class Schedule extends Model
     protected function casts(): array
     {
         return [
+            'type' => ScheduleType::class,
             'sunday_open' => 'string',
             'sunday_close' => 'string',
             'monday_open' => 'string',

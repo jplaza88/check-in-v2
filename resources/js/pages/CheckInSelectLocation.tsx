@@ -43,7 +43,7 @@ interface Location {
     id: string;
     name: string;
     address: string;
-    distance: number;
+    maxDistanceAllowed: number;
     todayOpenCloseTime: string | null;
     isOpen: boolean;
     hasException: boolean;
@@ -219,8 +219,9 @@ export default function SelectLocation() {
                             sortedLocations.map((location, idx) => {
                                 const isTooFar =
                                     location.userDistance != null &&
-                                    location.distance != null &&
-                                    location.userDistance > location.distance;
+                                    location.maxDistanceAllowed != null &&
+                                    location.userDistance >
+                                        location.maxDistanceAllowed;
 
                                 return (
                                     <button

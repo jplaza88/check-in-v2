@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\ScheduleType;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property-read int $id
  * @property-read int $location_id
+ * @property-read string $type
  * @property-read string $date
  * @property-read string|null $open
  * @property-read string|null $close
@@ -19,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read CarbonImmutable $updated_at
  * @property-read Location $location
  */
-#[Fillable(['location_id', 'date', 'open', 'close', 'is_closed', 'reason'])]
+#[Fillable(['location_id', 'type', 'date', 'open', 'close', 'is_closed', 'reason'])]
 class ScheduleException extends Model
 {
     /**
@@ -33,6 +35,7 @@ class ScheduleException extends Model
     protected function casts(): array
     {
         return [
+            'type' => ScheduleType::class,
             'is_closed' => 'boolean',
         ];
     }
