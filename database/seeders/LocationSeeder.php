@@ -25,7 +25,7 @@ class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'latitude' => 26.2284,
                 'longitude' => -80.1467,
-                'additional_fields' => false
+                'additional_fields' => false,
             ],
             [
                 'address_id' => 2,
@@ -41,7 +41,7 @@ class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'latitude' => 26.2284,
                 'longitude' => -80.1467,
-                'additional_fields' => false
+                'additional_fields' => false,
             ],
             [
                 'address_id' => 3,
@@ -57,7 +57,7 @@ class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'latitude' => 26.2284,
                 'longitude' => -80.1467,
-                'additional_fields' => false
+                'additional_fields' => false,
             ],
             [
                 'address_id' => 4,
@@ -73,7 +73,7 @@ class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'latitude' => 26.2284,
                 'longitude' => -80.1467,
-                'additional_fields' => false
+                'additional_fields' => false,
             ],
             [
                 'address_id' => 5,
@@ -89,7 +89,7 @@ class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'latitude' => 26.2284,
                 'longitude' => -80.1467,
-                'additional_fields' => false
+                'additional_fields' => false,
             ],
             [
                 'address_id' => 6,
@@ -105,7 +105,7 @@ class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'latitude' => 26.2284,
                 'longitude' => -80.1467,
-                'additional_fields' => false
+                'additional_fields' => false,
             ],
             [
                 'address_id' => 7,
@@ -121,7 +121,7 @@ class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'latitude' => 26.2284,
                 'longitude' => -80.1467,
-                'additional_fields' => false
+                'additional_fields' => false,
             ],
             [
                 'address_id' => 8,
@@ -137,7 +137,7 @@ class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'latitude' => 26.2284,
                 'longitude' => -80.1467,
-                'additional_fields' => false
+                'additional_fields' => false,
             ],
             [
                 'address_id' => 9,
@@ -153,7 +153,7 @@ class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'latitude' => 26.2284,
                 'longitude' => -80.1467,
-                'additional_fields' => false
+                'additional_fields' => false,
             ],
         ];
 
