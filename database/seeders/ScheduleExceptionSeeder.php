@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\ScheduleType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -23,6 +24,14 @@ class ScheduleExceptionSeeder extends Seeder
         foreach ($exceptions as $exception) {
             DB::table('schedule_exceptions')->insert([
                 ...$exception,
+                'type' => ScheduleType::CheckIn,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            DB::table('schedule_exceptions')->insert([
+                ...$exception,
+                'type' => ScheduleType::Appointment,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

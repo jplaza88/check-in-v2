@@ -14,7 +14,7 @@ final readonly class LocationDTO
         public string $id,
         public string $name,
         public string $address,
-        public int $distance,
+        public int $maxDistanceAllowed,
         public bool $isOpen,
         public ?string $todayOpenCloseTime,
         public ?string $reason,
@@ -43,7 +43,7 @@ final readonly class LocationDTO
             id: $location['uuid'],
             name: $location['name'],
             address: $addressService->buildAddress($location['address']),
-            distance: $location['distance'],
+            maxDistanceAllowed: $location['max_distance_allowed'],
             isOpen: $isOpen,
             todayOpenCloseTime: $openTime && $closeTime
                 ? $openTime->format('g:i A').' - '.$closeTime->format('g:i A T')

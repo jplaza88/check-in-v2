@@ -38,12 +38,12 @@ final readonly class LocationScheduleService
      */
     public function resolveOpenCloseTime(array $location, ScheduleType $scheduleType): array
     {
-        $timezone = $location['time_zone'];
+        $timezone = $location['timezone'];
 
         // Dynamically resolve schedule keys based on context (check-in vs appointment)
         [$scheduleKey, $exceptionsKey] = $scheduleType->scheduleRelationships(snake: true);
         $schedule = $location[$scheduleKey] ?? [];
-        $scheduleExceptions = $schedule[$exceptionsKey] ?? [];
+        $scheduleExceptions = $location[$exceptionsKey] ?? [];
 
         $now = now()->setTimezone($timezone);
 
