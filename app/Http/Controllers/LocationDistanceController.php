@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DTOs\LocationDistanceDTO;
+use App\Enums\ScheduleType;
 use App\Http\Requests\LocationDistanceRequest;
 use App\Services\CheckInAvailabilityService;
 use App\Services\LocationScheduleService;
@@ -21,7 +22,7 @@ class LocationDistanceController extends Controller
         $checkInAvailabilityService = app(CheckInAvailabilityService::class);
         $sessionService = app(SessionService::class);
 
-        $distances = $locationService->getActiveLocationsWithAddressAndSchedule('checkin')
+        $distances = $locationService->getActiveLocations(ScheduleType::CheckIn)
             ->filter(function ($location) {
                 $valid = ! is_null($location->address->latitude) && ! is_null($location->address->longitude);
 

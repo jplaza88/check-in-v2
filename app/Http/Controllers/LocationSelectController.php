@@ -15,17 +15,14 @@ class LocationSelectController extends Controller
 {
     public function __invoke(Request $request, LocationScheduleService $service): Response
     {
-        $context = $request->route('context');
-        $scheduleType = $context === 'checkin' ? ScheduleType::CheckIn : ScheduleType::Appointment;
+        $scheduleType = ScheduleType::from($request->route('context'));
 
-        $locations = $service->getActiveLocationsWithAddressAndSchedule($context)
+        $locations = $service->getActiveLocations($scheduleType)
             ->map(fn (Location $location) => LocationDTO::fromArray($location->toArray(), $scheduleType));
 
-        $page = $context === 'checkin' ? 'CheckInSelectLocation' : 'AppointmentSelectLocation';
-
-        return inertia($page, [
+        return inertia($scheduleType->selectLocationPage(), [
             'locations' => $locations,
-            'context' => $context,
+            'context' => $scheduleType->value,
         ]);
     }
 }

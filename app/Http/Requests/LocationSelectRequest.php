@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Enums\ScheduleType;
 use App\Models\Location;
 use App\Services\CheckInAvailabilityService;
 use App\Services\LocationScheduleService;
@@ -96,6 +97,6 @@ class LocationSelectRequest extends FormRequest
             return $this->location = null;
         }
 
-        return $this->location = app(LocationScheduleService::class)->getActiveCheckInLocationsWithScheduleByUuid($uuid);
+        return $this->location = app(LocationScheduleService::class)->getActiveLocationByUuid($uuid, ScheduleType::CheckIn);
     }
 }

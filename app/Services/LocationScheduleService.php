@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\ScheduleType;
 use App\Models\Location;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
@@ -11,46 +12,48 @@ use Illuminate\Support\Collection;
 
 final readonly class LocationScheduleService
 {
-    public function getActiveCheckInLocationsWithScheduleByUuid(string $uuid): ?Location
+    public function getActiveLocationByUuid(string $uuid, ScheduleType $scheduleType): ?Location
     {
-        return Location::with(['address', 'checkInSchedule', 'checkInScheduleExceptions'])
+        return Location::with(['address', ...$scheduleType->scheduleRelationships()])
             ->where('uuid', $uuid)
             ->where('is_active', true)
-            ->where('is_checkins_enabled', true)
+            ->where($scheduleType->locationEnabledColumn(), true)
             ->first();
     }
 
     /**
      * @return Collection<int, Location>
      */
-    public function getActiveLocationsWithAddressAndSchedule(string $context): Collection
+    public function getActiveLocations(ScheduleType $scheduleType): Collection
     {
-        $whereClause = $context === 'checkin' ? 'is_checkins_enabled' : 'is_appointments_enabled';
-
-        return Location::with(['address', 'checkInSchedule', 'checkInScheduleExceptions'])
+        return Location::with(['address', ...$scheduleType->scheduleRelationships()])
             ->where('is_active', true)
-            ->where($whereClause, true)
+            ->where($scheduleType->locationEnabledColumn(), true)
             ->get();
     }
 
     /**
-     * @param  array<string, array<string, string>>  $schedule
-     * @param  array<string, array<string, string>>  $exceptions
+     * @param  array<string, mixed>  $location
      * @return array{bool, Carbon|null, Carbon|null, string|null, bool, bool}
      */
-    public function resolveOpenCloseTime(array $schedule, array $exceptions, string $timezone, ?CarbonInterface $targetDateTime = null): array
+    public function resolveOpenCloseTime(array $location, ScheduleType $scheduleType): array
     {
-        // TODO:: Handle $targetDateTime for appointments
+        $timezone = $location['time_zone'];
+
+        // Dynamically resolve schedule keys based on context (check-in vs appointment)
+        [$scheduleKey, $exceptionsKey] = $scheduleType->scheduleRelationships(snake: true);
+        $schedule = $location[$scheduleKey] ?? [];
+        $scheduleExceptions = $schedule[$exceptionsKey] ?? [];
 
         $now = now()->setTimezone($timezone);
 
-        $exception = array_values(array_filter(
-            $exceptions,
+        $scheduleException = array_values(array_filter(
+            $scheduleExceptions,
             fn (array $e) => $e['date'] === $now->toDateString()
         ))[0] ?? null;
 
-        if ($exception) {
-            return $this->resolveFromException($exception, $timezone, $now);
+        if ($scheduleException) {
+            return $this->resolveFromException($scheduleException, $timezone, $now);
         }
 
         return $this->resolveFromSchedule($schedule, $timezone, $now);

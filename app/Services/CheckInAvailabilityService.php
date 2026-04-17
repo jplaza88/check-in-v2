@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\ScheduleType;
 use App\Models\Location;
 
 final readonly class CheckInAvailabilityService
@@ -71,11 +72,7 @@ final readonly class CheckInAvailabilityService
         }
 
         [$isOpen] = $this->locationScheduleService
-            ->resolveOpenCloseTime(
-                $location->checkInSchedule->toArray(),
-                $location->checkInScheduleExceptions->toArray(),
-                $location->timezone
-            );
+            ->resolveOpenCloseTime($location->toArray(), ScheduleType::CheckIn);
 
         return $isOpen;
     }

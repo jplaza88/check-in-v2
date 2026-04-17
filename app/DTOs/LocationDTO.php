@@ -31,15 +31,8 @@ final readonly class LocationDTO
         $locationService = app(LocationScheduleService::class);
         $addressService = app(AddressService::class);
 
-        $scheduleKey = $scheduleType === ScheduleType::CheckIn ? 'check_in_schedule' : 'appointment_schedule';
-        $exceptionsKey = $scheduleType === ScheduleType::CheckIn ? 'check_in_schedule_exceptions' : 'appointment_schedule_exceptions';
-
         [$isOpen, $openTime, $closeTime, $reason, $hasException, $isExceptionClosure] =
-            $locationService->resolveOpenCloseTime(
-                $location[$scheduleKey],
-                $location[$exceptionsKey],
-                $location['timezone']
-            );
+            $locationService->resolveOpenCloseTime($location, $scheduleType);
 
         // TODO:: Convert to this to a feature for the DB
         $isClosingSoon = $isOpen
