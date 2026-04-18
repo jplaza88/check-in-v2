@@ -21,7 +21,7 @@ class LocationFactory extends Factory
         return [
             'uuid' => (string) Str::uuid(),
             'address_id' => Address::factory(),
-            'distance' => 50,
+            'max_distance_allowed' => 50,
             'name' => fake()->company(),
             'abbreviation' => fake()->unique()->lexify('???'),
             'timezone' => 'UTC',

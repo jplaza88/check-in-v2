@@ -48,7 +48,7 @@ it('rejects check-in when the distribution center has no operating hours', funct
         'timezone' => 'UTC',
     ]);
 
-    $location->schedule->update(
+    $location->checkInSchedule->update(
         Schedule::factory()->closedEveryDay()->make()->getAttributes()
     );
 
@@ -76,7 +76,7 @@ it('rejects check-in when the driver arrives outside the weekday pickup window',
         'timezone' => 'America/New_York',
     ]);
 
-    $location->schedule->update(
+    $location->checkInSchedule->update(
         Schedule::factory()->weekdayPickupWindow()->make()->getAttributes()
     );
 
@@ -99,7 +99,7 @@ it('rejects check-in when the driver is farther than the allowed yard radius', f
     $location = Location::factory()->create([
         'latitude' => 26.142,
         'longitude' => -80.478,
-        'distance' => 5,
+        'max_distance_allowed' => 5,
         'timezone' => 'UTC',
     ]);
 

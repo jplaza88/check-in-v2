@@ -97,4 +97,9 @@ class Location extends Model
     {
         return $this->hasMany(ScheduleException::class)->where('type', ScheduleType::Appointment);
     }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
 }
