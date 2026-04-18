@@ -12,20 +12,13 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
-class LocationSelectRequest extends FormRequest
+final class LocationSelectRequest extends FormRequest
 {
-    protected ?Location $location = null;
+    private ?Location $location = null;
 
     public function authorize(): bool
     {
         return true;
-    }
-
-    protected function prepareForValidation(): void
-    {
-        if (! $this->filled('uuid')) {
-            $this->merge(['uuid' => $this->route('uuid')]);
-        }
     }
 
     /**
@@ -70,5 +63,12 @@ class LocationSelectRequest extends FormRequest
     {
         return $this->location ??= resolve(LocationScheduleService::class)
             ->getActiveLocationByUuid($this->input('uuid'), ScheduleType::CheckIn);
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if (! $this->filled('uuid')) {
+            $this->merge(['uuid' => $this->route('uuid')]);
+        }
     }
 }

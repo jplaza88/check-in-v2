@@ -6,7 +6,6 @@ namespace App\Models;
 
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -18,7 +17,4 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read State $state
  */
 #[Fillable(['name', 'state_id'])]
-class City extends Model
-{
-    use HasFactory;
-}
+final class City extends Model {}

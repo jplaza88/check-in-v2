@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use App\Enums\ScheduleType;
@@ -33,10 +35,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read Location $location
  */
 #[Fillable(['location_id', 'type', 'sunday_open', 'sunday_close', 'monday_open', 'monday_close', 'tuesday_open', 'tuesday_close', 'wednesday_open', 'wednesday_close', 'thursday_open', 'thursday_close', 'friday_open', 'friday_close', 'saturday_open', 'saturday_close'])]
-class Schedule extends Model
+final class Schedule extends Model
 {
     /** @use HasFactory<ScheduleFactory> */
     use HasFactory;
+
+    /**
+     * @return BelongsTo<Location, $this>
+     */
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
 
     protected function casts(): array
     {
@@ -57,13 +67,5 @@ class Schedule extends Model
             'saturday_open' => 'string',
             'saturday_close' => 'string',
         ];
-    }
-
-    /**
-     * @return BelongsTo<Location, $this>
-     */
-    public function location(): BelongsTo
-    {
-        return $this->belongsTo(Location::class);
     }
 }

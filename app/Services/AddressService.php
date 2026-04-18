@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-class AddressService
+final class AddressService
 {
     /**
      * @param  array<string, mixed>  $address

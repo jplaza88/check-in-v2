@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends Factory<Address>
  */
-class AddressFactory extends Factory
+final class AddressFactory extends Factory
 {
     /**
      * @return array<string, mixed>

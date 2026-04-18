@@ -11,7 +11,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
-class CountryStateCitySeeder extends Seeder
+final class CountryStateCitySeeder extends Seeder
 {
     /**
      * @throws FileNotFoundException

@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read Location $location
  */
 #[Fillable(['street1', 'street2', 'city', 'state', 'zip_code', 'zip_code_4', 'country', 'latitude', 'longitude'])]
-class Address extends Model
+final class Address extends Model
 {
     /** @use HasFactory<AddressFactory> */
     use HasFactory;

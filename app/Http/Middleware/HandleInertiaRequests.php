@@ -1,12 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
-class HandleInertiaRequests extends Middleware
+final class HandleInertiaRequests extends Middleware
 {
+    private const array PUBLIC_NAV_ROUTES = [
+        'appointment.selectLocation',
+        'checkIn.selectLocation',
+        // 'checkIn.*',
+        // 'appointment.*',
+    ];
+
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -15,13 +24,6 @@ class HandleInertiaRequests extends Middleware
      * @var string
      */
     protected $rootView = 'app';
-
-    private const array PUBLIC_NAV_ROUTES = [
-        'appointment.selectLocation',
-        'checkIn.selectLocation',
-        // 'checkIn.*',
-        // 'appointment.*',
-    ];
 
     /**
      * Determines the current asset version.
@@ -66,7 +68,7 @@ class HandleInertiaRequests extends Middleware
         ) ? request()->route()->getName() : null;
     }
 
-    private function getUserCoordsBrowserTtl(): ?string
+    private function getUserCoordsBrowserTtl(): ?int
     {
         return request()->route()?->getName() === 'checkIn.selectLocation' ?
             config('app.user_coordinates_browser_ttl') : null;

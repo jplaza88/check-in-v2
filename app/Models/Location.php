@@ -40,23 +40,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 #[Fillable(['uuid', 'address_id', 'max_distance_allowed', 'name', 'abbreviation', 'timezone', 'phone', 'phone_ext', 'email', 'latitude', 'longitude', 'is_active', 'is_checkins_enabled', 'is_appointments_enabled', 'additional_fields'])]
 #[Hidden(['id'])]
-class Location extends Model
+final class Location extends Model
 {
     /** @use HasFactory<LocationFactory> */
     use HasFactory;
-
-    protected function casts(): array
-    {
-        return [
-            'uuid' => 'string',
-            'is_active' => 'boolean',
-            'is_checkins_enabled' => 'boolean',
-            'is_appointments_enabled' => 'boolean',
-            'additional_fields' => 'boolean',
-            'latitude' => 'float',
-            'longitude' => 'float',
-        ];
-    }
 
     /**
      * @return BelongsTo<Address, $this>
@@ -101,5 +88,18 @@ class Location extends Model
     public function getRouteKeyName(): string
     {
         return 'uuid';
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'uuid' => 'string',
+            'is_active' => 'boolean',
+            'is_checkins_enabled' => 'boolean',
+            'is_appointments_enabled' => 'boolean',
+            'additional_fields' => 'boolean',
+            'latitude' => 'float',
+            'longitude' => 'float',
+        ];
     }
 }

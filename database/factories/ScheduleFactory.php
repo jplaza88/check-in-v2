@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends Factory<Schedule>
  */
-class ScheduleFactory extends Factory
+final class ScheduleFactory extends Factory
 {
     /**
      * @return array<string, mixed>

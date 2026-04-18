@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Address;
@@ -11,7 +13,7 @@ use Illuminate\Support\Str;
 /**
  * @extends Factory<Location>
  */
-class LocationFactory extends Factory
+final class LocationFactory extends Factory
 {
     /**
      * @return array<string, mixed>

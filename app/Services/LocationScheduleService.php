@@ -6,7 +6,7 @@ namespace App\Services;
 
 use App\Enums\ScheduleType;
 use App\Models\Location;
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
@@ -35,7 +35,7 @@ final readonly class LocationScheduleService
 
     /**
      * @param  array<string, mixed>  $location
-     * @return array{bool, Carbon|null, Carbon|null, string|null, bool, bool}
+     * @return array{bool, CarbonImmutable|null, CarbonImmutable|null, mixed, bool, mixed}
      */
     public function resolveOpenCloseTime(array $location, ScheduleType $scheduleType): array
     {
@@ -62,7 +62,7 @@ final readonly class LocationScheduleService
 
     /**
      * @param  array<string, mixed>  $exception
-     * @return array{bool, Carbon|null, Carbon|null, string|null, bool, bool}
+     * @return array{bool, CarbonImmutable|null, CarbonImmutable|null, mixed, bool, mixed}
      */
     private function resolveFromException(array $exception, string $timezone, CarbonInterface $now): array
     {
@@ -85,11 +85,11 @@ final readonly class LocationScheduleService
 
     /**
      * @param  ?array<string, mixed>  $schedule
-     * @return array{bool, Carbon|null, Carbon|null, string|null, bool, bool}
+     * @return array{bool, CarbonImmutable|null, CarbonImmutable|null, mixed, bool, bool}
      */
     private function resolveFromSchedule(?array $schedule, string $timezone, CarbonInterface $now): array
     {
-        $day = strtolower($now->englishDayOfWeek);
+        $day = mb_strtolower($now->englishDayOfWeek);
 
         $openTime = isset($schedule[$day.'_open']) ? Date::parse($schedule[$day.'_open'], $timezone) : null;
         $closeTime = isset($schedule[$day.'_close']) ? Date::parse($schedule[$day.'_close'], $timezone) : null;
