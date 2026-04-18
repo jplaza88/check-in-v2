@@ -59,10 +59,12 @@
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"php artisan inertia:start-ssr\" --names=server,queue,logs,ssr --kill-others"
         ],
         "lint": [
+            "rector",
             "pint --parallel"
         ],
         "lint:check": [
-            "pint --parallel --test"
+            "pint --parallel --test",
+            "rector --dry-run"
         ],
         "ci:check": [
             "Composer\\Config::disableProcessTimeout",
@@ -71,10 +73,15 @@
             "npm run types:check",
             "@test"
         ],
+        "test:unit": "XDEBUG_MODE=\"coverage\" pest --parallel --coverage --exactly=100.0",
         "test": [
-            "@php artisan config:clear --ansi",
-            "@lint:check",
-            "@php artisan test"
+            "@test:type-coverage",
+            "@test:unit",
+            "@test:lint",
+            "@test:types"
+        ],
+        "test:types": [
+            "phpstan"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
