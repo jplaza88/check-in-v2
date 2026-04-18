@@ -18,7 +18,7 @@ class CountryStateCitySeeder extends Seeder
      */
     public function run(): void
     {
-        Country::create([
+        Country::query()->create([
             'id' => 38,
             'short_name' => 'CA',
             'name' => 'Canada',
@@ -26,7 +26,7 @@ class CountryStateCitySeeder extends Seeder
             'active' => 1,
         ]);
 
-        Country::create([
+        Country::query()->create([
             'id' => 142,
             'short_name' => 'MX',
             'name' => 'Mexico',
@@ -34,7 +34,7 @@ class CountryStateCitySeeder extends Seeder
             'active' => 0,
         ]);
 
-        Country::create([
+        Country::query()->create([
             'id' => 231,
             'short_name' => 'US',
             'name' => 'United States',
@@ -43,7 +43,7 @@ class CountryStateCitySeeder extends Seeder
         ]);
 
         // Canada (country_id = 38)
-        State::insert([
+        State::query()->insert([
             ['id' => 663, 'short_name' => null, 'name' => 'Alberta', 'country_id' => 38],
             ['id' => 664, 'short_name' => null, 'name' => 'British Columbia', 'country_id' => 38],
             ['id' => 665, 'short_name' => null, 'name' => 'Manitoba', 'country_id' => 38],
@@ -60,7 +60,7 @@ class CountryStateCitySeeder extends Seeder
         ]);
 
         // Mexico (country_id = 142)
-        State::insert([
+        State::query()->insert([
             ['id' => 2427, 'short_name' => null, 'name' => 'Aguascalientes', 'country_id' => 142],
             ['id' => 2428, 'short_name' => null, 'name' => 'Baja California', 'country_id' => 142],
             ['id' => 2429, 'short_name' => null, 'name' => 'Baja California Sur', 'country_id' => 142],
@@ -97,7 +97,7 @@ class CountryStateCitySeeder extends Seeder
         ]);
 
         // United States (country_id = 231)
-        State::insert([
+        State::query()->insert([
             ['id' => 3919, 'short_name' => 'AL', 'name' => 'Alabama', 'country_id' => 231],
             ['id' => 3920, 'short_name' => 'AK', 'name' => 'Alaska', 'country_id' => 231],
             ['id' => 3921, 'short_name' => 'AZ', 'name' => 'Arizona', 'country_id' => 231],

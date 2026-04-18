@@ -18,12 +18,12 @@ class LocationDistanceController extends Controller
         $userLat = $request->float('latitude');
         $userLng = $request->float('longitude');
 
-        $locationService = app(LocationScheduleService::class);
-        $checkInAvailabilityService = app(CheckInAvailabilityService::class);
-        $sessionService = app(SessionService::class);
+        $locationService = resolve(LocationScheduleService::class);
+        $checkInAvailabilityService = resolve(CheckInAvailabilityService::class);
+        $sessionService = resolve(SessionService::class);
 
         $distances = $locationService->getActiveLocations(ScheduleType::CheckIn)
-            ->filter(function ($location) {
+            ->filter(function ($location): bool {
                 $valid = ! is_null($location->address->latitude) && ! is_null($location->address->longitude);
 
                 if (! $valid) {
@@ -35,7 +35,7 @@ class LocationDistanceController extends Controller
 
                 return $valid;
             })
-            ->map(fn ($location) => new LocationDistanceDTO(
+            ->map(fn ($location): LocationDistanceDTO => new LocationDistanceDTO(
                 id: $location->uuid,
                 userDistance: $checkInAvailabilityService->distance(
                     $userLat, $userLng,

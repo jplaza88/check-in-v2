@@ -16,12 +16,12 @@ class LocaleController extends Controller
         $availableLocales = config('app.locales');
 
         if (! in_array($locale, $availableLocales, true)) {
-            return redirect()->back();
+            return back();
         }
 
         app()->setLocale($locale);
         $sessionService->setLocale($locale);
 
-        return redirect()->back();
+        return back();
     }
 }

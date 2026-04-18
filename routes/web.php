@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
 
-Route::get('/about', static function () {
+Route::get('/about', static function (): string|false {
     ob_start();
     phpinfo();
 
@@ -19,14 +19,14 @@ Route::get('/about', static function () {
 
 $locales = implode('|', config('app.locales'));
 
-Route::prefix('locale')->group(function () use ($locales) {
+Route::prefix('locale')->group(function () use ($locales): void {
     Route::post('/{locale}', LocaleController::class)
         ->where('locale', $locales)
         ->name('localeSwitch');
 });
 
 Route::middleware(['setLocale'])
-    ->group(function () {
+    ->group(function (): void {
 
         Route::get('/check-in/select-location', LocationSelectController::class)
             ->defaults('context', 'checkin')

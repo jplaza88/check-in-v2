@@ -18,8 +18,7 @@ readonly class EnsureUserHasCoordinatesMiddleware
         $userCoords = $this->session->getUserCoords();
 
         if (! $userCoords) {
-            return redirect()
-                ->route('checkIn.selectLocation')
+            return to_route('checkIn.selectLocation')
                 ->withErrors(['userCoords' => 'Please select a location to start over.']);
         }
 

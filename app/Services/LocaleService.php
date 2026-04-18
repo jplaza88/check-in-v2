@@ -52,7 +52,7 @@ final readonly class LocaleService
      */
     private function loadTranslations(string $locale): array
     {
-        $path = base_path("lang/$locale/messages.php");
+        $path = base_path(sprintf('lang/%s/messages.php', $locale));
 
         return File::exists($path) ? include $path : [];
     }

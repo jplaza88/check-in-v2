@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Enums\ScheduleType;
-use App\Models\Location;
-use Carbon\CarbonInterface;
-
 final readonly class AppointmentAvailabilityService
 {
     /*public function __construct(private LocationScheduleService $localeScheduleService) {}

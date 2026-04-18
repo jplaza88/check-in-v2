@@ -28,8 +28,8 @@ final readonly class LocationDTO
      */
     public static function fromArray(array $location, ScheduleType $scheduleType): self
     {
-        $locationService = app(LocationScheduleService::class);
-        $addressService = app(AddressService::class);
+        $locationService = resolve(LocationScheduleService::class);
+        $addressService = resolve(AddressService::class);
 
         [$isOpen, $openTime, $closeTime, $reason, $hasException, $isExceptionClosure] =
             $locationService->resolveOpenCloseTime($location, $scheduleType);

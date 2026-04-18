@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\DTOs;
 
-final readonly class LocationDistanceDTO implements \JsonSerializable
+use JsonSerializable;
+
+final readonly class LocationDistanceDTO implements JsonSerializable
 {
     public function __construct(public string $id, public float $userDistance) {}
 

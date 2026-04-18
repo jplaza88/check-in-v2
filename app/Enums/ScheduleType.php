@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-use Str;
+use Illuminate\Support\Str;
 
 enum ScheduleType: string
 {

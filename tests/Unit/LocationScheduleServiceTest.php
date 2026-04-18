@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 use App\Enums\ScheduleType;
 use App\Services\LocationScheduleService;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Date;
 
-afterEach(function () {
-    Carbon::setTestNow();
+afterEach(function (): void {
+    Date::setTestNow();
 });
 
-it('returns open when current time falls within check-in schedule', function () {
-    Carbon::setTestNow(Carbon::parse('2026-06-15 14:00:00', 'UTC')); // Monday
+it('returns open when current time falls within check-in schedule', function (): void {
+    Date::setTestNow(Date::parse('2026-06-15 14:00:00', 'UTC')); // Monday
 
     $service = new LocationScheduleService;
 
@@ -35,8 +35,8 @@ it('returns open when current time falls within check-in schedule', function () 
         ->and($isExceptionClosure)->toBeFalse();
 });
 
-it('returns closed when current time is outside schedule hours', function () {
-    Carbon::setTestNow(Carbon::parse('2026-06-15 20:00:00', 'UTC')); // Monday 8pm
+it('returns closed when current time is outside schedule hours', function (): void {
+    Date::setTestNow(Date::parse('2026-06-15 20:00:00', 'UTC')); // Monday 8pm
 
     $service = new LocationScheduleService;
 
@@ -54,8 +54,8 @@ it('returns closed when current time is outside schedule hours', function () {
     expect($isOpen)->toBeFalse();
 });
 
-it('returns closed when schedule has null hours for the day', function () {
-    Carbon::setTestNow(Carbon::parse('2026-06-14 12:00:00', 'UTC')); // Sunday
+it('returns closed when schedule has null hours for the day', function (): void {
+    Date::setTestNow(Date::parse('2026-06-14 12:00:00', 'UTC')); // Sunday
 
     $service = new LocationScheduleService;
 
@@ -75,8 +75,8 @@ it('returns closed when schedule has null hours for the day', function () {
         ->and($closeTime)->toBeNull();
 });
 
-it('uses exception closure over regular schedule', function () {
-    Carbon::setTestNow(Carbon::parse('2026-06-15 12:00:00', 'UTC')); // Monday
+it('uses exception closure over regular schedule', function (): void {
+    Date::setTestNow(Date::parse('2026-06-15 12:00:00', 'UTC')); // Monday
 
     $service = new LocationScheduleService;
 
@@ -106,8 +106,8 @@ it('uses exception closure over regular schedule', function () {
         ->and($isExceptionClosure)->toBeTrue();
 });
 
-it('uses exception with modified hours over regular schedule', function () {
-    Carbon::setTestNow(Carbon::parse('2026-06-15 11:00:00', 'UTC')); // Monday 11am
+it('uses exception with modified hours over regular schedule', function (): void {
+    Date::setTestNow(Date::parse('2026-06-15 11:00:00', 'UTC')); // Monday 11am
 
     $service = new LocationScheduleService;
 
@@ -137,8 +137,8 @@ it('uses exception with modified hours over regular schedule', function () {
         ->and($isExceptionClosure)->toBeFalse();
 });
 
-it('ignores exceptions for other dates', function () {
-    Carbon::setTestNow(Carbon::parse('2026-06-15 12:00:00', 'UTC')); // Monday
+it('ignores exceptions for other dates', function (): void {
+    Date::setTestNow(Date::parse('2026-06-15 12:00:00', 'UTC')); // Monday
 
     $service = new LocationScheduleService;
 
@@ -159,7 +159,7 @@ it('ignores exceptions for other dates', function () {
         ],
     ];
 
-    [$isOpen, $reason, $hasException] = (function () use ($service, $location) {
+    [$isOpen, $reason, $hasException] = (function () use ($service, $location): array {
         [$isOpen, , , $reason, $hasException] = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
 
         return [$isOpen, $reason, $hasException];
@@ -169,8 +169,8 @@ it('ignores exceptions for other dates', function () {
         ->and($hasException)->toBeFalse();
 });
 
-it('resolves appointment schedule separately from check-in schedule', function () {
-    Carbon::setTestNow(Carbon::parse('2026-06-15 12:00:00', 'UTC')); // Monday
+it('resolves appointment schedule separately from check-in schedule', function (): void {
+    Date::setTestNow(Date::parse('2026-06-15 12:00:00', 'UTC')); // Monday
 
     $service = new LocationScheduleService;
 
@@ -195,8 +195,8 @@ it('resolves appointment schedule separately from check-in schedule', function (
         ->and($appointmentOpen)->toBeFalse();
 });
 
-it('respects timezone when resolving schedule', function () {
-    Carbon::setTestNow(Carbon::parse('2026-06-16 01:00:00', 'UTC')); // Monday 1am UTC = Sunday 9pm ET
+it('respects timezone when resolving schedule', function (): void {
+    Date::setTestNow(Date::parse('2026-06-16 01:00:00', 'UTC')); // Monday 1am UTC = Sunday 9pm ET
 
     $service = new LocationScheduleService;
 
