@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 use App\Models\Location;
 use App\Models\Schedule;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Date;
 
-afterEach(function () {
-    Carbon::setTestNow();
+afterEach(function (): void {
+    Date::setTestNow();
 });
 
-it('redirects to location select when session coordinates are missing', function () {
+it('redirects to location select when session coordinates are missing', function (): void {
     $location = Location::factory()->create();
 
     $this->post(route('checkIn.form', $location))
         ->assertRedirect(route('checkIn.selectLocation'));
 });
 
-it('passes validation and renders the check-in form after a successful gate post', function () {
+it('passes validation and renders the check-in form after a successful gate post', function (): void {
     $location = Location::factory()->create([
         'latitude' => 40.7128,
         'longitude' => -74.006,
@@ -39,8 +39,8 @@ it('passes validation and renders the check-in form after a successful gate post
         ->and($page['props']['location']['uuid'])->toBe($location->uuid);
 });
 
-it('rejects check-in when the distribution center has no operating hours', function () {
-    Carbon::setTestNow(Carbon::parse('2026-06-15 14:00:00', 'UTC'));
+it('rejects check-in when the distribution center has no operating hours', function (): void {
+    Date::setTestNow(Date::parse('2026-06-15 14:00:00', 'UTC'));
 
     $location = Location::factory()->create([
         'latitude' => 40.7128,
@@ -67,8 +67,8 @@ it('rejects check-in when the distribution center has no operating hours', funct
         ]);
 });
 
-it('rejects check-in when the driver arrives outside the weekday pickup window', function () {
-    Carbon::setTestNow(Carbon::parse('2026-06-15 20:00:00', 'America/New_York'));
+it('rejects check-in when the driver arrives outside the weekday pickup window', function (): void {
+    Date::setTestNow(Date::parse('2026-06-15 20:00:00', 'America/New_York'));
 
     $location = Location::factory()->create([
         'latitude' => 26.142,
@@ -95,7 +95,7 @@ it('rejects check-in when the driver arrives outside the weekday pickup window',
         ]);
 });
 
-it('rejects check-in when the driver is farther than the allowed yard radius', function () {
+it('rejects check-in when the driver is farther than the allowed yard radius', function (): void {
     $location = Location::factory()->create([
         'latitude' => 26.142,
         'longitude' => -80.478,

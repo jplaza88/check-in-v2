@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Services\AddressService;
 
-it('builds a full address from all parts', function () {
+it('builds a full address from all parts', function (): void {
     $service = new AddressService;
 
     $address = $service->buildAddress([
@@ -18,7 +18,7 @@ it('builds a full address from all parts', function () {
     expect($address)->toBe('123 Main St, Suite 100, Miami, FL 33101');
 });
 
-it('omits street2 when null', function () {
+it('omits street2 when null', function (): void {
     $service = new AddressService;
 
     $address = $service->buildAddress([
@@ -32,7 +32,7 @@ it('omits street2 when null', function () {
     expect($address)->toBe('456 Oak Ave, Orlando, FL 32801');
 });
 
-it('omits street2 when missing from array', function () {
+it('omits street2 when missing from array', function (): void {
     $service = new AddressService;
 
     $address = $service->buildAddress([

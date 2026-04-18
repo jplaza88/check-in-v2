@@ -9,7 +9,7 @@ class CheckInController extends Controller
 {
     public function gate(LocationSelectRequest $request): Response
     {
-        $validated = $request->validated();
+        $request->validated();
 
         return inertia('CheckInForm', [
             'location' => $request->getLocation(),

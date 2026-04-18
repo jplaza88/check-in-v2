@@ -7,6 +7,7 @@ namespace App\Models;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -22,6 +23,8 @@ use Illuminate\Database\Eloquent\Model;
 #[Fillable(['short_name', 'name', 'phone_code', 'active'])]
 class Country extends Model
 {
+    use HasFactory;
+
     protected function casts(): array
     {
         return [

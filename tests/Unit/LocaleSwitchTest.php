@@ -4,7 +4,7 @@ use Tests\TestCase;
 
 uses(TestCase::class);
 
-it('switches locale when locale is available', function () {
+it('switches locale when locale is available', function (): void {
     $targetUrl = route('checkIn.selectLocation');
 
     $response = $this
@@ -15,7 +15,7 @@ it('switches locale when locale is available', function () {
     $response->assertSessionHas('locale', 'es');
 });
 
-it('does not switch locale when locale is not available', function () {
+it('does not switch locale when locale is not available', function (): void {
     $targetUrl = route('checkIn.selectLocation');
 
     $response = $this

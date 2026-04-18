@@ -9,6 +9,7 @@ use App\Models\Location;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 
 final readonly class LocationScheduleService
 {
@@ -49,7 +50,7 @@ final readonly class LocationScheduleService
 
         $scheduleException = array_values(array_filter(
             $scheduleExceptions,
-            fn (array $e) => $e['date'] === $now->toDateString()
+            fn (array $e): bool => $e['date'] === $now->toDateString()
         ))[0] ?? null;
 
         if ($scheduleException) {
@@ -65,8 +66,8 @@ final readonly class LocationScheduleService
      */
     private function resolveFromException(array $exception, string $timezone, CarbonInterface $now): array
     {
-        $openTime = $exception['open'] ? Carbon::parse($exception['open'], $timezone) : null;
-        $closeTime = $exception['close'] ? Carbon::parse($exception['close'], $timezone) : null;
+        $openTime = $exception['open'] ? Date::parse($exception['open'], $timezone) : null;
+        $closeTime = $exception['close'] ? Date::parse($exception['close'], $timezone) : null;
 
         if ($exception['is_closed']) {
             return [false, $openTime, $closeTime, $exception['reason'], true, true];
@@ -90,8 +91,8 @@ final readonly class LocationScheduleService
     {
         $day = strtolower($now->englishDayOfWeek);
 
-        $openTime = isset($schedule["{$day}_open"]) ? Carbon::parse($schedule["{$day}_open"], $timezone) : null;
-        $closeTime = isset($schedule["{$day}_close"]) ? Carbon::parse($schedule["{$day}_close"], $timezone) : null;
+        $openTime = isset($schedule[$day.'_open']) ? Date::parse($schedule[$day.'_open'], $timezone) : null;
+        $closeTime = isset($schedule[$day.'_close']) ? Date::parse($schedule[$day.'_close'], $timezone) : null;
 
         return [
             $openTime && $closeTime && $now->between($openTime, $closeTime),

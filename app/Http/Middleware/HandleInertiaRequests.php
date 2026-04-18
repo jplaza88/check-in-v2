@@ -47,10 +47,10 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => fn () => $request->user(),
+                'user' => $request->user(...),
             ],
-            'currentRoute' => fn () => $this->getCurrentRouteName(),
-            'userCoordsBrowserTtl' => fn () => $this->getUserCoordsBrowserTtl(),
+            'currentRoute' => $this->getCurrentRouteName(...),
+            'userCoordsBrowserTtl' => $this->getUserCoordsBrowserTtl(...),
             'currentLocale' => fn () => app()->getLocale(),
             'localesAvailable' => fn () => config('app.locales'),
             'localesLabels' => fn () => config('app.locales_labels'),

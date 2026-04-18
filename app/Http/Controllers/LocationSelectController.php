@@ -18,7 +18,7 @@ class LocationSelectController extends Controller
         $scheduleType = ScheduleType::from($request->route('context'));
 
         $locations = $service->getActiveLocations($scheduleType)
-            ->map(fn (Location $location) => LocationDTO::fromArray($location->toArray(), $scheduleType));
+            ->map(fn (Location $location): LocationDTO => LocationDTO::fromArray($location->toArray(), $scheduleType));
 
         return inertia($scheduleType->selectLocationPage(), [
             'locations' => $locations,

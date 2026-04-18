@@ -23,8 +23,8 @@ class ScheduleFactory extends Factory
         ];
 
         foreach (['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as $day) {
-            $hours["{$day}_open"] = '00:00:00';
-            $hours["{$day}_close"] = '23:59:59';
+            $hours[$day.'_open'] = '00:00:00';
+            $hours[$day.'_close'] = '23:59:59';
         }
 
         return $hours;
@@ -45,8 +45,8 @@ class ScheduleFactory extends Factory
         return $this->state(function (): array {
             $hours = [];
             foreach (['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as $day) {
-                $hours["{$day}_open"] = null;
-                $hours["{$day}_close"] = null;
+                $hours[$day.'_open'] = null;
+                $hours[$day.'_close'] = null;
             }
 
             return $hours;
@@ -61,12 +61,13 @@ class ScheduleFactory extends Factory
         return $this->state(function (): array {
             $hours = [];
             foreach (['sunday', 'saturday'] as $day) {
-                $hours["{$day}_open"] = null;
-                $hours["{$day}_close"] = null;
+                $hours[$day.'_open'] = null;
+                $hours[$day.'_close'] = null;
             }
+
             foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day) {
-                $hours["{$day}_open"] = '09:00:00';
-                $hours["{$day}_close"] = '17:00:00';
+                $hours[$day.'_open'] = '09:00:00';
+                $hours[$day.'_close'] = '17:00:00';
             }
 
             return $hours;

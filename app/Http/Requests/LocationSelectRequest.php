@@ -46,10 +46,10 @@ class LocationSelectRequest extends FormRequest
     public function after(CheckInAvailabilityService $service): array
     {
         return [
-            function (Validator $validator) use ($service) {
+            function (Validator $validator) use ($service): void {
                 $location = $this->getLocation();
 
-                if (! $location) {
+                if (! $location instanceof Location) {
                     $validator->errors()->add('uuid', 'Invalid Location.');
 
                     return;
@@ -68,7 +68,7 @@ class LocationSelectRequest extends FormRequest
 
     public function getLocation(): ?Location
     {
-        return $this->location ??= app(LocationScheduleService::class)
+        return $this->location ??= resolve(LocationScheduleService::class)
             ->getActiveLocationByUuid($this->input('uuid'), ScheduleType::CheckIn);
     }
 }

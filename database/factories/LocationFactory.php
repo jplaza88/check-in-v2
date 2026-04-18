@@ -50,7 +50,7 @@ class LocationFactory extends Factory
 
     public function appointmentsOnly(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_checkins_enabled' => false,
             'is_appointments_enabled' => true,
         ]);

@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('states', static function (Blueprint $table) {
+        Schema::create('states', static function (Blueprint $table): void {
             $table->id();
             $table->string('short_name', 2)->nullable();
             $table->string('name', 150);
