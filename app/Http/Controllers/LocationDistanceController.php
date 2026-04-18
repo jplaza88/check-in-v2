@@ -25,18 +25,6 @@ final class LocationDistanceController extends Controller
         $sessionService = resolve(SessionService::class);
 
         $distances = $locationService->getActiveLocations(ScheduleType::CheckIn)
-            ->filter(function ($location): bool {
-                $valid = ! is_null($location->address->latitude) && ! is_null($location->address->longitude);
-
-                if (! $valid) {
-                    logger()->warning('Location missing address coordinates, excluded from distance calculation.', [
-                        'location_id' => $location->id,
-                        'location_name' => $location->name,
-                    ]);
-                }
-
-                return $valid;
-            })
             ->map(fn ($location): LocationDistanceDTO => new LocationDistanceDTO(
                 id: $location->uuid,
                 userDistance: $checkInAvailabilityService->distance(
