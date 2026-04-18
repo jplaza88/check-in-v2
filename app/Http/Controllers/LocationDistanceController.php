@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\DTOs\LocationDistanceDTO;
@@ -10,7 +12,7 @@ use App\Services\LocationScheduleService;
 use App\Services\SessionService;
 use Illuminate\Http\JsonResponse;
 
-class LocationDistanceController extends Controller
+final class LocationDistanceController extends Controller
 {
     public function __invoke(
         LocationDistanceRequest $request

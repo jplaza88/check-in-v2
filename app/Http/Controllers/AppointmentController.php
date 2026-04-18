@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Http\Requests\LocationSelectRequest;
 use Inertia\Response;
 
-class AppointmentController extends Controller
+final class AppointmentController extends Controller
 {
     public function gate(LocationSelectRequest $request): Response
     {

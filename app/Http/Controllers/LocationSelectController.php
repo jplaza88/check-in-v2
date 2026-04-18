@@ -11,7 +11,7 @@ use App\Services\LocationScheduleService;
 use Illuminate\Http\Request;
 use Inertia\Response;
 
-class LocationSelectController extends Controller
+final class LocationSelectController extends Controller
 {
     public function __invoke(Request $request, LocationScheduleService $service): Response
     {

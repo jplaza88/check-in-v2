@@ -8,7 +8,7 @@ use App\Enums\ScheduleType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class ScheduleSeeder extends Seeder
+final class ScheduleSeeder extends Seeder
 {
     public function run(): void
     {

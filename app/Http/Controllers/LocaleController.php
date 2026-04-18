@@ -1,11 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Services\SessionService;
 use Illuminate\Http\RedirectResponse;
 
-class LocaleController extends Controller
+final class LocaleController extends Controller
 {
     /*
      * Handles the language switch when the user clicks on a locale in the navbar

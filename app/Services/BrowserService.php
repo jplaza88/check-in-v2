@@ -26,7 +26,7 @@ final readonly class BrowserService
          **/
         if (preg_match('/^([a-z]+)/i', $browserLanguage ?: '', $matches)) {
 
-            return strtolower($matches[1]);
+            return mb_strtolower($matches[1]);
         }
 
         return null;
