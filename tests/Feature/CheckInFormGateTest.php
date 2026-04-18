@@ -63,7 +63,7 @@ it('rejects check-in when the distribution center has no operating hours', funct
         ->post(route('checkIn.form', $location))
         ->assertRedirect()
         ->assertSessionHasErrors([
-            'uuid' => 'This location is currently closed.',
+            'uuid' => __('messages.checkInSelectLocation.locationClosed'),
         ]);
 });
 
@@ -91,7 +91,7 @@ it('rejects check-in when the driver arrives outside the weekday pickup window',
         ->post(route('checkIn.form', $location))
         ->assertRedirect()
         ->assertSessionHasErrors([
-            'uuid' => 'This location is currently closed.',
+            'uuid' => __('messages.checkInSelectLocation.locationClosed'),
         ]);
 });
 
@@ -114,6 +114,6 @@ it('rejects check-in when the driver is farther than the allowed yard radius', f
         ->post(route('checkIn.form', $location))
         ->assertRedirect()
         ->assertSessionHasErrors([
-            'uuid' => 'You are too far from this location.',
+            'uuid' => __('messages.checkInSelectLocation.tooFar'),
         ]);
 });

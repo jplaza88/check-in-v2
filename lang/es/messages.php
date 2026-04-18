@@ -49,6 +49,9 @@ return [
         'geolocationNotSupportedTitle' => 'Navegador no compatible',
         'fetchDistancesErrorTitle' => 'No se pudieron cargar las ubicaciones',
         'fetchDistancesErrorMessage' => 'Ocurrió un error al calcular las distancias. Por favor, actualiza la página e inténtalo de nuevo.',
+        'tooFar' => 'Estás demasiado lejos de esta ubicación.',
+        'locationClosed' => 'Esta ubicación está cerrada actualmente.',
+        'invalidLocation' => 'Ubicación no válida.',
     ],
 
     'appointmentSelectLocation' => [

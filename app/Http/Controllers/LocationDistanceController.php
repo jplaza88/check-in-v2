@@ -27,7 +27,7 @@ final class LocationDistanceController extends Controller
         $distances = $locationService->getActiveLocations(ScheduleType::CheckIn)
             ->map(fn ($location): LocationDistanceDTO => new LocationDistanceDTO(
                 id: $location->uuid,
-                userDistance: $checkInAvailabilityService->distance(
+                userDistance: $checkInAvailabilityService->calculateDistance(
                     $userLat, $userLng,
                     (float) $location->address->latitude,
                     (float) $location->address->longitude,

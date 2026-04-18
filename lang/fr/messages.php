@@ -49,6 +49,9 @@ return [
         'geolocationNotSupportedTitle' => 'Navigateur non pris en charge',
         'fetchDistancesErrorTitle' => 'Impossible de charger les emplacements',
         'fetchDistancesErrorMessage' => 'Une erreur est survenue lors du calcul des distances. Veuillez actualiser la page et réessayer.',
+        'tooFar' => 'Vous êtes trop loin de cet emplacement.',
+        'locationClosed' => 'Cet emplacement est actuellement fermé.',
+        'invalidLocation' => 'Emplacement invalide.',
     ],
 
     'appointmentSelectLocation' => [

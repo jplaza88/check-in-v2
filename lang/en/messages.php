@@ -55,6 +55,9 @@ return [
         'geolocationNotSupportedTitle' => 'Browser not supported',
         'fetchDistancesErrorTitle' => 'Unable to load locations',
         'fetchDistancesErrorMessage' => 'Something went wrong while calculating distances. Please refresh the page and try again.',
+        'tooFar' => 'You are too far from this location.',
+        'locationClosed' => 'This location is currently closed.',
+        'invalidLocation' => 'Invalid Location.',
     ],
 
     'appointmentSelectLocation' => [

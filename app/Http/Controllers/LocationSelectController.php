@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\DTOs\LocationDTO;
+use App\DTOs\LocationSelectDTO;
 use App\Enums\ScheduleType;
 use App\Models\Location;
 use App\Services\LocationScheduleService;
@@ -18,7 +18,7 @@ final class LocationSelectController extends Controller
         $scheduleType = ScheduleType::from($request->route('context'));
 
         $locations = $service->getActiveLocations($scheduleType)
-            ->map(fn (Location $location): LocationDTO => LocationDTO::fromArray($location->toArray(), $scheduleType));
+            ->map(fn (Location $location): LocationSelectDTO => LocationSelectDTO::fromArray($location->toArray(), $scheduleType));
 
         return inertia($scheduleType->selectLocationPage(), [
             'locations' => $locations,

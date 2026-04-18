@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\DTOs\CheckInAvailabilityDTO;
 use App\Enums\ScheduleType;
 use App\Models\Location;
 
@@ -13,12 +14,11 @@ final readonly class CheckInAvailabilityService
 
     /**
      * @param  array<mixed, mixed>  $userCoords
-     * @return array<string, mixed>
      */
-    public function canCheckIn(Location $location, array $userCoords): array
+    public function canCheckIn(Location $location, array $userCoords): CheckInAvailabilityDTO
     {
         // User Distance
-        $distance = $this->distance(
+        $distance = $this->calculateDistance(
             $userCoords['latitude'],
             $userCoords['longitude'],
             $location->latitude,
@@ -27,30 +27,27 @@ final readonly class CheckInAvailabilityService
 
         // Is user close enough?
         if ($distance > $location->max_distance_allowed) {
-            return [
-                'allowed' => false,
-                'reason' => 'You are too far from this location.',
-            ];
+            return new CheckInAvailabilityDTO(
+                allowed: false,
+                reason: __('messages.checkInSelectLocation.tooFar'),
+            );
         }
 
         // Schedule & schedule exceptions
         if (! $this->isOpen($location)) {
-            return [
-                'allowed' => false,
-                'reason' => 'This location is currently closed.',
-            ];
+            return new CheckInAvailabilityDTO(
+                allowed: false,
+                reason: __('messages.checkInSelectLocation.locationClosed'),
+            );
         }
 
-        return [
-            'allowed' => true,
-            'reason' => null,
-        ];
+        return new CheckInAvailabilityDTO(allowed: true);
     }
 
     /**
      * Haversine distance formula
      */
-    public function distance(float $lat1, float $lng1, float $lat2, float $lng2, int $decimalPlaces = 1): float
+    public function calculateDistance(float $lat1, float $lng1, float $lat2, float $lng2, int $decimalPlaces = 1): float
     {
         $earthRadius = 3958.8; // miles
         // $earthRadius = 6371; //km

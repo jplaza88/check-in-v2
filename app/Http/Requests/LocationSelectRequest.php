@@ -52,8 +52,8 @@ final class LocationSelectRequest extends FormRequest
 
                 $canCheckIn = $service->canCheckIn($location, $coords);
 
-                if (! $canCheckIn['allowed']) {
-                    $validator->errors()->add('uuid', $canCheckIn['reason']);
+                if (! $canCheckIn->allowed) {
+                    $validator->errors()->add('uuid', $canCheckIn->reason ?? __('checkInSelectLocation.locationClosed'));
                 }
             },
         ];
