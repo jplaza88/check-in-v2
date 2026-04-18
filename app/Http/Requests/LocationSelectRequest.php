@@ -10,8 +10,6 @@ use App\Services\CheckInAvailabilityService;
 use App\Services\LocationScheduleService;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class LocationSelectRequest extends FormRequest
@@ -25,14 +23,8 @@ class LocationSelectRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        if ($this->filled('uuid')) {
-            return;
-        }
-
-        $uuid = $this->route('uuid');
-
-        if (is_string($uuid) && Str::isUuid($uuid)) {
-            $this->merge(['uuid' => $uuid]);
+        if (! $this->filled('uuid')) {
+            $this->merge(['uuid' => $this->route('uuid')]);
         }
     }
 
@@ -44,13 +36,7 @@ class LocationSelectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'uuid' => [
-                'required',
-                'uuid',
-                Rule::exists('locations', 'uuid')
-                    ->where('is_active', true)
-                    ->where('is_checkins_enabled', true),
-            ],
+            'uuid' => ['required', 'uuid'],
         ];
     }
 
@@ -62,7 +48,6 @@ class LocationSelectRequest extends FormRequest
         return [
             function (Validator $validator) use ($service) {
                 $location = $this->getLocation();
-                $coords = $this->attributes->get('userCoords');
 
                 if (! $location) {
                     $validator->errors()->add('uuid', 'Invalid Location.');
@@ -70,11 +55,7 @@ class LocationSelectRequest extends FormRequest
                     return;
                 }
 
-                if (! is_array($coords)) {
-                    $validator->errors()->add('uuid', 'Please select a location to start over.');
-
-                    return;
-                }
+                $coords = $this->attributes->get('userCoords');
 
                 $canCheckIn = $service->canCheckIn($location, $coords);
 
@@ -87,16 +68,7 @@ class LocationSelectRequest extends FormRequest
 
     public function getLocation(): ?Location
     {
-        if (! is_null($this->location)) {
-            return $this->location;
-        }
-
-        $uuid = $this->input('uuid');
-
-        if (! is_string($uuid) || $uuid === '') {
-            return $this->location = null;
-        }
-
-        return $this->location = app(LocationScheduleService::class)->getActiveLocationByUuid($uuid, ScheduleType::CheckIn);
+        return $this->location ??= app(LocationScheduleService::class)
+            ->getActiveLocationByUuid($this->input('uuid'), ScheduleType::CheckIn);
     }
 }

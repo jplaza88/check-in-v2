@@ -6,6 +6,11 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class LocationDistanceRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return true;
+    }
+
     /**
      * @return array<string, array<string>>
      */
@@ -15,10 +20,5 @@ class LocationDistanceRequest extends FormRequest
             'latitude' => ['required', 'numeric', 'between:-90,90'],
             'longitude' => ['required', 'numeric', 'between:-180,180'],
         ];
-    }
-
-    public function authorize(): bool
-    {
-        return true;
     }
 }

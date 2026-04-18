@@ -49,15 +49,26 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => fn () => $request->user(),
             ],
-            'currentRoute' => fn () => in_array(
-                request()->route()?->getName(),
-                self::PUBLIC_NAV_ROUTES,
-                strict: true
-            ) ? request()->route()->getName() : null,
-            'userCoordsBrowserTtl' => fn () => request()->route()?->getName() === 'checkIn.selectLocation' ? config('app.user_coordinates_browser_ttl') : null,
+            'currentRoute' => fn () => $this->getCurrentRouteName(),
+            'userCoordsBrowserTtl' => fn () => $this->getUserCoordsBrowserTtl(),
             'currentLocale' => fn () => app()->getLocale(),
             'localesAvailable' => fn () => config('app.locales'),
             'localesLabels' => fn () => config('app.locales_labels'),
         ];
+    }
+
+    private function getCurrentRouteName(): ?string
+    {
+        return in_array(
+            request()->route()?->getName(),
+            self::PUBLIC_NAV_ROUTES,
+            strict: true
+        ) ? request()->route()->getName() : null;
+    }
+
+    private function getUserCoordsBrowserTtl(): ?string
+    {
+        return request()->route()?->getName() === 'checkIn.selectLocation' ?
+            config('app.user_coordinates_browser_ttl') : null;
     }
 }
