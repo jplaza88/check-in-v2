@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\Address;
 use App\Models\Location;
 use App\Models\Schedule;
 use Illuminate\Support\Facades\Date;
@@ -18,10 +19,12 @@ it('redirects to location select when session coordinates are missing', function
 });
 
 it('passes validation and renders the check-in form after a successful gate post', function (): void {
-    $location = Location::factory()->create([
-        'latitude' => 40.7128,
-        'longitude' => -74.006,
-    ]);
+    $location = Location::factory()
+        ->for(Address::factory()->state([
+            'latitude' => 40.7128,
+            'longitude' => -74.006,
+        ]))
+        ->create();
 
     $response = $this->withSession([
         'userCoords' => [
@@ -42,11 +45,14 @@ it('passes validation and renders the check-in form after a successful gate post
 it('rejects check-in when the distribution center has no operating hours', function (): void {
     Date::setTestNow(Date::parse('2026-06-15 14:00:00', 'UTC'));
 
-    $location = Location::factory()->create([
-        'latitude' => 40.7128,
-        'longitude' => -74.006,
-        'timezone' => 'UTC',
-    ]);
+    $location = Location::factory()
+        ->for(Address::factory()->state([
+            'latitude' => 40.7128,
+            'longitude' => -74.006,
+        ]))
+        ->create([
+            'timezone' => 'America/New_York',
+        ]);
 
     $location->checkInSchedule->update(
         Schedule::factory()->closedEveryDay()->make()->getAttributes()
@@ -70,11 +76,14 @@ it('rejects check-in when the distribution center has no operating hours', funct
 it('rejects check-in when the driver arrives outside the weekday pickup window', function (): void {
     Date::setTestNow(Date::parse('2026-06-15 20:00:00', 'America/New_York'));
 
-    $location = Location::factory()->create([
-        'latitude' => 26.142,
-        'longitude' => -80.478,
-        'timezone' => 'America/New_York',
-    ]);
+    $location = Location::factory()
+        ->for(Address::factory()->state([
+            'latitude' => 26.142,
+            'longitude' => -80.478,
+        ]))
+        ->create([
+            'timezone' => 'America/New_York',
+        ]);
 
     $location->checkInSchedule->update(
         Schedule::factory()->weekdayPickupWindow()->make()->getAttributes()
@@ -91,17 +100,25 @@ it('rejects check-in when the driver arrives outside the weekday pickup window',
         ->post(route('checkIn.form', $location))
         ->assertRedirect()
         ->assertSessionHasErrors([
-            'uuid' => __('messages.checkInSelectLocation.locationClosed'),
+            'uuid' => __('messages.checkInSelectLocation.outsideHours', [
+                'name' => $location->name,
+                'open' => '9:00 AM',
+                'close' => '5:00 PM EDT',
+            ]),
         ]);
+
 });
 
 it('rejects check-in when the driver is farther than the allowed yard radius', function (): void {
-    $location = Location::factory()->create([
-        'latitude' => 26.142,
-        'longitude' => -80.478,
-        'max_distance_allowed' => 5,
-        'timezone' => 'UTC',
-    ]);
+    $location = Location::factory()
+        ->for(Address::factory()->state([
+            'latitude' => 26.142,
+            'longitude' => -80.478,
+        ]))
+        ->create([
+            'timezone' => 'UTC',
+            'max_distance_allowed' => 5,
+        ]);
 
     $this->from(route('checkIn.selectLocation'))
         ->withSession([
@@ -114,6 +131,10 @@ it('rejects check-in when the driver is farther than the allowed yard radius', f
         ->post(route('checkIn.form', $location))
         ->assertRedirect()
         ->assertSessionHasErrors([
-            'uuid' => __('messages.checkInSelectLocation.tooFar'),
+            'uuid' => __('messages.checkInSelectLocation.tooFar', [
+                'name' => $location->name,
+                'maxDistance' => 5,
+                'userDistance' => 1072.9,
+            ]),
         ]);
 });

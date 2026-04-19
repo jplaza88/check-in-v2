@@ -14,7 +14,7 @@ final class CheckInController extends Controller
         $request->validated();
 
         return inertia('CheckInForm', [
-            'location' => $request->getLocation(),
+            'location' => $request->location,
         ]);
     }
 }

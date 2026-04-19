@@ -30,8 +30,6 @@ final class LocationFactory extends Factory
             'phone' => fake()->phoneNumber(),
             'phone_ext' => null,
             'email' => fake()->safeEmail(),
-            'latitude' => 40.7128,
-            'longitude' => -74.006,
             'is_active' => true,
             'is_checkins_enabled' => true,
             'is_appointments_enabled' => false,

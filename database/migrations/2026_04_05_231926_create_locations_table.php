@@ -21,8 +21,6 @@ return new class extends Migration
             $table->string('phone');
             $table->string('phone_ext')->nullable();
             $table->string('email');
-            $table->string('latitude');
-            $table->string('longitude');
             $table->boolean('is_active');
             $table->boolean('is_checkins_enabled');
             $table->boolean('is_appointments_enabled');

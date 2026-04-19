@@ -24,15 +24,14 @@ it('returns open when current time falls within check-in schedule', function ():
         'check_in_schedule_exceptions' => [],
     ];
 
-    [$isOpen, $openTime, $closeTime, $reason, $hasException, $isExceptionClosure] =
-        $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
+    $result = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
 
-    expect($isOpen)->toBeTrue()
-        ->and($openTime)->not->toBeNull()
-        ->and($closeTime)->not->toBeNull()
-        ->and($reason)->toBeNull()
-        ->and($hasException)->toBeFalse()
-        ->and($isExceptionClosure)->toBeFalse();
+    expect($result->isOpen)->toBeTrue()
+        ->and($result->openTime)->not->toBeNull()
+        ->and($result->closeTime)->not->toBeNull()
+        ->and($result->reason)->toBeNull()
+        ->and($result->hasException)->toBeFalse()
+        ->and($result->isExceptionClosure)->toBeFalse();
 });
 
 it('returns closed when current time is outside schedule hours', function (): void {
@@ -49,9 +48,9 @@ it('returns closed when current time is outside schedule hours', function (): vo
         'check_in_schedule_exceptions' => [],
     ];
 
-    [$isOpen] = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
+    $result = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
 
-    expect($isOpen)->toBeFalse();
+    expect($result->isOpen)->toBeFalse();
 });
 
 it('returns closed when schedule has null hours for the day', function (): void {
@@ -68,11 +67,11 @@ it('returns closed when schedule has null hours for the day', function (): void 
         'check_in_schedule_exceptions' => [],
     ];
 
-    [$isOpen, $openTime, $closeTime] = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
+    $result = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
 
-    expect($isOpen)->toBeFalse()
-        ->and($openTime)->toBeNull()
-        ->and($closeTime)->toBeNull();
+    expect($result->isOpen)->toBeFalse()
+        ->and($result->openTime)->toBeNull()
+        ->and($result->closeTime)->toBeNull();
 });
 
 it('uses exception closure over regular schedule', function (): void {
@@ -97,13 +96,12 @@ it('uses exception closure over regular schedule', function (): void {
         ],
     ];
 
-    [$isOpen, $openTime, $closeTime, $reason, $hasException, $isExceptionClosure] =
-        $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
+    $result = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
 
-    expect($isOpen)->toBeFalse()
-        ->and($reason)->toBe('Holiday')
-        ->and($hasException)->toBeTrue()
-        ->and($isExceptionClosure)->toBeTrue();
+    expect($result->isOpen)->toBeFalse()
+        ->and($result->reason)->toBe('Holiday')
+        ->and($result->hasException)->toBeTrue()
+        ->and($result->isExceptionClosure)->toBeTrue();
 });
 
 it('uses exception with modified hours over regular schedule', function (): void {
@@ -128,13 +126,12 @@ it('uses exception with modified hours over regular schedule', function (): void
         ],
     ];
 
-    [$isOpen, $openTime, $closeTime, $reason, $hasException, $isExceptionClosure] =
-        $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
+    $result = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
 
-    expect($isOpen)->toBeTrue()
-        ->and($reason)->toBe('Half day')
-        ->and($hasException)->toBeTrue()
-        ->and($isExceptionClosure)->toBeFalse();
+    expect($result->isOpen)->toBeTrue()
+        ->and($result->reason)->toBe('Half day')
+        ->and($result->hasException)->toBeTrue()
+        ->and($result->isExceptionClosure)->toBeFalse();
 });
 
 it('ignores exceptions for other dates', function (): void {
@@ -159,14 +156,10 @@ it('ignores exceptions for other dates', function (): void {
         ],
     ];
 
-    [$isOpen, $reason, $hasException] = (function () use ($service, $location): array {
-        [$isOpen, , , $reason, $hasException] = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
+    $result = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
 
-        return [$isOpen, $reason, $hasException];
-    })();
-
-    expect($isOpen)->toBeTrue()
-        ->and($hasException)->toBeFalse();
+    expect($result->isOpen)->toBeTrue()
+        ->and($result->hasException)->toBeFalse();
 });
 
 it('resolves appointment schedule separately from check-in schedule', function (): void {
@@ -188,11 +181,11 @@ it('resolves appointment schedule separately from check-in schedule', function (
         'appointment_schedule_exceptions' => [],
     ];
 
-    [$checkInOpen] = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
-    [$appointmentOpen] = $service->resolveOpenCloseTime($location, ScheduleType::Appointment);
+    $resultCheckIn = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
+    $resultAppointment = $service->resolveOpenCloseTime($location, ScheduleType::Appointment);
 
-    expect($checkInOpen)->toBeTrue()
-        ->and($appointmentOpen)->toBeFalse();
+    expect($resultCheckIn->isOpen)->toBeTrue()
+        ->and($resultAppointment->isOpen)->toBeFalse();
 });
 
 it('respects timezone when resolving schedule', function (): void {
@@ -211,7 +204,7 @@ it('respects timezone when resolving schedule', function (): void {
         'check_in_schedule_exceptions' => [],
     ];
 
-    [$isOpen] = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
+    $result = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
 
-    expect($isOpen)->toBeFalse();
+    expect($result->isOpen)->toBeFalse();
 });

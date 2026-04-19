@@ -55,9 +55,12 @@ return [
         'geolocationNotSupportedTitle' => 'Browser not supported',
         'fetchDistancesErrorTitle' => 'Unable to load locations',
         'fetchDistancesErrorMessage' => 'Something went wrong while calculating distances. Please refresh the page and try again.',
-        'tooFar' => 'You are too far from this location.',
+        'tooFar' => 'You must be within :maxDistance miles of :name to check in. You are currently :userDistance mi away. Please try again once you are closer.',
         'locationClosed' => 'This location is currently closed.',
         'invalidLocation' => 'Invalid Location.',
+        'outsideHours' => ':name is closed right now. Business hours today are :open - :close. Please come back during business hours.',
+        'checkInUnavailable' => 'Check-In Unavailable',
+        'outsideExceptionHours' => ':name has special hours today: :open - :close. Please come back during business hours.',
     ],
 
     'appointmentSelectLocation' => [

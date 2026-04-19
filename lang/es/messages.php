@@ -49,9 +49,12 @@ return [
         'geolocationNotSupportedTitle' => 'Navegador no compatible',
         'fetchDistancesErrorTitle' => 'No se pudieron cargar las ubicaciones',
         'fetchDistancesErrorMessage' => 'Ocurrió un error al calcular las distancias. Por favor, actualiza la página e inténtalo de nuevo.',
-        'tooFar' => 'Estás demasiado lejos de esta ubicación.',
+        'tooFar' => 'Debe estar dentro de :maxDistance millas de :name para registrarse. Actualmente se encuentra a :userDistance mi de distancia. Inténtelo de nuevo cuando esté más cerca.',
         'locationClosed' => 'Esta ubicación está cerrada actualmente.',
         'invalidLocation' => 'Ubicación no válida.',
+        'outsideHours' => ':name está cerrado en este momento. El horario de atención hoy es de :open - :close. Por favor regrese durante el horario de atención.',
+        'checkInUnavailable' => 'Registro no disponible',
+        'outsideExceptionHours' => ':name tiene horario especial hoy: :open - :close. Por favor regrese durante el horario de atención.',
     ],
 
     'appointmentSelectLocation' => [

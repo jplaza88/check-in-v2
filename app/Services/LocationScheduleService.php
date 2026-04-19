@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\DTOs\LocationScheduleDTO;
 use App\Enums\ScheduleType;
 use App\Models\Location;
-use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
@@ -35,9 +35,8 @@ final readonly class LocationScheduleService
 
     /**
      * @param  array<string, mixed>  $location
-     * @return array{bool, CarbonImmutable|null, CarbonImmutable|null, mixed, bool, mixed}
      */
-    public function resolveOpenCloseTime(array $location, ScheduleType $scheduleType): array
+    public function resolveOpenCloseTime(array $location, ScheduleType $scheduleType): LocationScheduleDTO
     {
         $timezone = $location['timezone'];
 
@@ -62,45 +61,46 @@ final readonly class LocationScheduleService
 
     /**
      * @param  array<string, mixed>  $exception
-     * @return array{bool, CarbonImmutable|null, CarbonImmutable|null, mixed, bool, mixed}
      */
-    private function resolveFromException(array $exception, string $timezone, CarbonInterface $now): array
+    private function resolveFromException(array $exception, string $timezone, CarbonInterface $now): LocationScheduleDTO
     {
         $openTime = $exception['open'] ? Date::parse($exception['open'], $timezone) : null;
         $closeTime = $exception['close'] ? Date::parse($exception['close'], $timezone) : null;
 
         if ($exception['is_closed']) {
-            return [false, $openTime, $closeTime, $exception['reason'], true, true];
+            return new LocationScheduleDTO(
+                isOpen: false,
+                openTime: $openTime,
+                closeTime: $closeTime,
+                reason: $exception['reason'],
+                hasException: true,
+                isExceptionClosure: true,
+            );
         }
 
-        return [
-            $openTime && $closeTime && $now->between($openTime, $closeTime),
-            $openTime,
-            $closeTime,
-            $exception['reason'],
-            true,
-            false,
-        ];
+        return new LocationScheduleDTO(
+            isOpen: $openTime && $closeTime && $now->between($openTime, $closeTime),
+            openTime: $openTime,
+            closeTime: $closeTime,
+            reason: $exception['reason'],
+            hasException: true
+        );
     }
 
     /**
      * @param  ?array<string, mixed>  $schedule
-     * @return array{bool, CarbonImmutable|null, CarbonImmutable|null, mixed, bool, bool}
      */
-    private function resolveFromSchedule(?array $schedule, string $timezone, CarbonInterface $now): array
+    private function resolveFromSchedule(?array $schedule, string $timezone, CarbonInterface $now): LocationScheduleDTO
     {
         $day = mb_strtolower($now->englishDayOfWeek);
 
         $openTime = isset($schedule[$day.'_open']) ? Date::parse($schedule[$day.'_open'], $timezone) : null;
         $closeTime = isset($schedule[$day.'_close']) ? Date::parse($schedule[$day.'_close'], $timezone) : null;
 
-        return [
-            $openTime && $closeTime && $now->between($openTime, $closeTime),
-            $openTime,
-            $closeTime,
-            null,
-            false,
-            false,
-        ];
+        return new LocationScheduleDTO(
+            isOpen: $openTime && $closeTime && $now->between($openTime, $closeTime),
+            openTime: $openTime,
+            closeTime: $closeTime
+        );
     }
 }

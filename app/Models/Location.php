@@ -26,8 +26,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read string $phone
  * @property-read string|null $phone_ext
  * @property-read string $email
- * @property-read float $latitude
- * @property-read float $longitude
  * @property-read bool $is_active
  * @property-read bool $is_checkins_enabled
  * @property-read bool $is_appointments_enabled
@@ -38,7 +36,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read Schedule $schedule
  * @property-read ScheduleException $scheduleExceptions
  */
-#[Fillable(['uuid', 'address_id', 'max_distance_allowed', 'name', 'abbreviation', 'timezone', 'phone', 'phone_ext', 'email', 'latitude', 'longitude', 'is_active', 'is_checkins_enabled', 'is_appointments_enabled', 'additional_fields'])]
+#[Fillable(['uuid', 'address_id', 'max_distance_allowed', 'name', 'abbreviation', 'timezone', 'phone', 'phone_ext', 'email', 'is_active', 'is_checkins_enabled', 'is_appointments_enabled', 'additional_fields'])]
 #[Hidden(['id'])]
 final class Location extends Model
 {
@@ -98,8 +96,6 @@ final class Location extends Model
             'is_checkins_enabled' => 'boolean',
             'is_appointments_enabled' => 'boolean',
             'additional_fields' => 'boolean',
-            'latitude' => 'float',
-            'longitude' => 'float',
         ];
     }
 }

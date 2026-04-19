@@ -30,4 +30,12 @@ final class Address extends Model
 {
     /** @use HasFactory<AddressFactory> */
     use HasFactory;
+
+    protected function casts(): array
+    {
+        return [
+            'latitude' => 'float',
+            'longitude' => 'float',
+        ];
+    }
 }

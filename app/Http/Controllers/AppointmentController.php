@@ -14,7 +14,7 @@ final class AppointmentController extends Controller
         $request->validated();
 
         return inertia('AppointmentForm', [
-            'location' => $request->getLocation(),
+            'location' => $request->location,
         ]);
     }
 }

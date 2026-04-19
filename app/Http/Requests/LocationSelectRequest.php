@@ -14,7 +14,12 @@ use Illuminate\Validation\Validator;
 
 final class LocationSelectRequest extends FormRequest
 {
-    private ?Location $location = null;
+    public ?Location $location = null {
+        get {
+            return $this->location ??= resolve(LocationScheduleService::class)
+                ->getActiveLocationByUuid($this->input('uuid'), ScheduleType::CheckIn);
+        }
+    }
 
     public function authorize(): bool
     {
@@ -40,7 +45,7 @@ final class LocationSelectRequest extends FormRequest
     {
         return [
             function (Validator $validator) use ($service): void {
-                $location = $this->getLocation();
+                $location = $this->location;
 
                 if (! $location instanceof Location) {
                     $validator->errors()->add('uuid', 'Invalid Location.');
@@ -53,16 +58,10 @@ final class LocationSelectRequest extends FormRequest
                 $canCheckIn = $service->canCheckIn($location, $coords);
 
                 if (! $canCheckIn->allowed) {
-                    $validator->errors()->add('uuid', $canCheckIn->reason ?? __('checkInSelectLocation.locationClosed'));
+                    $validator->errors()->add('uuid', $canCheckIn->reason ?? __('messages.checkInSelectLocation.locationClosed'));
                 }
             },
         ];
-    }
-
-    public function getLocation(): ?Location
-    {
-        return $this->location ??= resolve(LocationScheduleService::class)
-            ->getActiveLocationByUuid($this->input('uuid'), ScheduleType::CheckIn);
     }
 
     protected function prepareForValidation(): void

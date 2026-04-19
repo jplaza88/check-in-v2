@@ -31,27 +31,46 @@ final readonly class LocationSelectDTO
         $locationService = resolve(LocationScheduleService::class);
         $addressService = resolve(AddressService::class);
 
-        [$isOpen, $openTime, $closeTime, $reason, $hasException, $isExceptionClosure] =
-            $locationService->resolveOpenCloseTime($location, $scheduleType);
+        $schedule = $locationService->resolveOpenCloseTime($location, $scheduleType);
 
         // TODO:: Convert to this to a feature for the DB
-        $isClosingSoon = $isOpen
-            && $closeTime !== null
-            && now()->setTimezone($location['timezone'])->diffInMinutes($closeTime) <= config('app.location_closing_soon_threshold');
+        $isClosingSoon = $schedule->isOpen
+            && $schedule->closeTime !== null
+            && now()->setTimezone($location['timezone'])->diffInMinutes($schedule->closeTime) <= config('app.location_closing_soon_threshold');
 
         return new self(
             id: $location['uuid'],
             name: $location['name'],
             address: $addressService->buildAddress($location['address']),
             maxDistanceAllowed: $location['max_distance_allowed'],
-            isOpen: $isOpen,
-            todayOpenCloseTime: $openTime && $closeTime
-                ? $openTime->format('g:i A').' - '.$closeTime->format('g:i A T')
-                : null,
-            reason: $reason,
-            hasException: $hasException,
-            isExceptionClosure: $isExceptionClosure,
+            isOpen: $schedule->isOpen,
+            todayOpenCloseTime: self::resolveOpenCloseTime($schedule),
+            reason: self::resolveReason($schedule),
+            hasException: $schedule->hasException,
+            isExceptionClosure: $schedule->isExceptionClosure,
             isClosingSoon: $isClosingSoon,
         );
+    }
+
+    private static function resolveOpenCloseTime(LocationScheduleDTO $schedule): string
+    {
+        return match (true) {
+            $schedule->openTime && $schedule->closeTime => $schedule->openTime->format('g:i A').' - '.$schedule->closeTime->format('g:i A T'),
+            ! $schedule->isOpen => __('messages.checkInSelectLocation.closedToday'),
+            default => 'N/A',
+        };
+    }
+
+    private static function resolveReason(LocationScheduleDTO $schedule): ?string
+    {
+        if (! $schedule->hasException) {
+            return null;
+        }
+
+        if ($schedule->isExceptionClosure) {
+            return $schedule->reason ?? __('messages.checkInSelectLocation.closedToday');
+        }
+
+        return $schedule->reason ?? __('messages.checkInSelectLocation.specialHoursToday');
     }
 }

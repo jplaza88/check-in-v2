@@ -49,9 +49,12 @@ return [
         'geolocationNotSupportedTitle' => 'Navigateur non pris en charge',
         'fetchDistancesErrorTitle' => 'Impossible de charger les emplacements',
         'fetchDistancesErrorMessage' => 'Une erreur est survenue lors du calcul des distances. Veuillez actualiser la page et réessayer.',
-        'tooFar' => 'Vous êtes trop loin de cet emplacement.',
+        'tooFar' => 'Vous devez être à moins de :maxDistance miles de :name pour vous enregistrer. Vous êtes actuellement à :userDistance mi. Veuillez réessayer lorsque vous serez plus proche.',
         'locationClosed' => 'Cet emplacement est actuellement fermé.',
         'invalidLocation' => 'Emplacement invalide.',
+        'outsideHours' => ':name est actuellement fermé. Les heures d\'ouverture aujourd\'hui sont de :open à :close. Veuillez revenir pendant les heures d\'ouverture.',
+        'checkInUnavailable' => 'Enregistrement non disponible',
+        'outsideExceptionHours' => ':name a des horaires spéciaux aujourd\'hui : :open - :close. Veuillez revenir pendant les heures d\'ouverture.',
     ],
 
     'appointmentSelectLocation' => [
