@@ -2,10 +2,6 @@
 
 declare(strict_types=1);
 
-use Tests\TestCase;
-
-uses(TestCase::class);
-
 it('switches locale when locale is available', function (): void {
     $targetUrl = route('checkIn.selectLocation');
 

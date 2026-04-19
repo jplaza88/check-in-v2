@@ -3,9 +3,6 @@
 declare(strict_types=1);
 
 use App\Enums\ScheduleType;
-use Tests\TestCase;
-
-uses(TestCase::class);
 
 it('has correct backing values', function (): void {
     expect(ScheduleType::CheckIn->value)->toBe('checkin')

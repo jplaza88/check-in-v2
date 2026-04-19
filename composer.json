@@ -80,7 +80,7 @@
         "test": [
             "@test:type-coverage",
             "@test:unit",
-            "@test:lint",
+            "@lint:check",
             "@test:types"
         ],
         "test:types": [
