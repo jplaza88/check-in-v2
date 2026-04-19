@@ -48,7 +48,7 @@ final class LocationSelectRequest extends FormRequest
                 $location = $this->location;
 
                 if (! $location instanceof Location) {
-                    $validator->errors()->add('uuid', 'Invalid Location.');
+                    $validator->errors()->add('uuid', __('messages.checkInSelectLocation.invalidLocation'));
 
                     return;
                 }

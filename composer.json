@@ -81,10 +81,14 @@
             "@test:type-coverage",
             "@test:unit",
             "@lint:check",
-            "@test:types"
+            "@test:types",
+            "@test:feature-browser"
         ],
         "test:types": [
             "phpstan"
+        ],
+        "test:feature-browser": [
+            "pest"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
