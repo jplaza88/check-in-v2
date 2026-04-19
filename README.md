@@ -76,7 +76,7 @@ cp .env.example .env
 
 ## Development
 
-> Octane is configured to run in watch mode - backend changes are picked up automatically with no server restart needed.
+> 💡 Octane is configured to run in watch mode - backend changes are picked up automatically with no server restart needed.
 
 ### Frontend
 
