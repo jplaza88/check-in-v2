@@ -8,7 +8,7 @@ use App\Enums\ScheduleType;
 use App\Services\AddressService;
 use App\Services\LocationScheduleService;
 
-final readonly class LocationSelectDTO
+final readonly class CheckInSelectDTO
 {
     public function __construct(
         public string $id,

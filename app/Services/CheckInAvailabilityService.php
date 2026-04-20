@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\DTOs\CheckInAvailabilityDTO;
+use App\DTOs\LocationAvailabilityDTO;
 use App\DTOs\LocationScheduleDTO;
 use App\Enums\ScheduleType;
 use App\Models\Location;
@@ -16,7 +16,7 @@ final readonly class CheckInAvailabilityService
     /**
      * @param  array<mixed, mixed>  $userCoords
      */
-    public function canCheckIn(Location $location, array $userCoords): CheckInAvailabilityDTO
+    public function isAvailableForCheckIn(Location $location, array $userCoords): LocationAvailabilityDTO
     {
         $userDistance = $this->calculateDistance(
             $userCoords['latitude'],
@@ -27,7 +27,7 @@ final readonly class CheckInAvailabilityService
 
         // Is user close enough?
         if ($userDistance >= $location->max_distance_allowed) {
-            return new CheckInAvailabilityDTO(
+            return new LocationAvailabilityDTO(
                 allowed: false,
                 reason: __('messages.checkInSelectLocation.tooFar', [
                     'name' => $location->name,
@@ -40,7 +40,7 @@ final readonly class CheckInAvailabilityService
         // Schedule & schedule exceptions
         $schedule = $this->resolveSchedule($location);
 
-        return new CheckInAvailabilityDTO(
+        return new LocationAvailabilityDTO(
             allowed: $schedule->isOpen,
             reason: $this->resolveReason($location, $schedule)
         );
@@ -81,13 +81,18 @@ final readonly class CheckInAvailabilityService
 
         // Admin-configured reason takes priority (e.g., "Closed for maintenance")
         if ($schedule->reason) {
-            return $schedule->reason;
+            return __('messages.checkInSelectLocation.closedForCheckInWithReason', [
+                'name' => $location->name,
+                'reason' => $schedule->reason,
+            ]);
         }
 
         // Schedule exception exists but admin didn't provide a reason - generate one
 
         if ($schedule->isExceptionClosure) {
-            return __('messages.checkInSelectLocation.closedToday');
+            return __('messages.checkInSelectLocation.closedForCheckInWithoutReason', [
+                'name' => $location->name,
+            ]);
         }
 
         if ($schedule->hasException && $schedule->openTime && $schedule->closeTime) {
@@ -108,6 +113,6 @@ final readonly class CheckInAvailabilityService
         }
 
         // No hours configured for today
-        return __('messages.checkInSelectLocation.locationClosed');
+        return __('messages.checkInSelectLocation.closedForCheckInToday', ['name' => $location->name]);
     }
 }

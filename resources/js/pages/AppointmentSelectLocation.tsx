@@ -1,4 +1,6 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
+import { useState } from 'react';
+import { gate } from '@/actions/App/Http/Controllers/AppointmentController';
 import PublicLayout from '@/layouts/PublicLayout';
 
 interface AppointmentSelectLocation {
@@ -21,7 +23,7 @@ interface PageProps {
 }
 
 interface Location {
-    id: number | string;
+    id: string;
     name: string;
     address: string;
     todayOpenCloseTime: string | null;
@@ -36,6 +38,31 @@ export default function AppointmentSelectLocation() {
     // Translations
     const { translations, locations } = usePage<PageProps>().props;
     const pageTranslations: AppointmentSelectLocation = translations.appointmentSelectLocation;
+
+    const [submittingLocationId, setSubmittingLocationId] = useState<string | null>(null);
+    const [appointmentError, setAppointmentError] = useState<string | null>(null);
+
+    const handleSelectLocation = (locationId: string) => {
+        setAppointmentError(null);
+        setSubmittingLocationId(locationId);
+
+        router.post(
+            gate.url({ uuid: String(locationId) }),
+            {},
+            {
+                onError: (errors) => {
+                    setAppointmentError(
+                        errors[Object.keys(errors)[0]] ??
+                            'Something went wrong. Please try again.',
+                    );
+                    setSubmittingLocationId(null);
+                },
+                onFinish: () => {
+                    setSubmittingLocationId(null);
+                },
+            },
+        );
+    };
 
     return (
         <PublicLayout>
@@ -73,27 +100,31 @@ export default function AppointmentSelectLocation() {
                             locations.map((location, idx) => (
                                 <button
                                     key={location.id}
-                                    className="relative block w-full focus:outline-none"
+                                    onClick={() =>
+                                        handleSelectLocation(
+                                            location.id,
+                                        )
+                                    }
+                                    disabled={submittingLocationId !== null}
+                                    className="relative block w-full focus:outline-none disabled:opacity-60"
                                     aria-label={`Book appointment at ${location.name}, ${location.address}`}
                                 >
                                     <div
-                                        className={`flex min-h-22 items-stretch rounded-lg border bg-white text-sm font-medium shadow-sm transition hover:border-gray-300 dark:border-gray-700/60 dark:bg-gray-800 dark:hover:border-gray-600 ${
+                                        className={`flex min-h-22 items-stretch rounded-lg border bg-white text-sm font-medium shadow-sm transition dark:bg-gray-800 ${
                                             location.isOpen
-                                                ? 'border-l-4 border-l-brand-green'
-                                                : 'border-l-4 border-l-red-400'
+                                                ? 'border-l-4 border-l-brand-green hover:border-brand-green/60 dark:hover:border-brand-green/50'
+                                                : 'border-l-4 border-l-red-400 hover:border-red-300 dark:hover:border-red-400/50'
                                         }`}
                                     >
                                         {/* Text */}
                                         <div className="flex flex-1 flex-col justify-center gap-0.5 p-4 text-left">
                                             {/* Exception / Closing Soon badge — mutually exclusive, above name */}
-                                            {location.isExceptionClosure ? (
+                                            {location.isExceptionClosure &&
+                                            location.reason ? (
                                                 <div className="mb-3">
                                                     <span
-                                                        title={
-                                                            location.reason ??
-                                                            pageTranslations.closedToday
-                                                        }
-                                                        aria-label={`Closed today: ${location.reason ?? pageTranslations.closedToday}`}
+                                                        title={location.reason}
+                                                        aria-label={`Closed today: ${location.reason}`}
                                                         className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-700 dark:text-red-400"
                                                     >
                                                         <svg
@@ -103,18 +134,15 @@ export default function AppointmentSelectLocation() {
                                                         >
                                                             <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
                                                         </svg>
-                                                        {location.reason ??
-                                                            pageTranslations.closedToday}
+                                                        {location.reason}
                                                     </span>
                                                 </div>
-                                            ) : location.hasException ? (
+                                            ) : location.hasException &&
+                                              location.reason ? (
                                                 <div className="mb-3">
                                                     <span
-                                                        title={
-                                                            location.reason ??
-                                                            pageTranslations.specialHoursToday
-                                                        }
-                                                        aria-label={`Schedule exception: ${location.reason ?? pageTranslations.specialHoursToday}`}
+                                                        title={location.reason}
+                                                        aria-label={`Schedule exception: ${location.reason}`}
                                                         className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-400"
                                                     >
                                                         <svg
@@ -124,8 +152,7 @@ export default function AppointmentSelectLocation() {
                                                         >
                                                             <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
                                                         </svg>
-                                                        {location.reason ??
-                                                            pageTranslations.specialHoursToday}
+                                                        {location.reason}
                                                     </span>
                                                 </div>
                                             ) : location.isClosingSoon ? (
@@ -164,7 +191,7 @@ export default function AppointmentSelectLocation() {
                                                 >
                                                     {location.todayOpenCloseTime ??
                                                         (location.hasException
-                                                            ? pageTranslations.closedToday
+                                                            ? location.reason
                                                             : '')}
                                                 </span>
 

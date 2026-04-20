@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CheckInController;
+use App\Http\Controllers\CheckInDistanceController;
 use App\Http\Controllers\LocaleController;
-use App\Http\Controllers\LocationDistanceController;
 use App\Http\Controllers\LocationSelectController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,7 +41,11 @@ Route::middleware(['setLocale'])
         Route::get('/appointment/select-location', LocationSelectController::class)
             ->defaults('context', 'appointment')
             ->name('appointment.selectLocation');
+
+        Route::post('/appointment/{uuid}', [AppointmentController::class, 'gate'])
+            ->defaults('context', 'appointment')
+            ->name('appointment.form');
     });
 
-Route::post('/check-in/location-distance', LocationDistanceController::class)
+Route::post('/check-in/location-distance', CheckInDistanceController::class)
     ->name('checkIn.locationDistance');

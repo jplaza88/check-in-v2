@@ -6,17 +6,27 @@ namespace App\Http\Controllers;
 
 use App\DTOs\LocationDistanceDTO;
 use App\Enums\ScheduleType;
-use App\Http\Requests\LocationDistanceRequest;
+use App\Http\Requests\CheckInDistanceRequest;
 use App\Models\Location;
 use App\Services\CheckInAvailabilityService;
 use App\Services\LocationScheduleService;
 use App\Services\SessionService;
 use Illuminate\Http\JsonResponse;
 
-final class LocationDistanceController extends Controller
+/**
+ * JSON endpoint:
+ *
+ * Provides distances from the user's coordinates to each active check-in location.
+ *
+ * Used by the check-in select location flow: {@see CheckInSelectController} renders the page,
+ * then the client requests this endpoint so the UI can sort or annotate locations by distance.
+ *
+ * Only locations enabled for check-in are included ({@see ScheduleType::CheckIn}).
+ */
+final class CheckInDistanceController extends Controller
 {
     public function __invoke(
-        LocationDistanceRequest $request
+        CheckInDistanceRequest $request
     ): JsonResponse {
         $userLat = $request->float('latitude');
         $userLng = $request->float('longitude');
