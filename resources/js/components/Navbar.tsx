@@ -49,7 +49,7 @@ export default function Navbar() {
             <div className="mx-auto flex h-15 max-w-7xl items-center justify-between px-6">
                 {/* Left: Logo + divider + links */}
                 <div className="flex items-center gap-8">
-                    <Link href="/" className="flex items-center">
+                    <Link href="/" className="flex items-center" prefetch>
                         <Logo />
                     </Link>
 

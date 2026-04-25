@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\DTOs\LocationDistanceDTO;
+use App\DTOs\CheckInDistanceDTO;
 use App\Enums\ScheduleType;
 use App\Http\Requests\CheckInDistanceRequest;
 use App\Models\Location;
@@ -36,7 +36,7 @@ final class CheckInDistanceController extends Controller
         $sessionService = resolve(SessionService::class);
 
         $distances = $locationService->getActiveLocations(ScheduleType::CheckIn)
-            ->map(fn (Location $location): LocationDistanceDTO => new LocationDistanceDTO(
+            ->map(fn (Location $location): CheckInDistanceDTO => new CheckInDistanceDTO(
                 id: $location->uuid,
                 userDistance: $checkInAvailabilityService->calculateDistance(
                     $userLat, $userLng,

@@ -26,6 +26,10 @@ Route::prefix('locale')->group(function () use ($locales): void {
         ->name('localeSwitch');
 });
 
+// JSON endpoint, no translations needed
+Route::post('/check-in/distance', CheckInDistanceController::class)
+    ->name('checkIn.distance');
+
 Route::middleware(['setLocale'])
     ->group(function (): void {
 
@@ -46,6 +50,3 @@ Route::middleware(['setLocale'])
             ->defaults('context', 'appointment')
             ->name('appointment.form');
     });
-
-Route::post('/check-in/location-distance', CheckInDistanceController::class)
-    ->name('checkIn.locationDistance');

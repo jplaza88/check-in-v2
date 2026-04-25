@@ -47,7 +47,7 @@ export default function AppointmentSelectLocation() {
         setSubmittingLocationId(locationId);
 
         router.post(
-            gate.url({ uuid: String(locationId) }),
+            gate.url({ uuid: locationId }),
             {},
             {
                 onError: (errors) => {
@@ -55,6 +55,7 @@ export default function AppointmentSelectLocation() {
                         errors[Object.keys(errors)[0]] ??
                             'Something went wrong. Please try again.',
                     );
+                    console.error(errors);
                     setSubmittingLocationId(null);
                 },
                 onFinish: () => {
@@ -101,79 +102,17 @@ export default function AppointmentSelectLocation() {
                                 <button
                                     key={location.id}
                                     onClick={() =>
-                                        handleSelectLocation(
-                                            location.id,
-                                        )
+                                        handleSelectLocation(location.id)
                                     }
                                     disabled={submittingLocationId !== null}
                                     className="relative block w-full focus:outline-none disabled:opacity-60"
                                     aria-label={`Book appointment at ${location.name}, ${location.address}`}
                                 >
                                     <div
-                                        className={`flex min-h-22 items-stretch rounded-lg border bg-white text-sm font-medium shadow-sm transition dark:bg-gray-800 ${
-                                            location.isOpen
-                                                ? 'border-l-4 border-l-brand-green hover:border-brand-green/60 dark:hover:border-brand-green/50'
-                                                : 'border-l-4 border-l-red-400 hover:border-red-300 dark:hover:border-red-400/50'
-                                        }`}
+                                        className={`flex min-h-22 items-stretch rounded-lg border border-l-4 border-gray-200 border-l-brand-green bg-white text-sm font-medium shadow-sm transition hover:border-brand-green/60 dark:border-gray-700/60 dark:bg-gray-800 dark:hover:border-brand-green/50`}
                                     >
                                         {/* Text */}
                                         <div className="flex flex-1 flex-col justify-center gap-0.5 p-4 text-left">
-                                            {/* Exception / Closing Soon badge — mutually exclusive, above name */}
-                                            {location.isExceptionClosure &&
-                                            location.reason ? (
-                                                <div className="mb-3">
-                                                    <span
-                                                        title={location.reason}
-                                                        aria-label={`Closed today: ${location.reason}`}
-                                                        className="inline-flex items-center gap-1 rounded-full bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-700 dark:text-red-400"
-                                                    >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            viewBox="0 0 16 16"
-                                                            className="h-3 w-3 fill-current"
-                                                        >
-                                                            <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
-                                                        </svg>
-                                                        {location.reason}
-                                                    </span>
-                                                </div>
-                                            ) : location.hasException &&
-                                              location.reason ? (
-                                                <div className="mb-3">
-                                                    <span
-                                                        title={location.reason}
-                                                        aria-label={`Schedule exception: ${location.reason}`}
-                                                        className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2.5 py-1 text-xs font-medium text-amber-700 dark:text-amber-400"
-                                                    >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            viewBox="0 0 16 16"
-                                                            className="h-3 w-3 fill-current"
-                                                        >
-                                                            <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
-                                                        </svg>
-                                                        {location.reason}
-                                                    </span>
-                                                </div>
-                                            ) : location.isClosingSoon ? (
-                                                <div className="mb-3">
-                                                    <span
-                                                        aria-label="Closing soon"
-                                                        className="inline-flex items-center gap-1 rounded-full bg-purple-500/15 px-2.5 py-1 text-xs font-medium text-purple-700 dark:text-purple-400"
-                                                    >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            viewBox="0 0 16 16"
-                                                            className="h-3 w-3 fill-current"
-                                                        >
-                                                            <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 2a.75.75 0 0 1 .75.75V8a.75.75 0 0 1-.22.53l-2 2a.75.75 0 1 1-1.06-1.06L7.25 7.69V3.75A.75.75 0 0 1 8 3z" />
-                                                        </svg>
-                                                        {
-                                                            pageTranslations.closingSoon
-                                                        }
-                                                    </span>
-                                                </div>
-                                            ) : null}
 
                                             <div
                                                 className={`font-semibold ${idx === 0 ? 'text-gray-900 dark:text-gray-100' : 'text-gray-800 dark:text-gray-100'}`}
@@ -187,26 +126,13 @@ export default function AppointmentSelectLocation() {
                                             {/* Hours + Open/Closed + Nearest */}
                                             <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                                                 <span
-                                                    aria-label={`Hours of operation: ${location.todayOpenCloseTime}`}
+                                                    aria-label={`Today's hours of operation: ${location.todayOpenCloseTime}`}
                                                 >
                                                     {location.todayOpenCloseTime ??
                                                         (location.hasException
                                                             ? location.reason
                                                             : '')}
                                                 </span>
-
-                                                {/* Open/Closed badge */}
-                                                {location.isOpen ? (
-                                                    <span className="inline-flex rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-brand-green">
-                                                        {pageTranslations.open}
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex rounded-full bg-red-500/20 px-2.5 py-1 text-xs font-medium text-red-700">
-                                                        {
-                                                            pageTranslations.closed
-                                                        }
-                                                    </span>
-                                                )}
                                             </div>
                                         </div>
                                     </div>

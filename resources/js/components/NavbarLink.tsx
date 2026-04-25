@@ -44,6 +44,7 @@ export default function NavbarLink({
                     ? 'font-semibold text-brand-grey-link dark:text-gray-200'
                     : 'text-brand-grey-link dark:text-gray-200'
             }`}
+            prefetch
         >
             {name}
             <span

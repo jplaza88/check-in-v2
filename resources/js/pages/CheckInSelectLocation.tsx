@@ -114,14 +114,14 @@ export default function SelectLocation() {
         setSubmittingLocationId(locationId);
 
         router.post(
-            gate.url({ uuid: String(locationId) }),
+            gate.url({ uuid: locationId }),
             {},
             {
                 onError: (errors) => {
                     setCheckInError(
                         errors[Object.keys(errors)[0]] ?? 'Something went wrong. Please try again.'
                     );
-                    console.log(errors)
+                    console.error(errors);
                     setSubmittingLocationId(null);
                 },
                 onFinish: () => {

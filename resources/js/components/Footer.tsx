@@ -43,12 +43,14 @@ export default function Footer() {
                             <Link
                                 href="#"
                                 className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                                prefetch
                             >
                                 {translations.publicNavigation.checkIn}
                             </Link>
                             <Link
                                 href="#"
                                 className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                                prefetch
                             >
                                 {translations.publicNavigation.appointment}
                             </Link>
@@ -63,18 +65,21 @@ export default function Footer() {
                             <Link
                                 href="#"
                                 className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                                prefetch
                             >
                                 {pageTranslations.schedule}
                             </Link>
                             <Link
                                 href="#"
                                 className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                                prefetch
                             >
                                 {pageTranslations.contact}
                             </Link>
                             <Link
                                 href="#"
                                 className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                                prefetch
                             >
                                 {pageTranslations.login}
                             </Link>
@@ -89,12 +94,14 @@ export default function Footer() {
                             <Link
                                 href="#"
                                 className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                                prefetch
                             >
                                 {pageTranslations.privacyPolicy}
                             </Link>
                             <Link
                                 href="#"
                                 className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                                prefetch
                             >
                                 {pageTranslations.termsOfService}
                             </Link>
@@ -104,11 +111,12 @@ export default function Footer() {
 
                 <div className="flex items-center justify-between border-t border-gray-200/80 pt-4 dark:border-gray-700/50">
                     {/* Logo links home */}
-                    <Link href="/">
+                    <Link href="/" prefetch>
                         <Logo size="sm" />
                     </Link>
                     <span className="text-xs text-gray-400">
-                        © {new Date().getFullYear()} {appName}. {pageTranslations.allRightsReserved}.
+                        © {new Date().getFullYear()} {appName}.{' '}
+                        {pageTranslations.allRightsReserved}.
                     </span>
                 </div>
             </div>

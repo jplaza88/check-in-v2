@@ -53,9 +53,9 @@ final class CheckInSelectRequest extends FormRequest
                     return;
                 }
 
-                $coords = $this->attributes->get('userCoords');
+                $userCoords = $this->attributes->get('userCoords');
 
-                $canCheckIn = $service->isAvailableForCheckIn($location, $coords);
+                $canCheckIn = $service->isAvailableForCheckIn($location, $userCoords);
 
                 if (! $canCheckIn->allowed) {
                     $validator->errors()->add('uuid', $canCheckIn->reason ?? __('messages.checkInSelectLocation.locationClosed'));
