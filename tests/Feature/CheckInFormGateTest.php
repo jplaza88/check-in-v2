@@ -69,7 +69,7 @@ it('rejects check-in when the distribution center has no operating hours', funct
         ->post(route('checkIn.form', $location))
         ->assertRedirect()
         ->assertSessionHasErrors([
-            'uuid' => __('messages.checkInSelectLocation.locationClosed'),
+            'uuid' => __('messages.checkInSelectLocation.closedForCheckInToday', ['name' => $location->name]),
         ]);
 });
 

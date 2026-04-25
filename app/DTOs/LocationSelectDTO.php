@@ -20,7 +20,7 @@ final readonly class LocationSelectDTO
         public ?string $reason,
         public bool $hasException,
         public bool $isExceptionClosure,
-        public bool $isClosingSoon,
+        public ?bool $isClosingSoon,
     ) {}
 
     /**
@@ -33,10 +33,12 @@ final readonly class LocationSelectDTO
 
         $schedule = $locationService->resolveOpenCloseTime($location, $scheduleType);
 
-        // TODO:: Convert to this to a feature for the DB
-        $isClosingSoon = $schedule->isOpen
-            && $schedule->closeTime !== null
-            && now()->setTimezone($location['timezone'])->diffInMinutes($schedule->closeTime) <= config('app.location_closing_soon_threshold');
+        // TODO:: Convert to this to an admin feature
+        if ($scheduleType->isCheckIn()) {
+            $isClosingSoon = $schedule->isOpen
+                && $schedule->closeTime !== null
+                && now()->setTimezone($location['timezone'])->diffInMinutes($schedule->closeTime) <= config('app.location_closing_soon_threshold');
+        }
 
         return new self(
             id: $location['uuid'],
@@ -44,15 +46,15 @@ final readonly class LocationSelectDTO
             address: $addressService->buildAddress($location['address']),
             maxDistanceAllowed: $location['max_distance_allowed'],
             isOpen: $schedule->isOpen,
-            todayOpenCloseTime: self::resolveOpenCloseTime($schedule),
+            todayOpenCloseTime: self::formatOpenCloseTime($schedule),
             reason: self::resolveReason($schedule),
             hasException: $schedule->hasException,
             isExceptionClosure: $schedule->isExceptionClosure,
-            isClosingSoon: $isClosingSoon,
+            isClosingSoon: $isClosingSoon ?? null,
         );
     }
 
-    private static function resolveOpenCloseTime(LocationScheduleDTO $schedule): string
+    private static function formatOpenCloseTime(LocationScheduleDTO $schedule): string
     {
         return match (true) {
             $schedule->openTime && $schedule->closeTime => $schedule->openTime->format('g:i A').' - '.$schedule->closeTime->format('g:i A T'),

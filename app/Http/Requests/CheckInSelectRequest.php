@@ -12,7 +12,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
-final class LocationSelectRequest extends FormRequest
+final class CheckInSelectRequest extends FormRequest
 {
     public ?Location $location = null {
         get {
@@ -53,9 +53,9 @@ final class LocationSelectRequest extends FormRequest
                     return;
                 }
 
-                $coords = $this->attributes->get('userCoords');
+                $userCoords = $this->attributes->get('userCoords');
 
-                $canCheckIn = $service->canCheckIn($location, $coords);
+                $canCheckIn = $service->isAvailableForCheckIn($location, $userCoords);
 
                 if (! $canCheckIn->allowed) {
                     $validator->errors()->add('uuid', $canCheckIn->reason ?? __('messages.checkInSelectLocation.locationClosed'));

@@ -60,7 +60,10 @@ return [
         'invalidLocation' => 'Invalid Location.',
         'outsideHours' => ':name is closed right now. Business hours today are :open - :close. Please come back during business hours.',
         'checkInUnavailable' => 'Check-In Unavailable',
-        'outsideExceptionHours' => ':name has special hours today: :open - :close. Please come back during business hours.',
+        'outsideExceptionHours' => ':name has special hours today (:open – :close). You’re outside those hours- please check in during that window.',
+        'closedForCheckInWithReason' => ':name is not available for check-in right now: :reason',
+        'closedForCheckInWithoutReason' => ':name is not available for check-in right now.',
+        'closedForCheckInToday' => ':name is closed for check-in today. Please come back during posted hours.',
     ],
 
     'appointmentSelectLocation' => [
@@ -71,5 +74,14 @@ return [
         'specialHoursToday' => 'Special hours today',
         'closingSoon' => 'Closing soon',
         'closedToday' => 'Closed today',
+    ],
+
+    'appointmentBooking' => [
+        'closedForAppointmentsOnDate' => ':name is not available for appointments on :date. Please choose another day.',
+        'closedForAppointmentsOnDateWithReason' => '::name is not available for appointments on :date (:reason). Please choose another day.',
+        'outsideSpecialHours' => ':name is not open at :time on :date. Special hours that day are :open - :close. Please choose another date or time.',
+        'outsideRegularHours' => ':name is not open at :time on :date. Business hours that day are :open - :close. Please choose another date or time.',
+        'notAvailableOnDay' => ':name is not available for appointments on :date. Please choose another day.',
+        'closedForAppointmentsOnDateWithoutReason' => ':name is not accepting appointments on :date. Please choose another date.',
     ],
 ];

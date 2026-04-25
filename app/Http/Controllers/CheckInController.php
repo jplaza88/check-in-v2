@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\LocationSelectRequest;
+use App\Http\Requests\CheckInSelectRequest;
 use Inertia\Response;
 
 final class CheckInController extends Controller
 {
-    public function gate(LocationSelectRequest $request): Response
+    public function gate(CheckInSelectRequest $request): Response
     {
         $request->validated();
 

@@ -2,7 +2,7 @@ import { Head, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { gate } from '@/actions/App/Http/Controllers/CheckInController';
-import LocationDistanceController from '@/actions/App/Http/Controllers/LocationDistanceController';
+import CheckInDistanceController from '@/actions/App/Http/Controllers/CheckInDistanceController';
 import AlertBanner from '@/components/AlertBanner';
 import { useGeolocation } from '@/hooks/useGeolocation';
 import PublicLayout from '@/layouts/PublicLayout';
@@ -114,14 +114,14 @@ export default function SelectLocation() {
         setSubmittingLocationId(locationId);
 
         router.post(
-            gate.url({ uuid: String(locationId) }),
+            gate.url({ uuid: locationId }),
             {},
             {
                 onError: (errors) => {
                     setCheckInError(
                         errors[Object.keys(errors)[0]] ?? 'Something went wrong. Please try again.'
                     );
-                    console.log(errors)
+                    console.error(errors);
                     setSubmittingLocationId(null);
                 },
                 onFinish: () => {
@@ -137,7 +137,7 @@ export default function SelectLocation() {
         }
 
         axios
-            .post(LocationDistanceController().url, {
+            .post(CheckInDistanceController().url, {
                 latitude: coords.latitude,
                 longitude: coords.longitude,
             })
@@ -156,15 +156,12 @@ export default function SelectLocation() {
 
                 const merged = data.locations
                     .map(({ id }: { id: string }) => {
-                        const location = locations.find(
-                            (loc) => loc.id === id,
-                        );
+                        const location = locations.find((loc) => loc.id === id);
 
                         return location
                             ? {
                                   ...location,
-                                  userDistance:
-                                      distanceMap.get(id) ?? null,
+                                  userDistance: distanceMap.get(id) ?? null,
                               }
                             : null;
                     })

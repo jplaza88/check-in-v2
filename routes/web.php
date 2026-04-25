@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CheckInController;
+use App\Http\Controllers\CheckInDistanceController;
 use App\Http\Controllers\LocaleController;
-use App\Http\Controllers\LocationDistanceController;
 use App\Http\Controllers\LocationSelectController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,10 @@ Route::prefix('locale')->group(function () use ($locales): void {
         ->name('localeSwitch');
 });
 
+// JSON endpoint, no translations needed
+Route::post('/check-in/distance', CheckInDistanceController::class)
+    ->name('checkIn.distance');
+
 Route::middleware(['setLocale'])
     ->group(function (): void {
 
@@ -40,7 +45,8 @@ Route::middleware(['setLocale'])
         Route::get('/appointment/select-location', LocationSelectController::class)
             ->defaults('context', 'appointment')
             ->name('appointment.selectLocation');
-    });
 
-Route::post('/check-in/location-distance', LocationDistanceController::class)
-    ->name('checkIn.locationDistance');
+        Route::post('/appointment/{uuid}', [AppointmentController::class, 'gate'])
+            ->defaults('context', 'appointment')
+            ->name('appointment.form');
+    });

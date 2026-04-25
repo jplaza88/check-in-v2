@@ -36,7 +36,7 @@ final readonly class LocationScheduleService
     /**
      * @param  array<string, mixed>  $location
      */
-    public function resolveOpenCloseTime(array $location, ScheduleType $scheduleType): LocationScheduleDTO
+    public function resolveOpenCloseTime(array $location, ScheduleType $scheduleType, ?CarbonInterface $at = null): LocationScheduleDTO
     {
         $timezone = $location['timezone'];
 
@@ -45,18 +45,19 @@ final readonly class LocationScheduleService
         $schedule = $location[$scheduleKey] ?? [];
         $scheduleExceptions = $location[$exceptionsKey] ?? [];
 
-        $now = now()->setTimezone($timezone);
+        // Check-in will use now(), appointments will use $at
+        $dateTimeReference = ($at ?? now())->setTimezone($timezone);
 
         $scheduleException = array_values(array_filter(
             $scheduleExceptions,
-            fn (array $e): bool => $e['date'] === $now->toDateString()
+            fn (array $e): bool => $e['date'] === $dateTimeReference->toDateString()
         ))[0] ?? null;
 
         if ($scheduleException) {
-            return $this->resolveFromException($scheduleException, $timezone, $now);
+            return $this->resolveFromException($scheduleException, $timezone, $dateTimeReference);
         }
 
-        return $this->resolveFromSchedule($schedule, $timezone, $now);
+        return $this->resolveFromSchedule($schedule, $timezone, $dateTimeReference);
     }
 
     /**

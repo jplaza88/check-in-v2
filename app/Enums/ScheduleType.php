@@ -49,4 +49,9 @@ enum ScheduleType: string
             ? array_map(Str::snake(...), $relationships)
             : $relationships;
     }
+
+    public function isCheckIn(): bool
+    {
+        return $this === self::CheckIn;
+    }
 }

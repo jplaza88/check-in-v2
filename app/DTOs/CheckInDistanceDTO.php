@@ -6,7 +6,7 @@ namespace App\DTOs;
 
 use JsonSerializable;
 
-final readonly class LocationDistanceDTO implements JsonSerializable
+final readonly class CheckInDistanceDTO implements JsonSerializable
 {
     public function __construct(public string $id, public float $userDistance) {}
 
