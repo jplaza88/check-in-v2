@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use App\Models\Address;
+use App\Models\CheckInSchedule;
 use App\Models\Location;
-use App\Models\Schedule;
 use Illuminate\Support\Facades\Date;
 
 afterEach(function (): void {
@@ -55,7 +55,7 @@ it('rejects check-in when the distribution center has no operating hours', funct
         ]);
 
     $location->checkInSchedule->update(
-        Schedule::factory()->closedEveryDay()->make()->getAttributes()
+        CheckInSchedule::factory()->closedEveryDay()->make()->getAttributes()
     );
 
     $this->from(route('checkIn.selectLocation'))
@@ -86,7 +86,7 @@ it('rejects check-in when the driver arrives outside the weekday pickup window',
         ]);
 
     $location->checkInSchedule->update(
-        Schedule::factory()->weekdayPickupWindow()->make()->getAttributes()
+        CheckInSchedule::factory()->weekdayPickupWindow()->make()->getAttributes()
     );
 
     $this->from(route('checkIn.selectLocation'))

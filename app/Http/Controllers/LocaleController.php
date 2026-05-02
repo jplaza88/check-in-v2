@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Services\SessionService;
+use App\Session\UserSession;
 use Illuminate\Http\RedirectResponse;
 
 final class LocaleController extends Controller
@@ -13,7 +13,7 @@ final class LocaleController extends Controller
      * Handles the language switch when the user clicks on a locale in the navbar
      * This will persist locale preference for session.
      */
-    public function __invoke(SessionService $sessionService, string $locale): RedirectResponse
+    public function __invoke(UserSession $session, string $locale): RedirectResponse
     {
         $availableLocales = config('app.locales');
 
@@ -22,7 +22,7 @@ final class LocaleController extends Controller
         }
 
         app()->setLocale($locale);
-        $sessionService->setLocale($locale);
+        $session->setLocale($locale);
 
         return back();
     }

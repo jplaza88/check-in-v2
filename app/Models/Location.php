@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Enums\ScheduleType;
 use Carbon\CarbonImmutable;
 use Database\Factories\LocationFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property-read int $id
@@ -33,8 +32,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property-read CarbonImmutable $created_at
  * @property-read CarbonImmutable $updated_at
  * @property-read Address $address
- * @property-read Schedule $schedule
- * @property-read ScheduleException $scheduleExceptions
+ * @property-read CheckInSchedule|null $checkinTodaySchedule
+ * @property-read Collection<int, CheckInScheduleOverride> $checkinScheduleOverrides
+ * @property-read Collection<int, CheckInSchedule> $checkInSchedule
  */
 #[Fillable(['uuid', 'address_id', 'max_distance_allowed', 'name', 'abbreviation', 'timezone', 'phone', 'phone_ext', 'email', 'is_active', 'is_checkins_enabled', 'is_appointments_enabled', 'additional_fields'])]
 #[Hidden(['id'])]
@@ -52,35 +52,51 @@ final class Location extends Model
     }
 
     /**
-     * @return HasOne<Schedule, $this>
+     * @return HasMany<CheckInSchedule, $this>
      */
-    public function checkInSchedule(): HasOne
+    public function checkinSchedule(): HasMany
     {
-        return $this->hasOne(Schedule::class)->where('type', ScheduleType::CheckIn);
+        return $this->hasMany(CheckInSchedule::class);
     }
 
     /**
-     * @return HasOne<Schedule, $this>
+     * @return HasOne<CheckInSchedule, $this>
      */
-    public function appointmentSchedule(): HasOne
+    /*public function checkinTodaySchedule(): HasOne
     {
-        return $this->hasOne(Schedule::class)->where('type', ScheduleType::Appointment);
+        return $this->hasOne(CheckInSchedule::class);
+    }*/
+
+    /**
+     * @return HasMany<AppointmentSchedule, $this>
+     */
+    public function appointmentSchedule(): HasMany
+    {
+        return $this->HasMany(AppointmentSchedule::class);
     }
 
     /**
-     * @return HasMany<ScheduleException, $this>
+     * @return HasOne<AppointmentSchedule, $this>
      */
-    public function checkInScheduleExceptions(): HasMany
+    /*public function appointmentTodaySchedule(): HasOne
     {
-        return $this->hasMany(ScheduleException::class)->where('type', ScheduleType::CheckIn);
+        return $this->hasOne(AppointmentSchedule::class);
+    }*/
+
+    /**
+     * @return HasMany<CheckInScheduleOverride, $this>
+     */
+    public function checkinScheduleOverrides(): HasMany
+    {
+        return $this->hasMany(CheckInScheduleOverride::class);
     }
 
     /**
-     * @return HasMany<ScheduleException, $this>
+     * @return HasMany<AppointmentScheduleOverride, $this>
      */
-    public function appointmentScheduleExceptions(): HasMany
+    public function appointmentScheduleOverrides(): HasMany
     {
-        return $this->hasMany(ScheduleException::class)->where('type', ScheduleType::Appointment);
+        return $this->hasMany(AppointmentScheduleOverride::class);
     }
 
     public function getRouteKeyName(): string

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Middleware\EnsureUserHasAppointmentLocationMiddleware;
 use App\Http\Middleware\EnsureUserHasCoordinatesMiddleware;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetLocale;
@@ -24,7 +25,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'setLocale' => SetLocale::class,
-            'coords' => EnsureUserHasCoordinatesMiddleware::class,
+            'userCoordinates' => EnsureUserHasCoordinatesMiddleware::class,
+            'appointmentLocation' => EnsureUserHasAppointmentLocationMiddleware::class,
         ]);
     })
 

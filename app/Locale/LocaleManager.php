@@ -2,16 +2,18 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Locale;
 
+use App\Browser\BrowserManager;
+use App\Session\UserSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
-final readonly class LocaleService
+final readonly class LocaleManager
 {
     public function __construct(
-        private BrowserService $browserService,
-        private SessionService $sessionService,
+        private BrowserManager $browser,
+        private UserSession $session,
     ) {}
 
     public function getLocale(Request $request): string
@@ -21,8 +23,8 @@ final readonly class LocaleService
          * changes the language in the navbar.
          */
 
-        return $this->sessionService->getLocale()
-            ?? $this->browserService->detectLocale($request)
+        return $this->session->getLocale()
+            ?? $this->browser->detectLocale($request)
             ?? config('app.locale');
     }
 

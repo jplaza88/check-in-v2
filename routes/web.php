@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\AppointmentLocationSelectController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\CheckInDistanceController;
+use App\Http\Controllers\CheckInLocationSelectController;
 use App\Http\Controllers\LocaleController;
-use App\Http\Controllers\LocationSelectController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
@@ -33,20 +34,21 @@ Route::post('/check-in/distance', CheckInDistanceController::class)
 Route::middleware(['setLocale'])
     ->group(function (): void {
 
-        Route::get('/check-in/select-location', LocationSelectController::class)
-            ->defaults('context', 'checkin')
+        Route::get('/check-in/select-location', CheckInLocationSelectController::class)
             ->name('checkIn.selectLocation');
 
-        Route::middleware(['coords'])
+        Route::middleware(['userCoordinates'])
             ->post('/check-in/{uuid}', [CheckInController::class, 'gate'])
             ->whereUuid('uuid')
             ->name('checkIn.form');
 
-        Route::get('/appointment/select-location', LocationSelectController::class)
-            ->defaults('context', 'appointment')
+        Route::get('/appointment/select-location', AppointmentLocationSelectController::class)
             ->name('appointment.selectLocation');
 
         Route::post('/appointment/{uuid}', [AppointmentController::class, 'gate'])
-            ->defaults('context', 'appointment')
+            ->name('appointment.gate');
+
+        Route::middleware(['appointmentLocation'])
+            ->get('/appointment/{uuid}/book', [AppointmentController::class, 'form'])
             ->name('appointment.form');
     });

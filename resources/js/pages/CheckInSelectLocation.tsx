@@ -1,5 +1,4 @@
-import { Head, router, usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { Head, router, usePage, useHttp } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { gate } from '@/actions/App/Http/Controllers/CheckInController';
 import CheckInDistanceController from '@/actions/App/Http/Controllers/CheckInDistanceController';
@@ -26,6 +25,16 @@ interface CheckInTranslations {
 
 interface Translations {
     checkInSelectLocation: CheckInTranslations;
+}
+
+interface DistanceLocation {
+    id: string;
+    userDistance: number;
+}
+
+interface DriverCoordinates {
+    latitude: number;
+    longitude: number;
 }
 
 interface Alert {
@@ -62,6 +71,193 @@ export default function SelectLocation() {
     // User coordinates
     const [sortedLocations, setSortedLocations] = useState<Location[] | null>(null);
     const { coords, loading, error, warning } = useGeolocation();
+
+    const { data, post } = useHttp({'latitude': 0,'longitude': 0});
+
+    const fetchDistances = async (position: DriverCoordinates) => {
+        await post(CheckInDistanceController().url, {
+            onBefore: () => {
+                data.latitude = position.latitude;
+                data.longitude = position.longitude;
+            },
+            onSuccess: (response: any) => {
+                const distanceMap = new Map(
+                    response.locations.map(
+                        ({ id, userDistance }: DistanceLocation) => [
+                            id,
+                            userDistance,
+                        ],
+                    ),
+                );
+
+                const merged = response.locations
+                    .map(({ id }: { id: string }) => {
+                        const location = locations.find((loc) => loc.id === id);
+
+                        return location
+                            ? {
+                                  ...location,
+                                  userDistance: distanceMap.get(id) ?? null,
+                              }
+                            : null;
+                    })
+                    .filter(Boolean);
+
+                setSortedLocations(merged);
+            },
+            onError: () => setFetchError(true),
+            onNetworkError: () => setFetchError(true),
+        });
+    };
+
+    // Alert banner
+    const getAlert = (): Alert | null => {
+        if (error) {
+            return {
+                type: 'error',
+                title: pageTranslations.geolocationErrorTitle,
+                message: pageTranslations.geolocationErrorMessage,
+            };
+        }
+
+        if (warning) {
+            return {
+                type: 'warning',
+                title: pageTranslations.geolocationNotSupportedTitle,
+                message: pageTranslations.geolocationNotSupportedMessage,
+            };
+        }
+
+        if (fetchError) {
+            return {
+                type: 'error',
+                title: pageTranslations.fetchDistancesErrorTitle,
+                message: pageTranslations.fetchDistancesErrorMessage,
+            };
+        }
+
+        if (checkInError) {
+            return {
+                type: 'error',
+                title: pageTranslations.checkInUnavailable,
+                message: checkInError,
+            };
+        }
+
+        return null;
+    };
+
+    const [fetchError, setFetchError] = useState(false);
+    const [checkInError, setCheckInError] = useState<string | null>(null);
+
+    const [submittingLocationId, setSubmittingLocationId] = useState<string | null>(null);
+
+    const [dismissed, setDismissed] = useState(false);
+    const alert = dismissed ? null : getAlert();
+
+    const handleSelectLocation = (locationId: string, isRetry = false) => {
+        setCheckInError(null);
+        setDismissed(false);
+        setSubmittingLocationId(locationId);
+
+        router.post(
+            gate.url({ uuid: locationId }),
+            {},
+            {
+                onError: (errors) => {
+                    // Session expired or missing coords — re-fetch to restore session, then retry once
+                    if (!isRetry && errors.userCoords && coords) {
+                        try {
+                            fetchDistances(coords).then(() => {
+                                handleSelectLocation(locationId, true)
+                            });
+                        } catch {
+                            setCheckInError(
+                                'Something went wrong. Please try again.',
+                            );
+                            setSubmittingLocationId(null);
+                        }
+
+                        return;
+                    }
+
+                    setCheckInError(
+                        errors[Object.keys(errors)[0]] ??
+                            'Something went wrong. Please try again.',
+                    );
+
+                    console.error(errors);
+                    setSubmittingLocationId(null);
+                },
+                onFinish: () => {
+                    if (isRetry) {
+                        setSubmittingLocationId(null);
+                    }
+                },
+            },
+        );
+    };
+
+    useEffect(() => {
+        if (!coords) {
+            return;
+        }
+
+        fetchDistances(coords);
+    }, [coords]);
+
+    // Translations
+    /*const { translations, locations } = usePage<PageProps>().props;
+    const pageTranslations: CheckInTranslations = translations.checkInSelectLocation;
+
+    // User coordinates
+    const [sortedLocations, setSortedLocations] = useState<Location[] | null>(null);
+    const { coords, loading, error, warning } = useGeolocation();
+
+    const { data, setData, post, errors, processing } = useHttp({
+        latitude: coords?.latitude ?? 0.0,
+        longitude: coords?.longitude ?? 0.0,
+    });
+
+    const fetchDistances = async (coords: any) => {
+        setData({
+            'latitude': coords.latitude,
+            'longitude': coords.longitude,
+        });
+
+        await post(CheckInDistanceController().url, {
+            onSuccess: (response) => {
+                const distanceMap = new Map(
+                    response.locations.map(
+                        ({
+                            id,
+                            userDistance,
+                        }: {
+                            id: string;
+                            userDistance: number;
+                        }) => [id, userDistance],
+                    ),
+                );
+
+                const merged = response.locations
+                    .map(({ id }: { id: string }) => {
+                        const location = locations.find((loc) => loc.id === id);
+
+                        return location
+                            ? {
+                                  ...location,
+                                  userDistance: distanceMap.get(id) ?? null,
+                              }
+                            : null;
+                    })
+                    .filter(Boolean);
+
+                setSortedLocations(merged);
+            },
+            onError: () => setFetchError(true),
+            onNetworkError: () => setFetchError(true),
+        });
+    };
 
     // Alert banner
     const getAlert = (): Alert | null => {
@@ -136,41 +332,16 @@ export default function SelectLocation() {
             return;
         }
 
-        axios
-            .post(CheckInDistanceController().url, {
-                latitude: coords.latitude,
-                longitude: coords.longitude,
-            })
-            .then(({ data }) => {
-                const distanceMap = new Map(
-                    data.locations.map(
-                        ({
-                            id,
-                            userDistance,
-                        }: {
-                            id: string;
-                            userDistance: number;
-                        }) => [id, userDistance],
-                    ),
-                );
-
-                const merged = data.locations
-                    .map(({ id }: { id: string }) => {
-                        const location = locations.find((loc) => loc.id === id);
-
-                        return location
-                            ? {
-                                  ...location,
-                                  userDistance: distanceMap.get(id) ?? null,
-                              }
-                            : null;
-                    })
-                    .filter(Boolean);
-
-                setSortedLocations(merged);
-            })
-            .catch(() => setFetchError(true));
+        fetchDistances(coords).then(r => );
     }, [coords]);
+
+    useEffect(() => {
+        if (!coords) {
+            return;
+        }
+
+        fetchDistances(coords).then(r => );
+    }, []);*/
 
     return (
         <PublicLayout>
@@ -280,7 +451,8 @@ export default function SelectLocation() {
                                                             too far
                                                         </span>
                                                     </div>
-                                                ) : location.isExceptionClosure &&
+                                                ) : location.hasException &&
+                                                  !location.isOpen &&
                                                   location.reason ? (
                                                     <div className="mb-3">
                                                         <span
@@ -301,6 +473,7 @@ export default function SelectLocation() {
                                                         </span>
                                                     </div>
                                                 ) : location.hasException &&
+                                                  location.isOpen &&
                                                   location.reason ? (
                                                     <div className="mb-3">
                                                         <span
@@ -391,8 +564,7 @@ export default function SelectLocation() {
                                         </div>
                                     </button>
                                 );
-                            })
-                        }
+                            })}
                     </div>
                 </div>
             </div>

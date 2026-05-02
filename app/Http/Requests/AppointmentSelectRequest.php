@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
-use App\Enums\ScheduleType;
 use App\Models\Location;
-use App\Services\LocationScheduleService;
+use App\Queries\AppointmentLocation;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
@@ -15,8 +14,7 @@ final class AppointmentSelectRequest extends FormRequest
 {
     public ?Location $location = null {
         get {
-            return $this->location ??= resolve(LocationScheduleService::class)
-                ->getActiveLocationByUuid($this->input('uuid'), ScheduleType::Appointment);
+            return $this->location ??= resolve(AppointmentLocation::class)->execute($this->input('uuid'));
         }
     }
 

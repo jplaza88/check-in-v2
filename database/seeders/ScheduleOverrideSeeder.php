@@ -4,36 +4,33 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Enums\ScheduleType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-final class ScheduleExceptionSeeder extends Seeder
+final class ScheduleOverrideSeeder extends Seeder
 {
     public function run(): void
     {
-        $exceptions = [
+        $overrides = [
             [
                 'location_id' => 1,
                 'date' => '2026-04-06',
-                'open' => '07:00:00',
-                'close' => '12:00:00',
+                'open_time' => '07:00:00',
+                'close_time' => '12:00:00',
                 'is_closed' => false,
                 'reason' => 'testing 123',
             ],
         ];
 
-        foreach ($exceptions as $exception) {
-            DB::table('schedule_exceptions')->insert([
-                ...$exception,
-                'type' => ScheduleType::CheckIn,
+        foreach ($overrides as $override) {
+            DB::table('checkin_schedule_overrides')->insert([
+                ...$override,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
-            DB::table('schedule_exceptions')->insert([
-                ...$exception,
-                'type' => ScheduleType::Appointment,
+            DB::table('appointment_schedule_overrides')->insert([
+                ...$override,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

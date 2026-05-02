@@ -6,7 +6,7 @@ namespace App\DTOs;
 
 use Carbon\CarbonInterface;
 
-final readonly class LocationScheduleDTO
+final readonly class AppointmentLocationScheduleDTO
 {
     public function __construct(
         public bool $isOpen,

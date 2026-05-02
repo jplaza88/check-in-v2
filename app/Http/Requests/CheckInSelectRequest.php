@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
-use App\Enums\ScheduleType;
+use App\CheckIn\CheckInAvailabilityResolver;
 use App\Models\Location;
-use App\Services\CheckInAvailabilityService;
-use App\Services\LocationScheduleService;
+use App\Queries\CheckInLocation;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
@@ -16,8 +15,7 @@ final class CheckInSelectRequest extends FormRequest
 {
     public ?Location $location = null {
         get {
-            return $this->location ??= resolve(LocationScheduleService::class)
-                ->getActiveLocationByUuid($this->input('uuid'), ScheduleType::CheckIn);
+            return $this->location ??= resolve(CheckInLocation::class)->execute($this->input('uuid'));
         }
     }
 
@@ -41,10 +39,10 @@ final class CheckInSelectRequest extends FormRequest
     /**
      * @return array<mixed>
      */
-    public function after(CheckInAvailabilityService $service): array
+    public function after(CheckInAvailabilityResolver $resolver): array
     {
         return [
-            function (Validator $validator) use ($service): void {
+            function (Validator $validator) use ($resolver): void {
                 $location = $this->location;
 
                 if (! $location instanceof Location) {
@@ -55,7 +53,7 @@ final class CheckInSelectRequest extends FormRequest
 
                 $userCoords = $this->attributes->get('userCoords');
 
-                $canCheckIn = $service->isAvailableForCheckIn($location, $userCoords);
+                $canCheckIn = $resolver->isAvailableForCheckIn($location, $userCoords);
 
                 if (! $canCheckIn->allowed) {
                     $validator->errors()->add('uuid', $canCheckIn->reason ?? __('messages.checkInSelectLocation.locationClosed'));

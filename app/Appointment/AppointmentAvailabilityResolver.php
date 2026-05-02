@@ -2,42 +2,28 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Appointment;
 
-use App\DTOs\LocationAvailabilityDTO;
-use App\DTOs\LocationScheduleDTO;
-use App\Enums\ScheduleType;
+use App\DTOs\AppointmentAvailabilityDTO;
+use App\DTOs\AppointmentLocationScheduleDTO;
 use App\Models\Location;
 use Carbon\CarbonInterface;
 
-final readonly class AppointmentAvailabilityService
+final readonly class AppointmentAvailabilityResolver
 {
-    public function __construct(private LocationScheduleService $locationScheduleService) {}
+    public function __construct(private AppointmentScheduleResolver $scheduleResolver) {}
 
-    public function isAvailableForAppointment(Location $location, CarbonInterface $appointmentDateTime): LocationAvailabilityDTO
+    public function isAvailableForAppointment(Location $location, CarbonInterface $appointmentDateTime): AppointmentAvailabilityDTO
     {
         $schedule = $this->resolveSchedule($location, $appointmentDateTime);
 
-        return new LocationAvailabilityDTO(
+        return new AppointmentAvailabilityDTO(
             allowed: $schedule->isOpen,
             reason: $this->resolveReason($location, $schedule, $appointmentDateTime)
         );
     }
 
-    private function resolveSchedule(Location $location, CarbonInterface $appointmentDateTime): LocationScheduleDTO
-    {
-        if (! isset($location->appointmentSchedule, $location->appointmentScheduleExceptions)) {
-            return new LocationScheduleDTO(isOpen: false);
-        }
-
-        return $this->locationScheduleService->resolveOpenCloseTime(
-            $location->toArray(),
-            ScheduleType::Appointment,
-            $appointmentDateTime
-        );
-    }
-
-    private function resolveReason(Location $location, LocationScheduleDTO $schedule, CarbonInterface $appointmentDateTime): ?string
+    public function resolveReason(Location $location, AppointmentLocationScheduleDTO $schedule, CarbonInterface $appointmentDateTime): ?string
     {
         if ($schedule->isOpen) {
             return null;
@@ -87,5 +73,14 @@ final readonly class AppointmentAvailabilityService
             'name' => $location->name,
             'date' => $appointmentDateTime->format('m/d/Y'),
         ]);
+    }
+
+    private function resolveSchedule(Location $location, CarbonInterface $appointmentDateTime): AppointmentLocationScheduleDTO
+    {
+        if (! isset($location->appointmentSchedule, $location->appointmentScheduleOverrides)) {
+            return new AppointmentLocationScheduleDTO(isOpen: false);
+        }
+
+        return $this->scheduleResolver->resolveSchedule($location, $appointmentDateTime);
     }
 }

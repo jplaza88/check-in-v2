@@ -11,6 +11,7 @@ final class HandleInertiaRequests extends Middleware
 {
     private const array PUBLIC_NAV_ROUTES = [
         'appointment.selectLocation',
+        'appointment.form',
         'checkIn.selectLocation',
         // 'checkIn.*',
         // 'appointment.*',
@@ -44,7 +45,6 @@ final class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        // TODO:: Only show route name for public routes for navigation bar purposes
         return [
             ...parent::share($request),
             'name' => config('app.name'),

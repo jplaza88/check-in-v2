@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('zip_code');
             $table->string('zip_code_4');
             $table->string('country');
-            $table->decimal('latitude', 9, 6)->nullable();
-            $table->decimal('longitude', 9, 6)->nullable();
+            $table->decimal('latitude', 9, 6);
+            $table->decimal('longitude', 9, 6);
             $table->timestampsTz();
 
             $table->unique(['street1', 'city', 'state', 'zip_code']);

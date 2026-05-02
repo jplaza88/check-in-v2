@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Address;
+use App\Models\CheckInSchedule;
 use App\Models\Location;
-use App\Models\Schedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -40,10 +40,10 @@ final class LocationFactory extends Factory
     public function configure(): static
     {
         return $this->afterCreating(function (Location $location): void {
-            Schedule::factory()->for($location)->create();
+            CheckInSchedule::factory()->for($location)->create();
 
             if ($location->is_appointments_enabled) {
-                Schedule::factory()->forAppointments()->for($location)->create();
+                CheckInSchedule::factory()->forAppointments()->for($location)->create();
             }
         });
     }

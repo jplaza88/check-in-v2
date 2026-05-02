@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Services\SessionService;
+use App\Session\UserSession;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final readonly class EnsureUserHasCoordinatesMiddleware
 {
-    public function __construct(
-        private SessionService $session,
-    ) {}
+    public function __construct(private UserSession $session) {}
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -21,7 +19,7 @@ final readonly class EnsureUserHasCoordinatesMiddleware
 
         if (! $userCoords) {
             return to_route('checkIn.selectLocation')
-                ->withErrors(['userCoords' => 'Please select a location to start over.']);
+                ->withErrors(['userCoords' => true]);
         }
 
         $request->attributes->set('userCoords', $userCoords);

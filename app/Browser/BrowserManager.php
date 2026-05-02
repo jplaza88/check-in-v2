@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Browser;
 
 use Illuminate\Http\Request;
 
-final readonly class BrowserService
+final readonly class BrowserManager
 {
     /*
      * Detect users default language set in their browser.

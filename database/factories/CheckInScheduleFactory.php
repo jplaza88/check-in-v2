@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Enums\ScheduleType;
-use App\Models\Schedule;
+use App\Models\CheckInSchedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Schedule>
+ * @extends Factory<CheckInSchedule>
  */
-final class ScheduleFactory extends Factory
+final class CheckInScheduleFactory extends Factory
 {
     /**
      * @return array<string, mixed>

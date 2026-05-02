@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Address;
 
-final class AddressService
+final class AddressManager
 {
     /**
      * @param  array<string, mixed>  $address

@@ -2,13 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Session;
 
-final readonly class SessionService
+use App\Models\Location;
+
+final readonly class UserSession
 {
+    public function getId(): string
+    {
+        return session()->getId();
+    }
+
     public function getLocale(): ?string
     {
-        return session('locale');
+        return session()->has('locale') ? session('locale') : null;
     }
 
     /**
@@ -16,7 +23,7 @@ final readonly class SessionService
      */
     public function getUserCoords(): ?array
     {
-        $coords = session('userCoords');
+        $coords = session()->has('userCoords') ? session('userCoords') : null;
 
         if (! $coords) {
             return null;
@@ -32,6 +39,16 @@ final readonly class SessionService
         return $coords;
     }
 
+    public function getCheckInLocation(): ?Location
+    {
+        return session()->has('checkInLocation') ? session('checkInLocation') : null;
+    }
+
+    public function getAppointmentLocation(): array
+    {
+        return session()->has('appointmentLocation') ? session('appointmentLocation') : [];
+    }
+
     public function setLocale(string $locale): void
     {
         session(['locale' => $locale]);
@@ -45,6 +62,20 @@ final readonly class SessionService
                 'longitude' => $longitude,
                 'storedAt' => now()->timestamp,
             ],
+        ]);
+    }
+
+    public function setCheckInLocation(?Location $location): void
+    {
+        session([
+            'checkInLocation' => $location,
+        ]);
+    }
+
+    public function setAppointmentLocation(?Location $location): void
+    {
+        session([
+            'appointmentLocation' => $location,
         ]);
     }
 }

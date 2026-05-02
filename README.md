@@ -4,19 +4,19 @@
 > The environment below is configured for local development via Laravel Sail (Docker).
 > A separate production Docker environment will need to be configured before deploying.
 
-A web application that manages truck drivers' check-in's across Martori Farms locations throughout the US.
+A web application that manages truck drivers' check-ins across Martori Farms locations throughout the US.
 
 ## Stack
 
-| Layer | Technology                       |
-|---|----------------------------------|
-| Backend | Laravel 13 |
-| Language | PHP 8.5                          |
-| Testing | Pest (Wrapper for PHPUnit)       |
-| Database | PostgreSQL 18                    |
-| Frontend | React · Inertia.js · Tailwind CSS |
-| Cache / Queue | Redis                            |
-| Mail | Mailpit                          |
+| Layer | Technology                                    |
+|---|-----------------------------------------------|
+| Backend | Laravel 13                                    |
+| Language | PHP 8.5                                       |
+| Testing | Pest (Wrapper for PHPUnit)                    |
+| Database | PostgreSQL 18                                 |
+| Frontend | React · TypeScript · Inertia.js · Tailwind CSS |
+| Cache / Queue | Redis                                         |
+| Mail | Mailpit                                       |
 
 ## Laravel Packages & Tooling
 
@@ -107,8 +107,8 @@ Runs at **level 8** (out of 10). Configuration in `phpstan.neon`.
 Uses [Driftingly/Laravel Rector](https://github.com/driftingly/rector-laravel) with Laravel-specific rule sets and prepared sets for dead code, code quality, type declarations, privatization, and early returns. Configuration in `rector.php`.
 
 ```bash
-vendor/bin/rector --dry-run          # preview changes without applying
-vendor/bin/rector                    # apply changes
+./vendor/bin/rector --dry-run          # preview changes without applying
+./vendor/bin/rector                    # apply changes
 ```
 
 ### Tests
