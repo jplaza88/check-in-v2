@@ -28,7 +28,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read bool $is_active
  * @property-read bool $is_checkins_enabled
  * @property-read bool $is_appointments_enabled
- * @property-read bool $additional_fields
+ * @property-read array $config
  * @property-read CarbonImmutable $created_at
  * @property-read CarbonImmutable $updated_at
  * @property-read Address $address
@@ -36,7 +36,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read Collection<int, CheckInScheduleOverride> $checkinScheduleOverrides
  * @property-read Collection<int, CheckInSchedule> $checkInSchedule
  */
-#[Fillable(['uuid', 'address_id', 'max_distance_allowed', 'name', 'abbreviation', 'timezone', 'phone', 'phone_ext', 'email', 'is_active', 'is_checkins_enabled', 'is_appointments_enabled', 'additional_fields'])]
+#[Fillable(['uuid', 'address_id', 'max_distance_allowed', 'name', 'abbreviation', 'timezone', 'phone', 'phone_ext', 'email', 'is_active', 'is_checkins_enabled', 'is_appointments_enabled', 'config'])]
 #[Hidden(['id'])]
 final class Location extends Model
 {
@@ -60,28 +60,12 @@ final class Location extends Model
     }
 
     /**
-     * @return HasOne<CheckInSchedule, $this>
-     */
-    /*public function checkinTodaySchedule(): HasOne
-    {
-        return $this->hasOne(CheckInSchedule::class);
-    }*/
-
-    /**
      * @return HasMany<AppointmentSchedule, $this>
      */
     public function appointmentSchedule(): HasMany
     {
         return $this->HasMany(AppointmentSchedule::class);
     }
-
-    /**
-     * @return HasOne<AppointmentSchedule, $this>
-     */
-    /*public function appointmentTodaySchedule(): HasOne
-    {
-        return $this->hasOne(AppointmentSchedule::class);
-    }*/
 
     /**
      * @return HasMany<CheckInScheduleOverride, $this>
@@ -111,7 +95,7 @@ final class Location extends Model
             'is_active' => 'boolean',
             'is_checkins_enabled' => 'boolean',
             'is_appointments_enabled' => 'boolean',
-            'additional_fields' => 'boolean',
+            'config' => 'array',
         ];
     }
 }

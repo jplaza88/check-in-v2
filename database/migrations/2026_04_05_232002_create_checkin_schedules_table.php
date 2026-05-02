@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('checkin_schedules', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('location_id')->constrained('locations');
+            $table->foreignId('location_id')->constrained('locations')->cascadeOnDelete();
             $table->integer('day_of_week');
             $table->time('open_time');
             $table->time('close_time');
