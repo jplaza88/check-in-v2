@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\File;
 final readonly class LocaleManager
 {
     public function __construct(
-        private BrowserManager $browser,
+        private BrowserManager     $browser,
         private UserSession $session,
     ) {}
 

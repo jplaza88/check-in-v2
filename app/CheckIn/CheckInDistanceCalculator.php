@@ -14,7 +14,7 @@ use Illuminate\Support\Collection;
 final readonly class CheckInDistanceCalculator
 {
     public function __construct(
-        private CheckInLocations $locations,
+        private CheckInLocations   $locations,
         private DistanceCalculator $distance,
         private UserSession $session,
     ) {}

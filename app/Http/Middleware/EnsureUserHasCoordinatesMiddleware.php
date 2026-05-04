@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Session\UserSession;
+use App\Session\CheckInSession;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final readonly class EnsureUserHasCoordinatesMiddleware
 {
-    public function __construct(private UserSession $session) {}
+    public function __construct(private CheckInSession $session) {}
 
     public function handle(Request $request, Closure $next): Response
     {

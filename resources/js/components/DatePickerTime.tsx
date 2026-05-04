@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { format } from 'date-fns';
-import { ChevronUpIcon, ChevronDownIcon } from 'lucide-react';
+import { CalendarIcon, ChevronUpIcon, ChevronDownIcon, ClockIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -82,8 +82,9 @@ export function DatePicker({
             <PopoverTrigger asChild>
                 <Button
                     variant="outline"
-                    className="w-full justify-between font-normal"
+                    className="w-full justify-between border-input font-normal"
                 >
+                    <CalendarIcon data-icon="inline-start" className="size-4 opacity-50" />
                     {date ? format(date, 'PP') : 'Select date'}
                     <ChevronDownIcon className="size-4 opacity-50" />
                 </Button>
@@ -157,8 +158,9 @@ export function TimePicker({
             <PopoverTrigger asChild>
                 <Button
                     variant="outline"
-                    className="w-full justify-between font-normal tabular-nums"
+                    className="w-full justify-between border-input font-normal tabular-nums"
                 >
+                    <ClockIcon data-icon="inline-start" className="size-4 opacity-50" />
                     {label}
                     <ChevronDownIcon className="size-4 opacity-50" />
                 </Button>

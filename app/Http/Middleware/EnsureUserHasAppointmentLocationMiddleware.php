@@ -6,7 +6,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Location;
 use App\Queries\AppointmentLocation;
-use App\Session\UserSession;
+use App\Session\AppointmentSession;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -14,22 +14,20 @@ use Illuminate\Support\Str;
 final readonly class EnsureUserHasAppointmentLocationMiddleware
 {
     public function __construct(
-        private UserSession $session,
+        private AppointmentSession $session,
     ) {}
 
     public function handle(Request $request, Closure $next)
     {
-        $location = $this->session->getAppointmentLocation();
+        $location = $this->session->location();
 
-        if (! $location) {
+        if (! $location || ! $this->session->isFresh()) {
             $uuid = $request->route('uuid');
 
             if ($uuid && Str::isUuid($uuid)) {
                 $location = resolve(AppointmentLocation::class)->execute($uuid);
 
                 if (! $location instanceof Location) {
-                    $this->session->setAppointmentLocation($location);
-
                     return $next($request);
                 }
             }

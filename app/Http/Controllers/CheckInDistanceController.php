@@ -6,7 +6,7 @@ namespace App\Http\Controllers;
 
 use App\CheckIn\CheckInDistanceCalculator;
 use App\Http\Requests\CheckInDistanceRequest;
-use App\Session\UserSession;
+use App\Session\CheckInSession;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -26,11 +26,11 @@ final class CheckInDistanceController extends Controller
         $userLng = $request->float('longitude');
 
         $distance = resolve(CheckInDistanceCalculator::class);
-        $userSession = resolve(UserSession::class);
+        $session = resolve(CheckInSession::class);
 
         $distances = $distance->resolve($userLat, $userLng);
 
-        $userSession->setUserCoords($userLat, $userLng);
+        $session->setUserCoords($userLat, $userLng);
 
         return response()->json(['locations' => $distances]);
     }
