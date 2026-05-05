@@ -6,14 +6,14 @@ namespace App\DTOs;
 
 use Carbon\CarbonInterface;
 
-final readonly class AppointmentLocationScheduleDTO
+final readonly class LocationScheduleDTO
 {
     public function __construct(
         public bool $isOpen,
         public ?CarbonInterface $openTime = null,
         public ?CarbonInterface $closeTime = null,
         public ?string $reason = null,
-        public bool $hasException = false,
-        public bool $isExceptionClosure = false,
+        public bool $hasOverride = false,
+        public bool $isOverrideClosure = false,
     ) {}
 }

@@ -28,9 +28,9 @@ interface Location {
     address: string;
     todayOpenCloseTime: string | null;
     isOpen: boolean;
-    hasException: boolean;
+    hasOverride: boolean;
     reason: string | null;
-    isExceptionClosure: boolean;
+    isOverrideClosure: boolean;
     isClosingSoon: boolean;
 }
 
@@ -113,7 +113,7 @@ export default function AppointmentSelectLocation() {
                                     >
                                         {/* Text */}
                                         <div className="flex flex-1 flex-col justify-center gap-0.5 p-4 text-left">
-                                            {location.hasException &&
+                                            {location.hasOverride &&
                                             !location.isOpen &&
                                             location.reason ? (
                                                 <div className="mb-3">
@@ -135,7 +135,7 @@ export default function AppointmentSelectLocation() {
                                                         {location.reason}
                                                     </span>
                                                 </div>
-                                            ) : location.hasException &&
+                                            ) : location.hasOverride &&
                                               location.isOpen &&
                                               location.reason ? (
                                                 <div className="mb-3">

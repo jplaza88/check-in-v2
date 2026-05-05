@@ -8,19 +8,22 @@ use App\Models\Location;
 use App\Queries\AppointmentLocation;
 use App\Session\AppointmentSession;
 use Closure;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
-final readonly class EnsureUserHasAppointmentLocationMiddleware
+final readonly class EnsureUserHasAppointmentLocation
 {
     public function __construct(
         private AppointmentSession $session,
     ) {}
 
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): RedirectResponse
     {
-        $location = $this->session->location();
+        $location = $this->session->getLocation();
 
+        // The user either doesn't have a location in session
+        // or the session is stale, let's force
         if (! $location || ! $this->session->isFresh()) {
             $uuid = $request->route('uuid');
 
@@ -32,6 +35,7 @@ final readonly class EnsureUserHasAppointmentLocationMiddleware
                 }
             }
 
+            // TODO:: Add translation
             return to_route('appointment.selectLocation')
                 ->withErrors(['uuid' => 'Please select a location to continue.']);
         }

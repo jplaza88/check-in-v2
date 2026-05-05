@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTOs;
 
-final readonly class AppointmentLocationSelectDTO
+final readonly class AppointmentLocationDTO
 {
     public function __construct(
         public string $id,
@@ -13,8 +13,8 @@ final readonly class AppointmentLocationSelectDTO
         public bool $isOpen,
         public ?string $todayOpenCloseTime,
         public ?string $reason,
-        public bool $hasException,
-        public bool $isExceptionClosure,
+        public bool $hasOverride,
+        public bool $isOverrideClosure,
         public ?bool $isClosingSoon,
     ) {}
 }

@@ -11,7 +11,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
-final class CheckInSelectRequest extends FormRequest
+final class CheckInLocationSelectRequest extends FormRequest
 {
     public ?Location $location = null {
         get {

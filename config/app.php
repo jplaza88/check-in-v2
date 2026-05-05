@@ -161,11 +161,11 @@ return [
     | in the server-side session. After this duration, the coordinates
     | will expire and may need to be re-acquired.
     |
-    | Default: 60 seconds * 10 (10 minutes)
+    | Default: 60 seconds * 2 (2 minutes)
     |
     */
 
-    'user_coordinates_session_ttl' => 60 * 10,
+    'user_coordinates_session_ttl' => 60 * 2,
 
     /*
     |--------------------------------------------------------------------------
@@ -176,11 +176,11 @@ return [
     | in the browser (e.g., localStorage). Once expired, the browser
     | should request fresh location data.
     |
-    | Default: 10 minutes
+    | Default: 2 minutes
     |
     */
 
-    'user_coordinates_browser_ttl' => 10,
+    'user_coordinates_browser_ttl' => 2,
 
     /*
     |--------------------------------------------------------------------------
@@ -196,4 +196,19 @@ return [
     */
 
     'user_location_distances_ttl' => 2,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Appointment Location Context
+    |--------------------------------------------------------------------------
+    |
+    | Specifies how long (in minutes) the user's coordinates are cached
+    | in the browser (e.g., localStorage). Once expired, the browser
+    | should request fresh location data.
+    |
+    | Default: 2 minutes
+    |
+    */
+
+    'user_appointment_location_context_ttl' => 2,
 ];

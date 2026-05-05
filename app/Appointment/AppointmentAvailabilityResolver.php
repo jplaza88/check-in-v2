@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Appointment;
 
 use App\DTOs\AppointmentAvailabilityDTO;
-use App\DTOs\AppointmentLocationScheduleDTO;
+use App\DTOs\LocationScheduleDTO;
 use App\Models\Location;
 use Carbon\CarbonInterface;
 
@@ -23,7 +23,7 @@ final readonly class AppointmentAvailabilityResolver
         );
     }
 
-    public function resolveReason(Location $location, AppointmentLocationScheduleDTO $schedule, CarbonInterface $appointmentDateTime): ?string
+    public function resolveReason(Location $location, LocationScheduleDTO $schedule, CarbonInterface $appointmentDateTime): ?string
     {
         if ($schedule->isOpen) {
             return null;
@@ -40,14 +40,14 @@ final readonly class AppointmentAvailabilityResolver
 
         // Schedule exception exists but admin didn't provide a reason - generate one
 
-        if ($schedule->isExceptionClosure) {
+        if ($schedule->isOverrideClosure) {
             return __('messages.appointmentBooking.closedForAppointmentsOnDateWithoutReason', [
                 'name' => $location->name,
                 'date' => $appointmentDateTime->format('m/d/Y'),
             ]);
         }
 
-        if ($schedule->hasException && $schedule->openTime && $schedule->closeTime) {
+        if ($schedule->hasOverride && $schedule->openTime && $schedule->closeTime) {
             return __('messages.appointmentBooking.outsideSpecialHours', [
                 'name' => $location->name,
                 'time' => $appointmentDateTime->format('g:i A T'),
@@ -75,10 +75,10 @@ final readonly class AppointmentAvailabilityResolver
         ]);
     }
 
-    private function resolveSchedule(Location $location, CarbonInterface $appointmentDateTime): AppointmentLocationScheduleDTO
+    private function resolveSchedule(Location $location, CarbonInterface $appointmentDateTime): LocationScheduleDTO
     {
         if (! isset($location->appointmentSchedule, $location->appointmentScheduleOverrides)) {
-            return new AppointmentLocationScheduleDTO(isOpen: false);
+            return new LocationScheduleDTO(isOpen: false);
         }
 
         return $this->scheduleResolver->resolveSchedule($location, $appointmentDateTime);

@@ -4,35 +4,49 @@ declare(strict_types=1);
 
 namespace App\Session;
 
-use App\DTOs\AppointmentLocationSelectDTO;
-use App\Models\Location;
+use App\DTOs\AppointmentLocationDTO;
 
 final readonly class AppointmentSession
 {
     private const string KEY = 'appointmentLocationContext';
 
-    public function set(Location $location, AppointmentLocationSelectDTO $scheduleToday): void
+    /**
+     * @return array<string, string>
+     */
+    public function getLocation(): array
+    {
+        return session(self::KEY.'.location') ?? [];
+    }
+
+    public function getStoredAt(): ?int
+    {
+        $value = session(self::KEY.'.storedAt');
+
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_float($value)) {
+            return (int) $value;
+        }
+
+        if (is_string($value) && is_numeric($value)) {
+            return (int) $value;
+        }
+
+        return null;
+    }
+
+    public function setLocation(AppointmentLocationDTO $location): void
     {
         session([self::KEY => [
             'location' => $location,
-            'scheduleToday' => $scheduleToday,
             'storedAt' => now()->timestamp,
         ]]);
-    }
-
-    public function location(): array
-    {
-        return session(self::KEY . '.location') ?? [];
-    }
-
-    public function scheduleToday(): array
-    {
-        return session(self::KEY . '.scheduleToday') ?? [];
-    }
-
-    public function storedAt(): float|int|string|null
-    {
-        return session(self::KEY . '.storedAt');
     }
 
     public function forget(): void
@@ -42,10 +56,17 @@ final readonly class AppointmentSession
 
     public function isFresh(): bool
     {
-        if ( is_null($this->storedAt()) ) {
+        $storedAt = $this->getStoredAt();
+
+        if (is_null($storedAt)) {
+            $this->forget();
+
             return false;
         }
 
-        return now()->timestamp - $this->storedAt() <= 120;
+        $storedSeconds = $storedAt;
+        $ttl = (int) config('app.user_appointment_location_context_ttl');
+
+        return (int) now()->timestamp - $storedSeconds <= $ttl;
     }
 }

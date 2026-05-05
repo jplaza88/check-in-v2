@@ -7,7 +7,6 @@ use Rector\CodingStyle\Rector\ClassMethod\MakeInheritedMethodVisibilitySameAsPar
 use Rector\Config\RectorConfig;
 use Rector\Exception\Configuration\InvalidConfigurationException;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
-use Rector\Php85\Rector\Property\AddOverrideAttributeToOverriddenPropertiesRector;
 use RectorLaravel\Set\LaravelSetList;
 use RectorLaravel\Set\LaravelSetProvider;
 
@@ -44,7 +43,6 @@ try {
         ->withSkip([
             AddOverrideAttributeToOverriddenMethodsRector::class,
             MakeInheritedMethodVisibilitySameAsParentRector::class,
-            AddOverrideAttributeToOverriddenPropertiesRector::class,
         ])
         ->withPreparedSets(
             deadCode: true,

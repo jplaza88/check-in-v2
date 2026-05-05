@@ -56,9 +56,9 @@ interface Location {
     maxDistanceAllowed: number;
     todayOpenCloseTime: string | null;
     isOpen: boolean;
-    hasException: boolean;
+    hasOverride: boolean;
     reason: string | null;
-    isExceptionClosure: boolean;
+    isOverrideClosure: boolean;
     isClosingSoon: boolean;
     userDistance?: number | null; // Retrieved after page render
 }
@@ -451,7 +451,7 @@ export default function SelectLocation() {
                                                             too far
                                                         </span>
                                                     </div>
-                                                ) : location.hasException &&
+                                                ) : location.hasOverride &&
                                                   !location.isOpen &&
                                                   location.reason ? (
                                                     <div className="mb-3">
@@ -472,7 +472,7 @@ export default function SelectLocation() {
                                                             {location.reason}
                                                         </span>
                                                     </div>
-                                                ) : location.hasException &&
+                                                ) : location.hasOverride &&
                                                   location.isOpen &&
                                                   location.reason ? (
                                                     <div className="mb-3">
@@ -528,7 +528,7 @@ export default function SelectLocation() {
                                                         aria-label={`Hours of operation: ${location.todayOpenCloseTime}`}
                                                     >
                                                         {location.todayOpenCloseTime ??
-                                                            (location.hasException
+                                                            (location.hasOverride
                                                                 ? pageTranslations.closedToday
                                                                 : '')}
                                                     </span>

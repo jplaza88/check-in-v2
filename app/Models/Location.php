@@ -28,7 +28,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read bool $is_active
  * @property-read bool $is_checkins_enabled
  * @property-read bool $is_appointments_enabled
- * @property-read array $config
+ * @property-read array<string, string>|null $config
  * @property-read CarbonImmutable $created_at
  * @property-read CarbonImmutable $updated_at
  * @property-read Address $address

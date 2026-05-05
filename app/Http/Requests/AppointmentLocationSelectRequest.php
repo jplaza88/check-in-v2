@@ -10,7 +10,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
 
-final class AppointmentSelectRequest extends FormRequest
+final class AppointmentLocationSelectRequest extends FormRequest
 {
     public ?Location $location = null {
         get {

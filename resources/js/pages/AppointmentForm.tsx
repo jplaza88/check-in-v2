@@ -33,29 +33,17 @@ import PublicLayout from '@/layouts/PublicLayout';
 interface Location {
     id: string;
     name: string;
-    address: Address;
-}
-
-interface Address {
-    street1: string;
-    street2: string | null;
-    city: string;
-    state: string;
-    zip_code: string;
-}
-
-interface ScheduleToday {
+    address: string;
     isOpen: boolean;
     todayOpenCloseTime: string | null;
     reason: string | null;
-    hasException: boolean;
-    isExceptionClosure: boolean;
+    hasOverride: boolean;
+    isOverrideClosure: boolean;
     isClosingSoon: boolean | null;
 }
 
 interface PageProps {
     location: Location;
-    scheduleToday: ScheduleToday;
 }
 
 // ── Schema ───────────────────────────────────────────────────────────────────
@@ -82,20 +70,6 @@ const schema = z.object({
 
 type AppointmentForm = z.infer<typeof schema>;
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function formatAddress(address: Address): string {
-    const parts = [address.street1];
-
-    if (address.street2) {
-        parts.push(address.street2);
-    }
-
-    parts.push(`${address.city}, ${address.state} ${address.zip_code}`);
-
-    return parts.join(', ');
-}
-
 // ── Step badge ───────────────────────────────────────────────────────────────
 
 function StepBadge({ number }: { number: number }) {
@@ -121,13 +95,7 @@ function SectionHeader({ step, label }: { step: number; label: string }) {
 
 // ── Location + schedule card ─────────────────────────────────────────────────
 
-function LocationScheduleCard({
-    location,
-    scheduleToday,
-}: {
-    location: Location;
-    scheduleToday: ScheduleToday;
-}) {
+function LocationScheduleCard({ location }: { location: Location }) {
     return (
         <div className="overflow-hidden rounded-lg border border-gray-150/50 bg-gray-100/50 dark:border-gray-900/50 dark:bg-gray-950/30">
             {/* Location row */}
@@ -146,12 +114,12 @@ function LocationScheduleCard({
                         {location.name}
                     </p>
                     <p className="mt-1 truncate text-xs leading-tight text-gray-500 dark:text-gray-400">
-                        {formatAddress(location.address)}
+                        {location.address}
                     </p>
                 </div>
 
                 <a
-                    href={`https://maps.google.com/?q=${encodeURIComponent(formatAddress(location.address))}`}
+                    href={`https://maps.google.com/?q=${encodeURIComponent(location.address)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label="Open in Maps"
@@ -192,12 +160,12 @@ function LocationScheduleCard({
                         <div className="flex items-start justify-between gap-4 py-2">
                             {/* Left: hours + open pill */}
                             <div className="flex shrink-0 items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                {scheduleToday.todayOpenCloseTime && (
+                                {location.todayOpenCloseTime && (
                                     <span>
-                                        {scheduleToday.todayOpenCloseTime}
+                                        {location.todayOpenCloseTime}
                                     </span>
                                 )}
-                                {scheduleToday.isOpen && (
+                                {location.isOpen && (
                                     <span className="inline-flex rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-brand-green">
                                         Open
                                     </span>
@@ -205,16 +173,16 @@ function LocationScheduleCard({
                             </div>
 
                             {/* Right: exception reason */}
-                            {scheduleToday.hasException &&
-                                scheduleToday.reason && (
+                            {location.hasException &&
+                                location.reason && (
                                     <span
                                         className={`self-start rounded-full px-2.5 py-1 text-xs font-medium ${
-                                            scheduleToday.isExceptionClosure
+                                            location.isExceptionClosure
                                                 ? 'bg-red-500/15 text-red-700 dark:text-red-400'
                                                 : 'bg-amber-500/15 text-amber-700 dark:text-amber-400'
                                         }`}
                                     >
-                                        {scheduleToday.reason}
+                                        {location.reason}
                                     </span>
                                 )}
                         </div>
@@ -227,7 +195,7 @@ function LocationScheduleCard({
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
-export default function ScheduleAppointment({ location, scheduleToday }: PageProps) {
+export default function ScheduleAppointment({ location }: PageProps) {
     const [processing, setProcessing] = useState(false);
 
     const { control, handleSubmit, setError } = useForm<AppointmentForm>({
@@ -311,10 +279,7 @@ return `(${area}`;
 
                                 {/* Location + today's hours */}
                                 <div className="mt-4">
-                                    <LocationScheduleCard
-                                        location={location}
-                                        scheduleToday={scheduleToday}
-                                    />
+                                    <LocationScheduleCard location={location} />
                                 </div>
 
                                 {/* Date + Time row */}

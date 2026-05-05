@@ -6,7 +6,8 @@ namespace App\Http\Controllers;
 
 use App\Appointment\AppointmentScheduleResolver;
 use App\Http\Requests\AppointmentFormRequest;
-use App\Http\Requests\AppointmentSelectRequest;
+use App\Http\Requests\AppointmentLocationSelectRequest;
+use App\Models\Location;
 use App\Session\AppointmentSession;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
@@ -15,28 +16,22 @@ final class AppointmentController extends Controller
 {
     public function __construct(private readonly AppointmentSession $session) {}
 
-    public function gate(AppointmentSelectRequest $request, AppointmentScheduleResolver $resolver): RedirectResponse
+    public function gate(AppointmentLocationSelectRequest $request, AppointmentScheduleResolver $resolver): RedirectResponse
     {
         $request->validated();
 
         $location = $request->location;
+        assert($location instanceof Location);
 
-        $scheduleToday = $resolver->buildDTO($location, now());
+        $this->session->setLocation($resolver->buildDTO($location, now()));
 
-        $this->session->set($location, $scheduleToday);
-
-        return redirect()->route('appointment.form', $location->uuid ?? '');
+        return to_route('appointment.form', $location->uuid ?? '');
     }
 
     public function form(): Response
     {
-        $locations = $this->session->location();
-
-        //unset($locations['address']);
-
         return inertia('AppointmentForm', [
-            'location' => $locations,
-            'scheduleToday' => $this->session->scheduleToday(),
+            'location' => $this->session->getLocation(),
         ]);
     }
 

@@ -30,8 +30,8 @@ it('returns open when current time falls within check-in schedule', function ():
         ->and($result->openTime)->not->toBeNull()
         ->and($result->closeTime)->not->toBeNull()
         ->and($result->reason)->toBeNull()
-        ->and($result->hasException)->toBeFalse()
-        ->and($result->isExceptionClosure)->toBeFalse();
+        ->and($result->hasOverride)->toBeFalse()
+        ->and($result->isOverrideClosure)->toBeFalse();
 });
 
 it('returns closed when current time is outside schedule hours', function (): void {
@@ -100,8 +100,8 @@ it('uses exception closure over regular schedule', function (): void {
 
     expect($result->isOpen)->toBeFalse()
         ->and($result->reason)->toBe('Holiday')
-        ->and($result->hasException)->toBeTrue()
-        ->and($result->isExceptionClosure)->toBeTrue();
+        ->and($result->hasOverride)->toBeTrue()
+        ->and($result->isOverrideClosure)->toBeTrue();
 });
 
 it('uses exception with modified hours over regular schedule', function (): void {
@@ -130,8 +130,8 @@ it('uses exception with modified hours over regular schedule', function (): void
 
     expect($result->isOpen)->toBeTrue()
         ->and($result->reason)->toBe('Half day')
-        ->and($result->hasException)->toBeTrue()
-        ->and($result->isExceptionClosure)->toBeFalse();
+        ->and($result->hasOverride)->toBeTrue()
+        ->and($result->isOverrideClosure)->toBeFalse();
 });
 
 it('ignores exceptions for other dates', function (): void {
@@ -159,7 +159,7 @@ it('ignores exceptions for other dates', function (): void {
     $result = $service->resolveOpenCloseTime($location, ScheduleType::CheckIn);
 
     expect($result->isOpen)->toBeTrue()
-        ->and($result->hasException)->toBeFalse();
+        ->and($result->hasOverride)->toBeFalse();
 });
 
 it('resolves appointment schedule separately from check-in schedule', function (): void {

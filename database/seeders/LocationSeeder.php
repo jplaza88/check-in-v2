@@ -85,7 +85,7 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_state' => true,
                         'show_drivers_license_expiration_date' => false,
                     ],
-                ], JSON_THROW_ON_ERROR)
+                ], JSON_THROW_ON_ERROR),
             ],
             [
                 'address_id' => 6,
@@ -107,7 +107,7 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_state' => true,
                         'show_drivers_license_expiration_date' => false,
                     ],
-                ], JSON_THROW_ON_ERROR)
+                ], JSON_THROW_ON_ERROR),
             ],
             [
                 'address_id' => 7,
@@ -129,7 +129,7 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_state' => true,
                         'show_drivers_license_expiration_date' => false,
                     ],
-                ], JSON_THROW_ON_ERROR)
+                ], JSON_THROW_ON_ERROR),
             ],
             [
                 'address_id' => 8,
@@ -151,7 +151,7 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_state' => true,
                         'show_drivers_license_expiration_date' => false,
                     ],
-                ], JSON_THROW_ON_ERROR)
+                ], JSON_THROW_ON_ERROR),
             ],
             [
                 'address_id' => 9,
@@ -173,7 +173,7 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_state' => true,
                         'show_drivers_license_expiration_date' => false,
                     ],
-                ], JSON_THROW_ON_ERROR)
+                ], JSON_THROW_ON_ERROR),
             ],
         ];
 

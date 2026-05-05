@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\CheckIn;
 
 use App\DTOs\CheckInAvailabilityDTO;
-use App\DTOs\CheckInLocationScheduleDTO;
+use App\DTOs\LocationScheduleDTO;
 use App\Geo\DistanceCalculator;
 use App\Models\Location;
 
@@ -48,7 +48,7 @@ final readonly class CheckInAvailabilityResolver
         );
     }
 
-    private function resolveReason(Location $location, CheckInLocationScheduleDTO $schedule): ?string
+    private function resolveReason(Location $location, LocationScheduleDTO $schedule): ?string
     {
         if ($schedule->isOpen) {
             return null;
@@ -64,13 +64,13 @@ final readonly class CheckInAvailabilityResolver
 
         // Schedule exception exists but admin didn't provide a reason - generate one
 
-        if ($schedule->isExceptionClosure) {
+        if ($schedule->isOverrideClosure) {
             return __('messages.checkInSelectLocation.closedForCheckInWithoutReason', [
                 'name' => $location->name,
             ]);
         }
 
-        if ($schedule->hasException && $schedule->openTime && $schedule->closeTime) {
+        if ($schedule->hasOverride && $schedule->openTime && $schedule->closeTime) {
             return __('messages.checkInSelectLocation.outsideExceptionHours', [
                 'name' => $location->name,
                 'open' => $schedule->openTime->format('g:i A'),

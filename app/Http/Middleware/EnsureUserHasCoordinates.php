@@ -9,7 +9,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-final readonly class EnsureUserHasCoordinatesMiddleware
+final readonly class EnsureUserHasCoordinates
 {
     public function __construct(private CheckInSession $session) {}
 
