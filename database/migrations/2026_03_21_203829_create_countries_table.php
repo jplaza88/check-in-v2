@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('short_name', 2)->unique();
             $table->string('name', 150)->unique();
             $table->string('phone_code', 10);
-            $table->boolean('active')->default(true);
+            $table->boolean('active');
             $table->timestampsTz();
         });
     }

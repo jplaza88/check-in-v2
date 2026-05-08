@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Appointment;
 
-use App\DTOs\AppointmentAvailabilityDTO;
+use App\DTOs\LocationAvailabilityDTO;
 use App\DTOs\LocationScheduleDTO;
 use App\Models\Location;
 use Carbon\CarbonInterface;
@@ -13,11 +13,11 @@ final readonly class AppointmentAvailabilityResolver
 {
     public function __construct(private AppointmentScheduleResolver $scheduleResolver) {}
 
-    public function isAvailableForAppointment(Location $location, CarbonInterface $appointmentDateTime): AppointmentAvailabilityDTO
+    public function isAvailableForAppointment(Location $location, CarbonInterface $appointmentDateTime): LocationAvailabilityDTO
     {
         $schedule = $this->resolveSchedule($location, $appointmentDateTime);
 
-        return new AppointmentAvailabilityDTO(
+        return new LocationAvailabilityDTO(
             allowed: $schedule->isOpen,
             reason: $this->resolveReason($location, $schedule, $appointmentDateTime)
         );
