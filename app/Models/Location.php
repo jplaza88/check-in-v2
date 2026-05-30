@@ -32,9 +32,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read CarbonImmutable $created_at
  * @property-read CarbonImmutable $updated_at
  * @property-read Address $address
- * @property-read CheckInSchedule|null $checkinTodaySchedule
+ * @property-read Collection<int, CheckInSchedule> $checkinSchedule
  * @property-read Collection<int, CheckInScheduleOverride> $checkinScheduleOverrides
- * @property-read Collection<int, CheckInSchedule> $checkInSchedule
+ * @property-read Collection<int, AppointmentSchedule> $appointmentSchedule
+ * @property-read Collection<int, AppointmentScheduleOverride> $appointmentScheduleOverrides
  */
 #[Fillable(['uuid', 'address_id', 'max_distance_allowed', 'name', 'abbreviation', 'timezone', 'phone', 'phone_ext', 'email', 'is_active', 'is_checkins_enabled', 'is_appointments_enabled', 'config'])]
 #[Hidden(['id'])]

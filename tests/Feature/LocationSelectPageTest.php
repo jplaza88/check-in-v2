@@ -16,7 +16,6 @@ it('renders the check-in location select page with check-in-enabled locations', 
         ->assertSuccessful()
         ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
             ->component('CheckInSelectLocation')
-            ->where('context', 'checkin')
             ->has('locations', 1)
             ->where('locations.0.name', $checkInLocation->name));
 });
@@ -29,7 +28,6 @@ it('renders the appointment location select page with appointment-enabled locati
         ->assertSuccessful()
         ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
             ->component('AppointmentSelectLocation')
-            ->where('context', 'appointment')
             ->has('locations', 1)
             ->where('locations.0.name', $appointmentLocation->name));
 });

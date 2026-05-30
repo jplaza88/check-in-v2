@@ -29,6 +29,7 @@ Route::prefix('locale')->group(function () use ($locales): void {
 
 // JSON endpoint, no translations needed
 Route::post('/check-in/distance', CheckInDistanceController::class)
+    ->middleware('throttle:30,1')
     ->name('checkIn.distance');
 
 Route::middleware(['setLocale'])
@@ -37,7 +38,7 @@ Route::middleware(['setLocale'])
         Route::get('/check-in/select-location', CheckInLocationSelectController::class)
             ->name('checkIn.selectLocation');
 
-        Route::middleware(['userCoordinates'])
+        Route::middleware(['userCoordinates', 'throttle:30,1'])
             ->post('/check-in/{uuid}', [CheckInController::class, 'gate'])
             ->whereUuid('uuid')
             ->name('checkIn.form');
@@ -45,7 +46,8 @@ Route::middleware(['setLocale'])
         Route::get('/appointment/select-location', AppointmentLocationSelectController::class)
             ->name('appointment.selectLocation');
 
-        Route::post('/appointment/{uuid}', [AppointmentController::class, 'gate'])
+        Route::middleware(['throttle:30,1'])
+            ->post('/appointment/{uuid}', [AppointmentController::class, 'gate'])
             ->name('appointment.gate');
 
         Route::middleware(['appointmentLocation'])

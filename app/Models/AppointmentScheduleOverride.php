@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\CarbonImmutable;
+use Database\Factories\AppointmentScheduleOverrideFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -24,6 +26,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['location_id', 'date', 'open_time', 'close_time', 'is_closed', 'reason'])]
 final class AppointmentScheduleOverride extends Model
 {
+    /** @use HasFactory<AppointmentScheduleOverrideFactory> */
+    use HasFactory;
+
     /**
      * @return BelongsTo<Location, $this>
      */

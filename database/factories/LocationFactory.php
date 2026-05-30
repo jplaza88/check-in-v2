@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Address;
-use App\Models\CheckInSchedule;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -33,17 +32,30 @@ final class LocationFactory extends Factory
             'is_active' => true,
             'is_checkins_enabled' => true,
             'is_appointments_enabled' => false,
-            'additional_fields' => false,
         ];
     }
 
     public function configure(): static
     {
         return $this->afterCreating(function (Location $location): void {
-            CheckInSchedule::factory()->for($location)->create();
+            if ($location->is_checkins_enabled) {
+                foreach (range(0, 6) as $dayOfWeek) {
+                    $location->checkinSchedule()->create([
+                        'day_of_week' => $dayOfWeek,
+                        'open_time' => '00:00:00',
+                        'close_time' => '23:59:59',
+                    ]);
+                }
+            }
 
             if ($location->is_appointments_enabled) {
-                CheckInSchedule::factory()->forAppointments()->for($location)->create();
+                foreach (range(0, 6) as $dayOfWeek) {
+                    $location->appointmentSchedule()->create([
+                        'day_of_week' => $dayOfWeek,
+                        'open_time' => '00:00:00',
+                        'close_time' => '23:59:59',
+                    ]);
+                }
             }
         });
     }
@@ -54,5 +66,33 @@ final class LocationFactory extends Factory
             'is_checkins_enabled' => false,
             'is_appointments_enabled' => true,
         ]);
+    }
+
+    /**
+     * No open hours on any day (distribution center appears closed for check-in).
+     */
+    public function checkinClosedAllWeek(): static
+    {
+        return $this->afterCreating(function (Location $location): void {
+            $location->checkinSchedule()->delete();
+        });
+    }
+
+    /**
+     * Weekdays 9am-5pm in the location timezone; weekends have no hours.
+     */
+    public function checkinWeekdayWindow(): static
+    {
+        return $this->afterCreating(function (Location $location): void {
+            $location->checkinSchedule()->delete();
+
+            foreach (range(1, 5) as $dayOfWeek) {
+                $location->checkinSchedule()->create([
+                    'day_of_week' => $dayOfWeek,
+                    'open_time' => '09:00:00',
+                    'close_time' => '17:00:00',
+                ]);
+            }
+        });
     }
 }

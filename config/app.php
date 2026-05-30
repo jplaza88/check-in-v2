@@ -161,11 +161,11 @@ return [
     | in the server-side session. After this duration, the coordinates
     | will expire and may need to be re-acquired.
     |
-    | Default: 60 seconds * 2 (2 minutes)
+    | Default: 60 seconds * 5 (5 minutes)
     |
     */
 
-    'user_coordinates_session_ttl' => 60 * 2,
+    'user_coordinates_session_ttl' => 60 * 5,
 
     /*
     |--------------------------------------------------------------------------
@@ -176,39 +176,59 @@ return [
     | in the browser (e.g., localStorage). Once expired, the browser
     | should request fresh location data.
     |
-    | Default: 2 minutes
+    | Default: 5 minutes
     |
     */
 
-    'user_coordinates_browser_ttl' => 2,
+    'user_coordinates_browser_ttl' => 5,
 
     /*
     |--------------------------------------------------------------------------
-    | Distance Calculation
+    | Check-In Gate Pass Time-to-Live
     |--------------------------------------------------------------------------
     |
-    | Specifies how long (in minutes) the user's coordinates are cached
-    | in the browser (e.g., localStorage). Once expired, the browser
-    | should request fresh location data.
+    | How long (in seconds) a driver has to complete and submit the
+    | check-in form after clearing the proximity gate. The gate pass is
+    | issued only once the proximity check has passed and is bound to a
+    | specific location, so this can be generous without weakening the
+    | "is the driver actually here?" guarantee enforced by the coordinate
+    | freshness window above.
     |
-    | Default: 2 minutes
+    | Default: 60 seconds * 20 (20 minutes)
     |
     */
 
-    'user_location_distances_ttl' => 2,
+    'checkin_gate_pass_ttl' => 60 * 20,
 
     /*
     |--------------------------------------------------------------------------
-    | Appointment Location Context
+    | User Location Distances Time-to-Live
     |--------------------------------------------------------------------------
     |
-    | Specifies how long (in minutes) the user's coordinates are cached
-    | in the browser (e.g., localStorage). Once expired, the browser
-    | should request fresh location data.
+    | How long (in minutes) the computed location-distance list is cached
+    | per user. The cache key includes the exact coordinates and session,
+    | so it self-invalidates when the driver moves; this TTL just bounds
+    | how long an unchanged result is reused. Keep it aligned with the
+    | coordinate freshness window above.
     |
-    | Default: 2 minutes
+    | Default: 5 minutes
     |
     */
 
-    'user_appointment_location_context_ttl' => 2,
+    'user_location_distances_ttl' => 5,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Appointment Location Context Time-to-Live
+    |--------------------------------------------------------------------------
+    |
+    | How long (in seconds) the selected appointment location context is
+    | retained in the server-side session between the appointment gate and
+    | the booking form.
+    |
+    | Default: 60 seconds * 2 (2 minutes)
+    |
+    */
+
+    'user_appointment_location_context_ttl' => 60 * 2,
 ];

@@ -24,13 +24,22 @@ final readonly class CheckInDistanceCalculator
      */
     public function resolve(float $userLat, float $userLng): Collection
     {
+        // Key on exact coordinates + session so the cache self-invalidates
+        // when the driver moves; the TTL only bounds reuse of an unchanged result.
         $cacheKey = sprintf('checkin_distances:%s,%s:%s', $userLat, $userLng, $this->session->getId());
-        cache()->forget($cacheKey);
 
-        /** @noinspection PhpPipeOperatorCanBeUsedInspection */
-        return cache()->remember($cacheKey, now()->addMinutes(config('app.user_location_distances_ttl')),
-            fn (): Collection => $this->calculateDistances($userLat, $userLng)
-        );
+        $cached = cache()->get($cacheKey);
+
+        if ($cached instanceof Collection
+            && $cached->every(static fn (mixed $distance): bool => $distance instanceof CheckInDistanceDTO)) {
+            return $cached;
+        }
+
+        $distances = $this->calculateDistances($userLat, $userLng);
+
+        cache()->put($cacheKey, $distances, now()->addMinutes(config('app.user_location_distances_ttl')));
+
+        return $distances;
     }
 
     /**

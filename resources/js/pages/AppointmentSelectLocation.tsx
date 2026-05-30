@@ -174,19 +174,6 @@ export default function AppointmentSelectLocation() {
                                                         location.todayOpenCloseTime
                                                     }
                                                 </span>
-
-                                                {/* Open/Closed badge */}
-                                                {location.isOpen ? (
-                                                    <span className="inline-flex rounded-full bg-green-500/10 px-2.5 py-1 text-xs font-medium text-brand-green">
-                                                        {pageTranslations.open}
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex rounded-full bg-red-500/20 px-2.5 py-1 text-xs font-medium text-red-700">
-                                                        {
-                                                            pageTranslations.closed
-                                                        }
-                                                    </span>
-                                                )}
                                             </div>
                                         </div>
                                     </div>

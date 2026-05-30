@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\CarbonImmutable;
+use Database\Factories\AppointmentScheduleFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -22,6 +24,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Fillable(['location_id', 'day_of_week', 'open_time', 'close_time'])]
 final class AppointmentSchedule extends Model
 {
+    /** @use HasFactory<AppointmentScheduleFactory> */
+    use HasFactory;
+
     /**
      * @return BelongsTo<Location, $this>
      */

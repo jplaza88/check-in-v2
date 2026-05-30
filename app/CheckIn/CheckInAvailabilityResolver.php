@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\CheckIn;
 
-use App\DTOs\CheckInAvailabilityDTO;
+use App\DTOs\LocationAvailabilityDTO;
 use App\DTOs\LocationScheduleDTO;
 use App\Geo\DistanceCalculator;
 use App\Models\Location;
@@ -19,7 +19,7 @@ final readonly class CheckInAvailabilityResolver
     /**
      * @param  array<mixed, mixed>  $userCoords
      */
-    public function isAvailableForCheckIn(Location $location, array $userCoords): CheckInAvailabilityDTO
+    public function isAvailableForCheckIn(Location $location, array $userCoords): LocationAvailabilityDTO
     {
         $userDistance = $this->distance->calculate(
             $userCoords['latitude'],
@@ -29,7 +29,7 @@ final readonly class CheckInAvailabilityResolver
         );
 
         if ($userDistance >= $location->max_distance_allowed) {
-            return new CheckInAvailabilityDTO(
+            return new LocationAvailabilityDTO(
                 allowed: false,
                 reason: __('messages.checkInSelectLocation.tooFar', [
                     'name' => $location->name,
@@ -42,7 +42,7 @@ final readonly class CheckInAvailabilityResolver
         $localNow = now()->setTimezone($location->timezone);
         $schedule = $this->scheduleResolver->resolveSchedule($location, $localNow);
 
-        return new CheckInAvailabilityDTO(
+        return new LocationAvailabilityDTO(
             allowed: $schedule->isOpen,
             reason: $this->resolveReason($location, $schedule)
         );

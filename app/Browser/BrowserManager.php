@@ -21,7 +21,7 @@ final readonly class BrowserManager
 
         /**
          * Use a regular expression to extract only the language code, eg: 'es', or 'fr'.
-         * Do not default to 'en' if $browserLangue evaluates to false, let the LocaleService
+         * Do not default to 'en' if $browserLangue evaluates to false, let the LocaleManager
          * decide what locale to use.
          **/
         if (preg_match('/^([a-z]+)/i', $browserLanguage ?: '', $matches)) {

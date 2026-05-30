@@ -49,11 +49,6 @@ final readonly class AppointmentSession
         ]]);
     }
 
-    public function forget(): void
-    {
-        session()->forget(self::KEY);
-    }
-
     public function isFresh(): bool
     {
         $storedAt = $this->getStoredAt();
@@ -68,5 +63,10 @@ final readonly class AppointmentSession
         $ttl = (int) config('app.user_appointment_location_context_ttl');
 
         return (int) now()->timestamp - $storedSeconds <= $ttl;
+    }
+
+    public function forget(): void
+    {
+        session()->forget(self::KEY);
     }
 }

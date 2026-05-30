@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Services\AddressService;
+use App\Address\AddressManager;
 
 it('builds a full address from all parts', function (): void {
-    $service = new AddressService;
+    $manager = new AddressManager;
 
-    $address = $service->buildAddress([
+    $address = $manager->buildAddress([
         'street1' => '123 Main St',
         'street2' => 'Suite 100',
         'city' => 'Miami',
@@ -19,9 +19,9 @@ it('builds a full address from all parts', function (): void {
 });
 
 it('omits street2 when null', function (): void {
-    $service = new AddressService;
+    $manager = new AddressManager;
 
-    $address = $service->buildAddress([
+    $address = $manager->buildAddress([
         'street1' => '456 Oak Ave',
         'street2' => null,
         'city' => 'Orlando',
@@ -33,9 +33,9 @@ it('omits street2 when null', function (): void {
 });
 
 it('omits street2 when missing from array', function (): void {
-    $service = new AddressService;
+    $manager = new AddressManager;
 
-    $address = $service->buildAddress([
+    $address = $manager->buildAddress([
         'street1' => '789 Pine Rd',
         'city' => 'Tampa',
         'state' => 'FL',

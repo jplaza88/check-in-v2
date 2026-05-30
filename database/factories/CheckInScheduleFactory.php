@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
-use App\Enums\ScheduleType;
 use App\Models\CheckInSchedule;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -18,59 +17,25 @@ final class CheckInScheduleFactory extends Factory
      */
     public function definition(): array
     {
-        $hours = [
-            'type' => ScheduleType::CheckIn,
+        return [
+            'day_of_week' => fake()->numberBetween(0, 6),
+            'open_time' => '00:00:00',
+            'close_time' => '23:59:59',
         ];
-
-        foreach (['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as $day) {
-            $hours[$day.'_open'] = '00:00:00';
-            $hours[$day.'_close'] = '23:59:59';
-        }
-
-        return $hours;
     }
 
-    public function forAppointments(): static
+    public function forDay(int $dayOfWeek): static
     {
         return $this->state(fn (): array => [
-            'type' => ScheduleType::Appointment,
+            'day_of_week' => $dayOfWeek,
         ]);
     }
 
-    /**
-     * No open hours on any day (distribution center appears closed for check-in).
-     */
-    public function closedEveryDay(): static
+    public function hours(string $openTime, string $closeTime): static
     {
-        return $this->state(function (): array {
-            $hours = [];
-            foreach (['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as $day) {
-                $hours[$day.'_open'] = null;
-                $hours[$day.'_close'] = null;
-            }
-
-            return $hours;
-        });
-    }
-
-    /**
-     * Weekdays 9am–5pm in the location timezone; weekends have no hours.
-     */
-    public function weekdayPickupWindow(): static
-    {
-        return $this->state(function (): array {
-            $hours = [];
-            foreach (['sunday', 'saturday'] as $day) {
-                $hours[$day.'_open'] = null;
-                $hours[$day.'_close'] = null;
-            }
-
-            foreach (['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as $day) {
-                $hours[$day.'_open'] = '09:00:00';
-                $hours[$day.'_close'] = '17:00:00';
-            }
-
-            return $hours;
-        });
+        return $this->state(fn (): array => [
+            'open_time' => $openTime,
+            'close_time' => $closeTime,
+        ]);
     }
 }

@@ -386,11 +386,6 @@ export default function SelectLocation() {
                         {/* Locations List */}
                         {sortedLocations !== null &&
                             sortedLocations.map((location, idx) => {
-                                const isTooFar =
-                                    location.userDistance != null &&
-                                    location.maxDistanceAllowed != null &&
-                                    location.userDistance >
-                                        location.maxDistanceAllowed;
 
                                 return (
                                     <button
@@ -437,21 +432,7 @@ export default function SelectLocation() {
 
                                             {/* Text */}
                                             <div className="flex flex-1 flex-col justify-center gap-0.5 text-left">
-                                                {/* Too far badge — replaces other badges when isTooFar */}
-                                                {isTooFar ? (
-                                                    <div className="mb-3">
-                                                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-500/15 px-2.5 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                viewBox="0 0 16 16"
-                                                                className="h-3 w-3 fill-current"
-                                                            >
-                                                                <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
-                                                            </svg>
-                                                            too far
-                                                        </span>
-                                                    </div>
-                                                ) : location.hasOverride &&
+                                                {location.hasOverride &&
                                                   !location.isOpen &&
                                                   location.reason ? (
                                                     <div className="mb-3">
