@@ -26,7 +26,7 @@ jobs:
         run: |
           cp /opt/da-server/check-in/.env .env
           docker compose -f compose.staging.yaml up -d --remove-orphans
-          docker compose -f compose.staging.yaml run --rm checkin php artisan migrate:status 2>/dev/null | grep -q "Ran" || SEED_DB=true
+          docker compose -f compose.staging.yaml run --rm checkin php artisan migrate:status 2>/dev/null | grep -q "Yes" || SEED_DB=true
           docker compose -f compose.staging.yaml run --rm checkin php artisan migrate --force
           if [ "${SEED_DB:-false}" = "true" ]; then
             docker compose -f compose.staging.yaml run --rm checkin php artisan db:seed --force
