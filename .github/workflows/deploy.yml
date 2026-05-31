@@ -27,6 +27,6 @@ jobs:
           cp /opt/da-server/check-in/.env .env
           docker compose -f compose.staging.yaml up -d --remove-orphans
           docker compose -f compose.staging.yaml run --rm checkin php artisan migrate --force
-          docker compose -f compose.staging.yaml exec -T checkin php artisan config:cache route:cache view:cache
+          docker compose -f compose.staging.yaml exec -T checkin php artisan optimize
           docker compose -f compose.staging.yaml exec -T checkin php artisan octane:reload
 
