@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Services\LocaleService;
+use App\Locale\LocaleManager;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -13,16 +13,16 @@ use Illuminate\Http\Request;
  */
 final readonly class SetLocale
 {
-    public function __construct(private LocaleService $localeService) {}
+    public function __construct(private LocaleManager $locales) {}
 
     public function handle(Request $request, Closure $next): mixed
     {
-        $locale = $this->localeService->getLocale($request);
+        $locale = $this->locales->getLocale($request);
 
         $routeName = $request->route()?->getName() ?? '';
 
         app()->setLocale($locale);
-        inertia()->share('translations', $this->localeService->getTranslationsForRoute($routeName, $locale));
+        inertia()->share('translations', $this->locales->getTranslationsForRoute($routeName, $locale));
 
         return $next($request);
     }

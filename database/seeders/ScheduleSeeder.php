@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use App\Enums\ScheduleType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -13,40 +12,32 @@ final class ScheduleSeeder extends Seeder
     public function run(): void
     {
         $locationIds = DB::table('locations')->pluck('id');
+        $now = now();
 
-        $default = [
-            'sunday_open' => null,
-            'sunday_close' => null,
-            'monday_open' => '07:00:00',
-            'monday_close' => '17:00:00',
-            'tuesday_open' => '07:00:00',
-            'tuesday_close' => '17:00:00',
-            'wednesday_open' => '07:00:00',
-            'wednesday_close' => '17:00:00',
-            'thursday_open' => '07:00:00',
-            'thursday_close' => '17:00:00',
-            'friday_open' => '07:00:00',
-            'friday_close' => '17:00:00',
-            'saturday_open' => null,
-            'saturday_close' => null,
+        // Carbon: 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        $weekdaySchedule = [
+            1 => ['open_time' => '07:00:00', 'close_time' => '17:00:00'],
+            2 => ['open_time' => '07:00:00', 'close_time' => '17:00:00'],
+            3 => ['open_time' => '07:00:00', 'close_time' => '17:00:00'],
+            4 => ['open_time' => '07:00:00', 'close_time' => '17:00:00'],
+            5 => ['open_time' => '07:00:00', 'close_time' => '17:00:00'],
         ];
 
-        foreach ($locationIds as $locationId) {
-            DB::table('schedules')->insert([
-                ...$default,
-                'location_id' => $locationId,
-                'type' => ScheduleType::CheckIn,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        $rows = [];
 
-            DB::table('schedules')->insert([
-                ...$default,
-                'location_id' => $locationId,
-                'type' => ScheduleType::Appointment,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        foreach ($locationIds as $locationId) {
+            foreach ($weekdaySchedule as $dayOfWeek => $hours) {
+                $rows[] = [
+                    'location_id' => $locationId,
+                    'day_of_week' => $dayOfWeek,
+                    ...$hours,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
         }
+
+        DB::table('checkin_schedules')->insert($rows);
+        DB::table('appointment_schedules')->insert($rows);
     }
 }

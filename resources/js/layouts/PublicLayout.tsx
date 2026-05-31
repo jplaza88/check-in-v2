@@ -39,7 +39,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                         </div>
 
                         <div className="flex flex-1 items-center px-4 py-4">
-                            <div className="mx-auto w-full max-w-md">
+                            <div className="mx-auto w-full max-w-md lg:max-w-2xl">
                                 {children}
                             </div>
                         </div>

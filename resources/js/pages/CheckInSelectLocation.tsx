@@ -1,5 +1,4 @@
-import { Head, router, usePage } from '@inertiajs/react';
-import axios from 'axios';
+import { Head, router, usePage, useHttp } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { gate } from '@/actions/App/Http/Controllers/CheckInController';
 import CheckInDistanceController from '@/actions/App/Http/Controllers/CheckInDistanceController';
@@ -28,6 +27,16 @@ interface Translations {
     checkInSelectLocation: CheckInTranslations;
 }
 
+interface DistanceLocation {
+    id: string;
+    userDistance: number;
+}
+
+interface DriverCoordinates {
+    latitude: number;
+    longitude: number;
+}
+
 interface Alert {
     type: 'error' | 'warning' | 'success';
     title: string;
@@ -47,9 +56,9 @@ interface Location {
     maxDistanceAllowed: number;
     todayOpenCloseTime: string | null;
     isOpen: boolean;
-    hasException: boolean;
+    hasOverride: boolean;
     reason: string | null;
-    isExceptionClosure: boolean;
+    isOverrideClosure: boolean;
     isClosingSoon: boolean;
     userDistance?: number | null; // Retrieved after page render
 }
@@ -62,6 +71,44 @@ export default function SelectLocation() {
     // User coordinates
     const [sortedLocations, setSortedLocations] = useState<Location[] | null>(null);
     const { coords, loading, error, warning } = useGeolocation();
+
+    const { data, post } = useHttp({'latitude': 0,'longitude': 0});
+
+    const fetchDistances = async (position: DriverCoordinates) => {
+        await post(CheckInDistanceController().url, {
+            onBefore: () => {
+                data.latitude = position.latitude;
+                data.longitude = position.longitude;
+            },
+            onSuccess: (response: any) => {
+                const distanceMap = new Map(
+                    response.locations.map(
+                        ({ id, userDistance }: DistanceLocation) => [
+                            id,
+                            userDistance,
+                        ],
+                    ),
+                );
+
+                const merged = response.locations
+                    .map(({ id }: { id: string }) => {
+                        const location = locations.find((loc) => loc.id === id);
+
+                        return location
+                            ? {
+                                  ...location,
+                                  userDistance: distanceMap.get(id) ?? null,
+                              }
+                            : null;
+                    })
+                    .filter(Boolean);
+
+                setSortedLocations(merged);
+            },
+            onError: () => setFetchError(true),
+            onNetworkError: () => setFetchError(true),
+        });
+    };
 
     // Alert banner
     const getAlert = (): Alert | null => {
@@ -108,7 +155,7 @@ export default function SelectLocation() {
     const [dismissed, setDismissed] = useState(false);
     const alert = dismissed ? null : getAlert();
 
-    const handleSelectLocation = (locationId: string) => {
+    const handleSelectLocation = (locationId: string, isRetry = false) => {
         setCheckInError(null);
         setDismissed(false);
         setSubmittingLocationId(locationId);
@@ -118,14 +165,34 @@ export default function SelectLocation() {
             {},
             {
                 onError: (errors) => {
+                    // Session expired or missing coords — re-fetch to restore session, then retry once
+                    if (!isRetry && errors.userCoords && coords) {
+                        try {
+                            fetchDistances(coords).then(() => {
+                                handleSelectLocation(locationId, true)
+                            });
+                        } catch {
+                            setCheckInError(
+                                'Something went wrong. Please try again.',
+                            );
+                            setSubmittingLocationId(null);
+                        }
+
+                        return;
+                    }
+
                     setCheckInError(
-                        errors[Object.keys(errors)[0]] ?? 'Something went wrong. Please try again.'
+                        errors[Object.keys(errors)[0]] ??
+                            'Something went wrong. Please try again.',
                     );
+
                     console.error(errors);
                     setSubmittingLocationId(null);
                 },
                 onFinish: () => {
-                    setSubmittingLocationId(null);
+                    if (isRetry) {
+                        setSubmittingLocationId(null);
+                    }
                 },
             },
         );
@@ -136,40 +203,7 @@ export default function SelectLocation() {
             return;
         }
 
-        axios
-            .post(CheckInDistanceController().url, {
-                latitude: coords.latitude,
-                longitude: coords.longitude,
-            })
-            .then(({ data }) => {
-                const distanceMap = new Map(
-                    data.locations.map(
-                        ({
-                            id,
-                            userDistance,
-                        }: {
-                            id: string;
-                            userDistance: number;
-                        }) => [id, userDistance],
-                    ),
-                );
-
-                const merged = data.locations
-                    .map(({ id }: { id: string }) => {
-                        const location = locations.find((loc) => loc.id === id);
-
-                        return location
-                            ? {
-                                  ...location,
-                                  userDistance: distanceMap.get(id) ?? null,
-                              }
-                            : null;
-                    })
-                    .filter(Boolean);
-
-                setSortedLocations(merged);
-            })
-            .catch(() => setFetchError(true));
+        fetchDistances(coords);
     }, [coords]);
 
     return (
@@ -215,11 +249,6 @@ export default function SelectLocation() {
                         {/* Locations List */}
                         {sortedLocations !== null &&
                             sortedLocations.map((location, idx) => {
-                                const isTooFar =
-                                    location.userDistance != null &&
-                                    location.maxDistanceAllowed != null &&
-                                    location.userDistance >
-                                        location.maxDistanceAllowed;
 
                                 return (
                                     <button
@@ -266,21 +295,8 @@ export default function SelectLocation() {
 
                                             {/* Text */}
                                             <div className="flex flex-1 flex-col justify-center gap-0.5 text-left">
-                                                {/* Too far badge — replaces other badges when isTooFar */}
-                                                {isTooFar ? (
-                                                    <div className="mb-3">
-                                                        <span className="inline-flex items-center gap-1 rounded-full bg-gray-500/15 px-2.5 py-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                viewBox="0 0 16 16"
-                                                                className="h-3 w-3 fill-current"
-                                                            >
-                                                                <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 3.5a.75.75 0 0 1 .75.75v3a.75.75 0 0 1-1.5 0v-3A.75.75 0 0 1 8 4.5zm0 6.5a.875.875 0 1 1 0-1.75A.875.875 0 0 1 8 11z" />
-                                                            </svg>
-                                                            too far
-                                                        </span>
-                                                    </div>
-                                                ) : location.isExceptionClosure &&
+                                                {location.hasOverride &&
+                                                  !location.isOpen &&
                                                   location.reason ? (
                                                     <div className="mb-3">
                                                         <span
@@ -300,7 +316,8 @@ export default function SelectLocation() {
                                                             {location.reason}
                                                         </span>
                                                     </div>
-                                                ) : location.hasException &&
+                                                ) : location.hasOverride &&
+                                                  location.isOpen &&
                                                   location.reason ? (
                                                     <div className="mb-3">
                                                         <span
@@ -355,7 +372,7 @@ export default function SelectLocation() {
                                                         aria-label={`Hours of operation: ${location.todayOpenCloseTime}`}
                                                     >
                                                         {location.todayOpenCloseTime ??
-                                                            (location.hasException
+                                                            (location.hasOverride
                                                                 ? pageTranslations.closedToday
                                                                 : '')}
                                                     </span>
@@ -391,8 +408,7 @@ export default function SelectLocation() {
                                         </div>
                                     </button>
                                 );
-                            })
-                        }
+                            })}
                     </div>
                 </div>
             </div>

@@ -15,7 +15,7 @@ final class LocationSeeder extends Seeder
         $locations = [
             [
                 'address_id' => 1,
-                'name' => 'Pompano Beach, FL - Sol Group Marketing',
+                'name' => 'Pompano Beach, FL - Martori Farms',
                 'abbreviation' => 'pmp',
                 'timezone' => 'America/New_York',
                 'max_distance_allowed' => 5,
@@ -25,21 +25,19 @@ final class LocationSeeder extends Seeder
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
-                'additional_fields' => false,
             ],
             [
                 'address_id' => 2,
                 'name' => 'Eddystone, PA - Penn Terminals',
                 'abbreviation' => 'ppt',
                 'timezone' => 'America/New_York',
-                'max_distance_allowed' => 5,
+                'max_distance_allowed' => 500,
                 'phone' => '(954) 781-0003',
                 'phone_ext' => null,
                 'email' => 'ci-pennterminal@solgroup-marketing.com',
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
-                'additional_fields' => false,
             ],
             [
                 'address_id' => 3,
@@ -53,7 +51,6 @@ final class LocationSeeder extends Seeder
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
-                'additional_fields' => false,
             ],
             [
                 'address_id' => 4,
@@ -67,7 +64,6 @@ final class LocationSeeder extends Seeder
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
-                'additional_fields' => false,
             ],
             [
                 'address_id' => 5,
@@ -81,7 +77,15 @@ final class LocationSeeder extends Seeder
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
-                'additional_fields' => false,
+                'config' => json_encode([
+                    'checkin' => [
+                        'show_truck_color' => true,
+                        'show_trailer_empty_weight_lbs' => true,
+                        'show_trailer_plate_state' => false,
+                        'show_drivers_license_state' => true,
+                        'show_drivers_license_expiration_date' => false,
+                    ],
+                ], JSON_THROW_ON_ERROR),
             ],
             [
                 'address_id' => 6,
@@ -95,7 +99,15 @@ final class LocationSeeder extends Seeder
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
-                'additional_fields' => false,
+                'config' => json_encode([
+                    'checkin' => [
+                        'show_truck_color' => true,
+                        'show_trailer_empty_weight_lbs' => true,
+                        'show_trailer_plate_state' => false,
+                        'show_drivers_license_state' => true,
+                        'show_drivers_license_expiration_date' => false,
+                    ],
+                ], JSON_THROW_ON_ERROR),
             ],
             [
                 'address_id' => 7,
@@ -109,21 +121,37 @@ final class LocationSeeder extends Seeder
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
-                'additional_fields' => false,
+                'config' => json_encode([
+                    'checkin' => [
+                        'show_truck_color' => true,
+                        'show_trailer_empty_weight_lbs' => true,
+                        'show_trailer_plate_state' => false,
+                        'show_drivers_license_state' => true,
+                        'show_drivers_license_expiration_date' => false,
+                    ],
+                ], JSON_THROW_ON_ERROR),
             ],
             [
                 'address_id' => 8,
                 'name' => 'Tonopah, AZ - Court House',
                 'abbreviation' => 'crt',
                 'timezone' => 'America/Phoenix',
-                'max_distance_allowed' => 5,
+                'max_distance_allowed' => 5000,
                 'phone' => '(480) 998-1444',
                 'phone_ext' => null,
                 'email' => 'ci-courthouse@martorifarms.com',
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
-                'additional_fields' => false,
+                'config' => json_encode([
+                    'checkin' => [
+                        'show_truck_color' => true,
+                        'show_trailer_empty_weight_lbs' => true,
+                        'show_trailer_plate_state' => false,
+                        'show_drivers_license_state' => true,
+                        'show_drivers_license_expiration_date' => false,
+                    ],
+                ], JSON_THROW_ON_ERROR),
             ],
             [
                 'address_id' => 9,
@@ -137,7 +165,15 @@ final class LocationSeeder extends Seeder
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
-                'additional_fields' => false,
+                'config' => json_encode([
+                    'checkin' => [
+                        'show_truck_color' => true,
+                        'show_trailer_empty_weight_lbs' => true,
+                        'show_trailer_plate_state' => false,
+                        'show_drivers_license_state' => true,
+                        'show_drivers_license_expiration_date' => false,
+                    ],
+                ], JSON_THROW_ON_ERROR),
             ],
         ];
 

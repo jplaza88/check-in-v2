@@ -65,5 +65,7 @@ return [
         'specialHoursToday' => 'Horario especial hoy',
         'closingSoon' => 'Cierra pronto',
         'closedToday' => 'Cerrado hoy',
+        'invalidLocation' => 'Ubicación no válida.',
+        'selectLocationToContinue' => 'Por favor seleccione una ubicación para continuar.',
     ],
 ];

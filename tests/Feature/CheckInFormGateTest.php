@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Models\Address;
 use App\Models\Location;
-use App\Models\Schedule;
 use Illuminate\Support\Facades\Date;
 
 afterEach(function (): void {
@@ -27,7 +26,7 @@ it('passes validation and renders the check-in form after a successful gate post
         ->create();
 
     $response = $this->withSession([
-        'userCoords' => [
+        'userCoordinates' => [
             'latitude' => 40.7128,
             'longitude' => -74.006,
             'storedAt' => now()->timestamp,
@@ -35,6 +34,8 @@ it('passes validation and renders the check-in form after a successful gate post
     ])->post(route('checkIn.form', $location));
 
     $response->assertSuccessful();
+
+    $response->assertSessionHas('checkInGatePass.uuid', $location->uuid);
 
     $page = $response->viewData('page');
 
@@ -46,6 +47,7 @@ it('rejects check-in when the distribution center has no operating hours', funct
     Date::setTestNow(Date::parse('2026-06-15 14:00:00', 'UTC'));
 
     $location = Location::factory()
+        ->checkinClosedAllWeek()
         ->for(Address::factory()->state([
             'latitude' => 40.7128,
             'longitude' => -74.006,
@@ -54,13 +56,9 @@ it('rejects check-in when the distribution center has no operating hours', funct
             'timezone' => 'America/New_York',
         ]);
 
-    $location->checkInSchedule->update(
-        Schedule::factory()->closedEveryDay()->make()->getAttributes()
-    );
-
     $this->from(route('checkIn.selectLocation'))
         ->withSession([
-            'userCoords' => [
+            'userCoordinates' => [
                 'latitude' => 40.7128,
                 'longitude' => -74.006,
                 'storedAt' => now()->timestamp,
@@ -77,6 +75,7 @@ it('rejects check-in when the driver arrives outside the weekday pickup window',
     Date::setTestNow(Date::parse('2026-06-15 20:00:00', 'America/New_York'));
 
     $location = Location::factory()
+        ->checkinWeekdayWindow()
         ->for(Address::factory()->state([
             'latitude' => 26.142,
             'longitude' => -80.478,
@@ -85,13 +84,9 @@ it('rejects check-in when the driver arrives outside the weekday pickup window',
             'timezone' => 'America/New_York',
         ]);
 
-    $location->checkInSchedule->update(
-        Schedule::factory()->weekdayPickupWindow()->make()->getAttributes()
-    );
-
     $this->from(route('checkIn.selectLocation'))
         ->withSession([
-            'userCoords' => [
+            'userCoordinates' => [
                 'latitude' => 26.142,
                 'longitude' => -80.478,
                 'storedAt' => now()->timestamp,
@@ -122,7 +117,7 @@ it('rejects check-in when the driver is farther than the allowed yard radius', f
 
     $this->from(route('checkIn.selectLocation'))
         ->withSession([
-            'userCoords' => [
+            'userCoordinates' => [
                 'latitude' => 40.7128,
                 'longitude' => -74.006,
                 'storedAt' => now()->timestamp,

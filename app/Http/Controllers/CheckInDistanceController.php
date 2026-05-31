@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\DTOs\CheckInDistanceDTO;
-use App\Enums\ScheduleType;
+use App\CheckIn\CheckInDistanceCalculator;
 use App\Http\Requests\CheckInDistanceRequest;
-use App\Models\Location;
-use App\Services\CheckInAvailabilityService;
-use App\Services\LocationScheduleService;
-use App\Services\SessionService;
+use App\Session\CheckInSession;
 use Illuminate\Http\JsonResponse;
 
 /**
@@ -20,8 +16,6 @@ use Illuminate\Http\JsonResponse;
  *
  * Used by the check-in select location flow: {@see CheckInSelectController} renders the page,
  * then the client requests this endpoint so the UI can sort or annotate locations by distance.
- *
- * Only locations enabled for check-in are included ({@see ScheduleType::CheckIn}).
  */
 final class CheckInDistanceController extends Controller
 {
@@ -31,23 +25,12 @@ final class CheckInDistanceController extends Controller
         $userLat = $request->float('latitude');
         $userLng = $request->float('longitude');
 
-        $locationService = resolve(LocationScheduleService::class);
-        $checkInAvailabilityService = resolve(CheckInAvailabilityService::class);
-        $sessionService = resolve(SessionService::class);
+        $distance = resolve(CheckInDistanceCalculator::class);
+        $session = resolve(CheckInSession::class);
 
-        $distances = $locationService->getActiveLocations(ScheduleType::CheckIn)
-            ->map(fn (Location $location): CheckInDistanceDTO => new CheckInDistanceDTO(
-                id: $location->uuid,
-                userDistance: $checkInAvailabilityService->calculateDistance(
-                    $userLat, $userLng,
-                    (float) $location->address->latitude,
-                    (float) $location->address->longitude,
-                ),
-            ))
-            ->sortBy('userDistance')
-            ->values();
+        $distances = $distance->resolve($userLat, $userLng);
 
-        $sessionService->setUserCoords($userLat, $userLng);
+        $session->setUserCoords($userLat, $userLng);
 
         return response()->json(['locations' => $distances]);
     }

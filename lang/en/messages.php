@@ -74,6 +74,8 @@ return [
         'specialHoursToday' => 'Special hours today',
         'closingSoon' => 'Closing soon',
         'closedToday' => 'Closed today',
+        'invalidLocation' => 'Invalid Location.',
+        'selectLocationToContinue' => 'Please select a location to continue.',
     ],
 
     'appointmentBooking' => [

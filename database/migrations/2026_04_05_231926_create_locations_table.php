@@ -13,7 +13,7 @@ return new class extends Migration
         Schema::create('locations', function (Blueprint $table): void {
             $table->id();
             $table->uuid()->unique();
-            $table->foreignId('address_id')->constrained('addresses');
+            $table->foreignId('address_id')->constrained('addresses')->cascadeOnDelete();
             $table->integer('max_distance_allowed');
             $table->string('name');
             $table->string('abbreviation')->unique();
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->boolean('is_active');
             $table->boolean('is_checkins_enabled');
             $table->boolean('is_appointments_enabled');
-            $table->boolean('additional_fields');
+            $table->json('config')->nullable();
             $table->timestampsTz();
         });
     }
