@@ -33,4 +33,3 @@ jobs:
           fi
           docker compose -f compose.staging.yaml exec -T checkin php artisan optimize
           docker compose -f compose.staging.yaml exec -T checkin php artisan octane:reload
-
