@@ -1,7 +1,7 @@
 name: check-in
 
 x-app: &app
-  image: ghcr.io/OWNER/check-in:${IMAGE_TAG:-latest}
+  image: ghcr.io/jplaza88/check-in:${IMAGE_TAG:-latest}
   env_file: [.env]
   restart: unless-stopped
   depends_on:
