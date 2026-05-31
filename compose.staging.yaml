@@ -1,0 +1,74 @@
+name: check-in
+
+x-app: &app
+  image: ghcr.io/OWNER/check-in:${IMAGE_TAG:-latest}
+  env_file: [.env]
+  restart: unless-stopped
+  depends_on:
+    pgsql:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  networks: [backend]
+
+services:
+  checkin:
+    <<: *app
+    environment:
+      OCTANE_SERVER: frankenphp
+      OCTANE_HTTPS: "false"
+    networks: [proxy, backend]   # proxy = reachable by Caddy as check-in-checkin-1:80
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/up"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  queue:
+    <<: *app
+    command: php artisan queue:work --tries=3 --timeout=90 --sleep=1
+
+  scheduler:
+    <<: *app
+    command: php artisan schedule:work
+
+  pgsql:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      TZ: ${APP_TIMEZONE:-UTC}
+      PGTZ: ${APP_TIMEZONE:-UTC}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks: [backend]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:alpine
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    networks: [backend]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  proxy:
+    external: true
+  backend:
+    driver: bridge
+
+volumes:
+  pgdata:
+  redisdata:
