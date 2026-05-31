@@ -37,7 +37,7 @@ final class ScheduleSeeder extends Seeder
             }
         }
 
-        DB::table('checkin_schedules')->insert($rows);
-        DB::table('appointment_schedules')->insert($rows);
+        DB::table('checkin_schedules')->insertOrIgnore($rows);
+        DB::table('appointment_schedules')->insertOrIgnore($rows);
     }
 }

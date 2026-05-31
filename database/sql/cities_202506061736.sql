@@ -7889,4 +7889,5 @@ INSERT INTO cities (id,name,state_id) VALUES
 	 (48311,'Weston',3976),
 	 (48312,'Lewisburg',3976),
 	 (48313,'Ravenswood',3976),
-	 (48314,'Summersville',3976);
+	 (48314,'Summersville',3976)
+    ON CONFLICT DO NOTHING;

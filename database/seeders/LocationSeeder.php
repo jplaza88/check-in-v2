@@ -178,7 +178,7 @@ final class LocationSeeder extends Seeder
         ];
 
         foreach ($locations as $location) {
-            DB::table('locations')->insert([
+            DB::table('locations')->insertOrIgnore([
                 ...$location,
                 'uuid' => Str::uuid(),
                 'created_at' => now(),
