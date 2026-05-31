@@ -28,6 +28,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'userCoordinates' => EnsureUserHasCoordinates::class,
             'appointmentLocation' => EnsureUserHasAppointmentLocation::class,
         ]);
+
+        // We're behind Caddy
+        $middleware->trustProxies(at: '*');
     })
 
     ->withExceptions(function (Exceptions $exceptions): void {
