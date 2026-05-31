@@ -29,3 +29,4 @@ jobs:
           docker compose -f compose.staging.yaml run --rm checkin php artisan migrate --force
           docker compose -f compose.staging.yaml exec -T checkin php artisan config:cache route:cache view:cache
           docker compose -f compose.staging.yaml exec -T checkin php artisan octane:reload
+
