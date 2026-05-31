@@ -6,7 +6,10 @@ namespace App\Http\Requests;
 
 use App\Appointment\AppointmentAvailabilityResolver;
 use App\Models\Location;
+use App\Queries\AppointmentLocation;
+use App\Session\AppointmentSession;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Validator;
 
 final class AppointmentFormRequest extends FormRequest
@@ -17,36 +20,43 @@ final class AppointmentFormRequest extends FormRequest
     }
 
     /**
-     * @return array<mixed>
+     * @return array<string, array<string>>
      */
     public function rules(): array
     {
         return [
-            'datetime' => ['required', 'datetime', 'datetime_format:Y-m-d H:i:s', 'after_or_equal:today'],
+            'datetime' => ['required', 'date', 'date_format:Y-m-d H:i:s', 'after_or_equal:today'],
         ];
     }
 
     /**
-     * @return array<mixed>
+     * The location is resolved from the gate context in the session (never from
+     * user input) and re-queried so availability is validated against current data.
+     *
+     * @return array<int, callable>
      */
-    public function after(AppointmentAvailabilityResolver $resolver): array
+    public function after(AppointmentAvailabilityResolver $resolver, AppointmentSession $session): array
     {
         return [
-            function (Validator $validator) use ($resolver): void {
-                $location = $this->location;
+            function (Validator $validator) use ($resolver, $session): void {
+                $context = $session->getLocation();
+
+                $location = $context
+                    ? resolve(AppointmentLocation::class)->execute($context->id)
+                    : null;
 
                 if (! $location instanceof Location) {
-                    $validator->errors()->add('uuid', __('messages.checkInSelectLocation.invalidLocation'));
+                    $validator->errors()->add('datetime', __('messages.appointmentSelectLocation.invalidLocation'));
 
                     return;
                 }
 
-                $appointmentDateTime = $validator->validated()['datetime'];
+                $appointmentDateTime = Date::parse($validator->validated()['datetime'], $location->timezone);
 
-                $canBookAppointment = $resolver->isAvailableForAppointment($location, $appointmentDateTime);
+                $availability = $resolver->isAvailableForAppointment($location, $appointmentDateTime);
 
-                if (! $canBookAppointment->allowed) {
-                    $validator->errors()->add('uuid', $canBookAppointment->reason ?? '');
+                if (! $availability->allowed) {
+                    $validator->errors()->add('datetime', $availability->reason ?? __('messages.appointmentSelectLocation.invalidLocation'));
                 }
             },
         ];

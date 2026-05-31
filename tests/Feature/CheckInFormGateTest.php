@@ -26,7 +26,7 @@ it('passes validation and renders the check-in form after a successful gate post
         ->create();
 
     $response = $this->withSession([
-        'userCoords' => [
+        'userCoordinates' => [
             'latitude' => 40.7128,
             'longitude' => -74.006,
             'storedAt' => now()->timestamp,
@@ -58,7 +58,7 @@ it('rejects check-in when the distribution center has no operating hours', funct
 
     $this->from(route('checkIn.selectLocation'))
         ->withSession([
-            'userCoords' => [
+            'userCoordinates' => [
                 'latitude' => 40.7128,
                 'longitude' => -74.006,
                 'storedAt' => now()->timestamp,
@@ -86,7 +86,7 @@ it('rejects check-in when the driver arrives outside the weekday pickup window',
 
     $this->from(route('checkIn.selectLocation'))
         ->withSession([
-            'userCoords' => [
+            'userCoordinates' => [
                 'latitude' => 26.142,
                 'longitude' => -80.478,
                 'storedAt' => now()->timestamp,
@@ -117,7 +117,7 @@ it('rejects check-in when the driver is farther than the allowed yard radius', f
 
     $this->from(route('checkIn.selectLocation'))
         ->withSession([
-            'userCoords' => [
+            'userCoordinates' => [
                 'latitude' => 40.7128,
                 'longitude' => -74.006,
                 'storedAt' => now()->timestamp,

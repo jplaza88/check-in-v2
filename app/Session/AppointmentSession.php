@@ -8,65 +8,58 @@ use App\DTOs\AppointmentLocationDTO;
 
 final readonly class AppointmentSession
 {
-    private const string KEY = 'appointmentLocationContext';
+    private const string LOCATION_KEY = 'appointmentLocationContext';
 
     /**
-     * @return array<string, string>
+     * Store the location selected at the appointment gate. Mirrors the
+     * check-in gate pass: it proves the user cleared the gate and is bound to
+     * a specific location, with a TTL bounding how long the booking form stays
+     * accessible.
      */
-    public function getLocation(): array
+    public function setLocation(AppointmentLocationDTO $location): void
     {
-        return session(self::KEY.'.location') ?? [];
+        session([
+            self::LOCATION_KEY => [
+                'location' => $location,
+                'storedAt' => now()->timestamp,
+            ],
+        ]);
     }
 
-    public function getStoredAt(): ?int
+    /**
+     * The selected location, or null once the context has expired. Freshness
+     * is folded into the getter to mirror CheckInSession::getUserCoords().
+     */
+    public function getLocation(): ?AppointmentLocationDTO
     {
-        $value = session(self::KEY.'.storedAt');
+        $context = session(self::LOCATION_KEY);
 
-        if ($value === null) {
+        if (! $context || ! ($context['location'] ?? null) instanceof AppointmentLocationDTO) {
             return null;
         }
 
-        if (is_int($value)) {
-            return $value;
+        if (now()->timestamp - $context['storedAt'] > config('app.user_appointment_location_context_ttl')) {
+            $this->forgetLocation();
+
+            return null;
         }
 
-        if (is_float($value)) {
-            return (int) $value;
-        }
-
-        if (is_string($value) && is_numeric($value)) {
-            return (int) $value;
-        }
-
-        return null;
+        return $context['location'];
     }
 
-    public function setLocation(AppointmentLocationDTO $location): void
+    /**
+     * Whether a fresh context exists for the given location. Mirrors
+     * CheckInSession::hasFreshGatePass().
+     */
+    public function hasFreshLocation(string $locationUuid): bool
     {
-        session([self::KEY => [
-            'location' => $location,
-            'storedAt' => now()->timestamp,
-        ]]);
+        $location = $this->getLocation();
+
+        return $location instanceof AppointmentLocationDTO && $location->id === $locationUuid;
     }
 
-    public function isFresh(): bool
+    public function forgetLocation(): void
     {
-        $storedAt = $this->getStoredAt();
-
-        if (is_null($storedAt)) {
-            $this->forget();
-
-            return false;
-        }
-
-        $storedSeconds = $storedAt;
-        $ttl = (int) config('app.user_appointment_location_context_ttl');
-
-        return (int) now()->timestamp - $storedSeconds <= $ttl;
-    }
-
-    public function forget(): void
-    {
-        session()->forget(self::KEY);
+        session()->forget(self::LOCATION_KEY);
     }
 }

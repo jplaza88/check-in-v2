@@ -15,7 +15,7 @@ final class LocationSeeder extends Seeder
         $locations = [
             [
                 'address_id' => 1,
-                'name' => 'Pompano Beach, FL - Sol Group Marketing',
+                'name' => 'Pompano Beach, FL - Martori Farms',
                 'abbreviation' => 'pmp',
                 'timezone' => 'America/New_York',
                 'max_distance_allowed' => 5,
