@@ -43,7 +43,7 @@ services:
       TZ: ${APP_TIMEZONE:-UTC}
       PGTZ: ${APP_TIMEZONE:-UTC}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql
     networks: [backend]
     healthcheck:
       test: ["CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}"]
