@@ -24,7 +24,7 @@ jobs:
         env:
           IMAGE_TAG: ${{ github.sha }}
         run: |
-          cp /srv/check-in/.env .env          # server-managed env, never in repo
+          cp /opt/da-server/check-in/.env .env
           docker compose -f compose.staging.yaml up -d --remove-orphans
           docker compose -f compose.staging.yaml run --rm checkin php artisan migrate --force
           docker compose -f compose.staging.yaml exec -T checkin php artisan config:cache route:cache view:cache
