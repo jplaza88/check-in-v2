@@ -231,4 +231,26 @@ return [
     */
 
     'user_appointment_location_context_ttl' => 60 * 2,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Appointment Booking Safeguards
+    |--------------------------------------------------------------------------
+    |
+    | Hard limits and defaults that clamp per-location appointment booking
+    | configuration. These protect the booking UX from careless or malicious
+    | admin values by enforcing sane defaults, caps, and an allowlist for the
+    | slot interval granularity.
+    |
+    */
+
+    'appointment_booking' => [
+        'max_days_ahead' => 7,
+        'slot_interval_minutes' => [
+            'default' => 15,
+            'allowed' => [10, 15, 30, 60],
+        ],
+        'lead_time_minutes' => ['default' => 60, 'max' => 480],
+        'buffer_before_close_minutes' => ['default' => 30, 'max' => 480],
+    ],
 ];

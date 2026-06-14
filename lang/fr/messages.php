@@ -68,4 +68,14 @@ return [
         'invalidLocation' => 'Lieu non valide.',
         'selectLocationToContinue' => 'Veuillez sélectionner un lieu pour continuer.',
     ],
+
+    'appointmentBooking' => [
+        'closedForAppointmentsOnDate' => ':name n’est pas disponible pour les rendez-vous le :date. Veuillez choisir un autre jour.',
+        'closedForAppointmentsOnDateWithReason' => ':name n’est pas disponible pour les rendez-vous le :date (:reason). Veuillez choisir un autre jour.',
+        'outsideSpecialHours' => ':name n’est pas ouvert à :time le :date. Les horaires spéciaux ce jour-là sont :open - :close. Veuillez choisir une autre date ou heure.',
+        'outsideRegularHours' => ':name n’est pas ouvert à :time le :date. Les heures d’ouverture ce jour-là sont :open - :close. Veuillez choisir une autre date ou heure.',
+        'notAvailableOnDay' => ':name n’est pas disponible pour les rendez-vous le :date. Veuillez choisir un autre jour.',
+        'closedForAppointmentsOnDateWithoutReason' => ':name n’accepte pas de rendez-vous le :date. Veuillez choisir une autre date.',
+        'outsideBookingWindow' => 'Veuillez choisir un créneau de rendez-vous disponible dans les :days prochains jours.',
+    ],
 ];

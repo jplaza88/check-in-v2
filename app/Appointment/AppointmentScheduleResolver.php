@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Appointment;
 
 use App\Address\AddressManager;
+use App\DTOs\AppointmentAvailabilityWindowDTO;
 use App\DTOs\AppointmentLocationDTO;
 use App\DTOs\LocationScheduleDTO;
 use App\Models\Location;
@@ -12,6 +13,7 @@ use App\Queries\AppointmentLocations;
 use App\Schedule\LocationScheduleParser;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 
 final readonly class AppointmentScheduleResolver
 {
@@ -36,6 +38,7 @@ final readonly class AppointmentScheduleResolver
     {
         $localNow = $now->setTimezone($location->timezone);
         $schedule = $this->resolveSchedule($location, $localNow);
+        $interval = $location->appointmentSlotIntervalMinutes();
 
         return new AppointmentLocationDTO(
             id: $location->uuid,
@@ -47,7 +50,52 @@ final readonly class AppointmentScheduleResolver
             hasOverride: $schedule->hasOverride,
             isOverrideClosure: $schedule->isOverrideClosure,
             isClosingSoon: $this->isClosingSoon($schedule, $localNow),
+            availability: $this->resolveAvailabilityWindows(
+                $location,
+                $localNow,
+                $location->appointmentMaxBookingDaysAhead(),
+                $interval,
+                $location->appointmentMinLeadTimeMinutes(),
+                $location->appointmentBufferBeforeCloseMinutes(),
+            ),
+            slotIntervalMinutes: $interval,
         );
+    }
+
+    public function isBookableSlot(Location $location, CarbonInterface $candidate): bool
+    {
+        $localNow = Date::now($location->timezone);
+        $localCandidate = $candidate->copy()->setTimezone($location->timezone);
+        $interval = $location->appointmentSlotIntervalMinutes();
+
+        $windows = $this->resolveAvailabilityWindows(
+            $location,
+            $localNow,
+            $location->appointmentMaxBookingDaysAhead(),
+            $interval,
+            $location->appointmentMinLeadTimeMinutes(),
+            $location->appointmentBufferBeforeCloseMinutes(),
+        );
+
+        foreach ($windows as $window) {
+            if ($window->date !== $localCandidate->toDateString()) {
+                continue;
+            }
+
+            $first = Date::parse("{$window->date} {$window->firstSlot}", $location->timezone);
+            $last = Date::parse("{$window->date} {$window->lastSlot}", $location->timezone);
+
+            if (! $localCandidate->betweenIncluded($first, $last)) {
+                return false;
+            }
+
+            $steps = (int) $first->diffInMinutes($localCandidate);
+
+            return $steps % $interval === 0
+                && $first->copy()->addMinutes($steps)->equalTo($localCandidate);
+        }
+
+        return false;
     }
 
     public function resolveSchedule(Location $location, CarbonInterface $at): LocationScheduleDTO
@@ -66,6 +114,70 @@ final readonly class AppointmentScheduleResolver
         }
 
         return $this->locationScheduleParser->resolveFromSchedule($schedule?->toArray(), $location->timezone, $localNow);
+    }
+
+    /**
+     * @return list<AppointmentAvailabilityWindowDTO>
+     */
+    private function resolveAvailabilityWindows(
+        Location $location,
+        CarbonInterface $localNow,
+        int $maxDaysAhead,
+        int $intervalMinutes,
+        int $leadTimeMinutes,
+        int $bufferBeforeCloseMinutes,
+    ): array {
+        $windows = [];
+
+        for ($offset = 0; $offset <= $maxDaysAhead; $offset++) {
+            $day = $localNow->copy()->addDays($offset)->startOfDay();
+            $schedule = $this->resolveSchedule($location, $day);
+
+            if (! $schedule->openTime || ! $schedule->closeTime || $schedule->isOverrideClosure) {
+                continue;
+            }
+
+            // Re-anchor parsed time-of-day onto the target day (parser anchors to "today").
+            $open = $day->copy()->setTimeFrom($schedule->openTime);
+            $close = $day->copy()->setTimeFrom($schedule->closeTime);
+
+            $lastSlot = $close->copy()->subMinutes($bufferBeforeCloseMinutes);
+            $firstSlot = $this->ceilToInterval($open, $intervalMinutes);
+
+            if ($offset === 0) {
+                // Earliest bookable today must respect the lead-time buffer from now.
+                $earliest = $this->ceilToInterval($localNow->copy()->addMinutes($leadTimeMinutes), $intervalMinutes);
+
+                if ($earliest->gt($firstSlot)) {
+                    $firstSlot = $earliest;
+                }
+            }
+
+            if ($firstSlot->gt($lastSlot)) {
+                continue;
+            }
+
+            $windows[] = new AppointmentAvailabilityWindowDTO(
+                date: $day->toDateString(),
+                firstSlot: $firstSlot->format('H:i:s'),
+                lastSlot: $lastSlot->format('H:i:s'),
+            );
+        }
+
+        return $windows;
+    }
+
+    private function ceilToInterval(CarbonInterface $at, int $intervalMinutes): CarbonInterface
+    {
+        if ($intervalMinutes <= 0) {
+            return $at->copy();
+        }
+
+        $startOfDay = $at->copy()->startOfDay();
+        $elapsedMinutes = $startOfDay->diffInMinutes($at);
+        $steps = (int) ceil($elapsedMinutes / $intervalMinutes);
+
+        return $startOfDay->addMinutes($steps * $intervalMinutes);
     }
 
     private function formatOpenCloseTime(LocationScheduleDTO $schedule): string
