@@ -1,7 +1,7 @@
 'use client';
-import * as React from 'react';
 import { format } from 'date-fns';
 import { CalendarIcon, ChevronUpIcon, ChevronDownIcon, ClockIcon } from 'lucide-react';
+import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -48,7 +48,7 @@ function DrumColumn({
                 <div className="flex h-8 items-center justify-center text-sm text-muted-foreground/40 select-none">
                     {fmt(prev)}
                 </div>
-                <div className="flex h-10 items-center justify-center border-y bg-background text-base font-medium tabular-nums select-none">
+                <div className="flex h-10 items-center justify-center border-y bg-background text-base font-medium tabular-nums select-none dark:bg-gray-700">
                     {fmt(selected)}
                 </div>
                 <div className="flex h-8 items-center justify-center text-sm text-muted-foreground/40 select-none">
@@ -82,7 +82,7 @@ export function DatePicker({
             <PopoverTrigger asChild>
                 <Button
                     variant="outline"
-                    className="w-full justify-between border-input font-normal"
+                    className="w-full justify-between border-input font-normal aria-expanded:bg-white dark:aria-expanded:bg-gray-800"
                 >
                     <CalendarIcon data-icon="inline-start" className="size-4 opacity-50" />
                     {date ? format(date, 'PP') : 'Select date'}
@@ -158,7 +158,7 @@ export function TimePicker({
             <PopoverTrigger asChild>
                 <Button
                     variant="outline"
-                    className="w-full justify-between border-input font-normal tabular-nums"
+                    className="w-full justify-between border-input font-normal tabular-nums aria-expanded:bg-white dark:aria-expanded:bg-gray-800"
                 >
                     <ClockIcon data-icon="inline-start" className="size-4 opacity-50" />
                     {label}

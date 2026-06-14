@@ -105,7 +105,7 @@ export default function AppointmentSelectLocation() {
                                         handleSelectLocation(location.id)
                                     }
                                     disabled={submittingLocationId !== null}
-                                    className="relative block w-full focus:outline-none disabled:opacity-60"
+                                    className="relative block w-full focus:outline-none disabled:opacity-60 cursor-pointer"
                                     aria-label={`Book appointment at ${location.name}, ${location.address}`}
                                 >
                                     <div
