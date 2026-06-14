@@ -23,13 +23,13 @@ final class ScheduleOverrideSeeder extends Seeder
         ];
 
         foreach ($overrides as $override) {
-            DB::table('checkin_schedule_overrides')->insert([
+            DB::table('checkin_schedule_overrides')->insertOrIgnore([
                 ...$override,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
-            DB::table('appointment_schedule_overrides')->insert([
+            DB::table('appointment_schedule_overrides')->insertOrIgnore([
                 ...$override,
                 'created_at' => now(),
                 'updated_at' => now(),

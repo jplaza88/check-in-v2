@@ -113,6 +113,6 @@ final class AddressSeeder extends Seeder
             ],
         ];
 
-        DB::table('addresses')->insert($addresses);
+        DB::table('addresses')->insertOrIgnore($addresses);
     }
 }

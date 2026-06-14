@@ -7,9 +7,13 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use JsonException;
 
 final class LocationSeeder extends Seeder
 {
+    /**
+     * @throws JsonException
+     */
     public function run(): void
     {
         $locations = [
@@ -25,6 +29,14 @@ final class LocationSeeder extends Seeder
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
+                'config' => json_encode([
+                    'appointment' => [
+                        'max_booking_days_ahead' => 2,
+                        'slot_interval_minutes' => 15,
+                        'min_lead_time_minutes' => 60,
+                        'buffer_before_close_minutes' => 30,
+                    ],
+                ], JSON_THROW_ON_ERROR),
             ],
             [
                 'address_id' => 2,
@@ -38,6 +50,14 @@ final class LocationSeeder extends Seeder
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
+                'config' => json_encode([
+                    'appointment' => [
+                        'max_booking_days_ahead' => 2,
+                        'slot_interval_minutes' => 15,
+                        'min_lead_time_minutes' => 60,
+                        'buffer_before_close_minutes' => 30,
+                    ],
+                ], JSON_THROW_ON_ERROR),
             ],
             [
                 'address_id' => 3,
@@ -51,6 +71,14 @@ final class LocationSeeder extends Seeder
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
+                'config' => json_encode([
+                    'appointment' => [
+                        'max_booking_days_ahead' => 2,
+                        'slot_interval_minutes' => 15,
+                        'min_lead_time_minutes' => 60,
+                        'buffer_before_close_minutes' => 30,
+                    ],
+                ], JSON_THROW_ON_ERROR),
             ],
             [
                 'address_id' => 4,
@@ -64,6 +92,14 @@ final class LocationSeeder extends Seeder
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
+                'config' => json_encode([
+                    'appointment' => [
+                        'max_booking_days_ahead' => 2,
+                        'slot_interval_minutes' => 15,
+                        'min_lead_time_minutes' => 60,
+                        'buffer_before_close_minutes' => 30,
+                    ],
+                ], JSON_THROW_ON_ERROR),
             ],
             [
                 'address_id' => 5,
@@ -84,6 +120,12 @@ final class LocationSeeder extends Seeder
                         'show_trailer_plate_state' => false,
                         'show_drivers_license_state' => true,
                         'show_drivers_license_expiration_date' => false,
+                    ],
+                    'appointment' => [
+                        'max_booking_days_ahead' => 2,
+                        'slot_interval_minutes' => 15,
+                        'min_lead_time_minutes' => 60,
+                        'buffer_before_close_minutes' => 30,
                     ],
                 ], JSON_THROW_ON_ERROR),
             ],
@@ -107,6 +149,12 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_state' => true,
                         'show_drivers_license_expiration_date' => false,
                     ],
+                    'appointment' => [
+                        'max_booking_days_ahead' => 2,
+                        'slot_interval_minutes' => 15,
+                        'min_lead_time_minutes' => 60,
+                        'buffer_before_close_minutes' => 30,
+                    ],
                 ], JSON_THROW_ON_ERROR),
             ],
             [
@@ -128,6 +176,12 @@ final class LocationSeeder extends Seeder
                         'show_trailer_plate_state' => false,
                         'show_drivers_license_state' => true,
                         'show_drivers_license_expiration_date' => false,
+                    ],
+                    'appointment' => [
+                        'max_booking_days_ahead' => 2,
+                        'slot_interval_minutes' => 15,
+                        'min_lead_time_minutes' => 60,
+                        'buffer_before_close_minutes' => 30,
                     ],
                 ], JSON_THROW_ON_ERROR),
             ],
@@ -151,6 +205,12 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_state' => true,
                         'show_drivers_license_expiration_date' => false,
                     ],
+                    'appointment' => [
+                        'max_booking_days_ahead' => 2,
+                        'slot_interval_minutes' => 15,
+                        'min_lead_time_minutes' => 60,
+                        'buffer_before_close_minutes' => 30,
+                    ],
                 ], JSON_THROW_ON_ERROR),
             ],
             [
@@ -173,12 +233,18 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_state' => true,
                         'show_drivers_license_expiration_date' => false,
                     ],
+                    'appointment' => [
+                        'max_booking_days_ahead' => 2,
+                        'slot_interval_minutes' => 15,
+                        'min_lead_time_minutes' => 60,
+                        'buffer_before_close_minutes' => 30,
+                    ],
                 ], JSON_THROW_ON_ERROR),
             ],
         ];
 
         foreach ($locations as $location) {
-            DB::table('locations')->insert([
+            DB::table('locations')->insertOrIgnore([
                 ...$location,
                 'uuid' => Str::uuid(),
                 'created_at' => now(),

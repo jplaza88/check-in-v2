@@ -85,5 +85,6 @@ return [
         'outsideRegularHours' => ':name is not open at :time on :date. Business hours that day are :open - :close. Please choose another date or time.',
         'notAvailableOnDay' => ':name is not available for appointments on :date. Please choose another day.',
         'closedForAppointmentsOnDateWithoutReason' => ':name is not accepting appointments on :date. Please choose another date.',
+        'outsideBookingWindow' => 'Please choose an available appointment time within the next :days days.',
     ],
 ];

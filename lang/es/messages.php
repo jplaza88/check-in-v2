@@ -68,4 +68,14 @@ return [
         'invalidLocation' => 'Ubicación no válida.',
         'selectLocationToContinue' => 'Por favor seleccione una ubicación para continuar.',
     ],
+
+    'appointmentBooking' => [
+        'closedForAppointmentsOnDate' => ':name no está disponible para citas el :date. Por favor elija otro día.',
+        'closedForAppointmentsOnDateWithReason' => ':name no está disponible para citas el :date (:reason). Por favor elija otro día.',
+        'outsideSpecialHours' => ':name no está abierto a las :time el :date. El horario especial ese día es :open - :close. Por favor elija otra fecha u hora.',
+        'outsideRegularHours' => ':name no está abierto a las :time el :date. El horario de atención ese día es :open - :close. Por favor elija otra fecha u hora.',
+        'notAvailableOnDay' => ':name no está disponible para citas el :date. Por favor elija otro día.',
+        'closedForAppointmentsOnDateWithoutReason' => ':name no acepta citas el :date. Por favor elija otra fecha.',
+        'outsideBookingWindow' => 'Por favor elija una hora de cita disponible dentro de los próximos :days días.',
+    ],
 ];

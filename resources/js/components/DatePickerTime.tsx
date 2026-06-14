@@ -1,7 +1,13 @@
 'use client';
-import * as React from 'react';
 import { format } from 'date-fns';
-import { CalendarIcon, ChevronUpIcon, ChevronDownIcon, ClockIcon } from 'lucide-react';
+import { CalendarIcon, ChevronDownIcon, ClockIcon } from 'lucide-react';
+import * as React from 'react';
+import {
+    Accordion,
+    AccordionContent,
+    AccordionItem,
+    AccordionTrigger,
+} from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import {
@@ -11,59 +17,28 @@ import {
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
-const MINUTE_INTERVAL = 15;
+// ─── Time helpers ─────────────────────────────────────────────────────────────
 
-// ─── Drum Column ──────────────────────────────────────────────────────────────
+const pad = (n: number) => String(n).padStart(2, '0');
 
-function DrumColumn({
-    values,
-    selected,
-    onSelect,
-    label,
-    fmt = (v: number) => String(v).padStart(2, '0'),
-    className,
-}: {
-    values: number[];
-    selected: number;
-    onSelect: (v: number) => void;
-    label: string;
-    fmt?: (v: number) => string;
-    className?: string;
-}) {
-    const idx = values.indexOf(selected);
-    const prev = values[(idx - 1 + values.length) % values.length];
-    const next = values[(idx + 1) % values.length];
+function timeToMinutes(time: string): number {
+    const [h, m] = time.split(':').map(Number);
 
-    return (
-        <div className={cn('flex flex-col items-center gap-1', className)}>
-            <span className="text-[10px] text-muted-foreground">{label}</span>
-            <button
-                type="button"
-                onClick={() => onSelect(prev)}
-                className="flex h-7 w-full items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-                <ChevronUpIcon className="size-4" />
-            </button>
-            <div className="w-full overflow-hidden rounded-md border bg-muted/40">
-                <div className="flex h-8 items-center justify-center text-sm text-muted-foreground/40 select-none">
-                    {fmt(prev)}
-                </div>
-                <div className="flex h-10 items-center justify-center border-y bg-background text-base font-medium tabular-nums select-none">
-                    {fmt(selected)}
-                </div>
-                <div className="flex h-8 items-center justify-center text-sm text-muted-foreground/40 select-none">
-                    {fmt(next)}
-                </div>
-            </div>
-            <button
-                type="button"
-                onClick={() => onSelect(next)}
-                className="flex h-7 w-full items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-            >
-                <ChevronDownIcon className="size-4" />
-            </button>
-        </div>
-    );
+    return h * 60 + m;
+}
+
+function minutesToValue(total: number): string {
+    return `${pad(Math.floor(total / 60))}:${pad(total % 60)}:00`;
+}
+
+function formatLabel(value: string): string {
+    const total = timeToMinutes(value);
+    const h24 = Math.floor(total / 60);
+    const m = total % 60;
+    const isPm = h24 >= 12;
+    const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+
+    return `${h12}:${pad(m)} ${isPm ? 'PM' : 'AM'}`;
 }
 
 // ─── Date Picker ──────────────────────────────────────────────────────────────
@@ -71,9 +46,11 @@ function DrumColumn({
 export function DatePicker({
     date,
     onDateChange,
+    availableDates,
 }: {
     date: Date | undefined;
     onDateChange: (d: Date | undefined) => void;
+    availableDates: Set<string>;
 }) {
     const [open, setOpen] = React.useState(false);
 
@@ -82,7 +59,7 @@ export function DatePicker({
             <PopoverTrigger asChild>
                 <Button
                     variant="outline"
-                    className="w-full justify-between border-input font-normal"
+                    className="w-full justify-between border-input font-normal aria-expanded:bg-white dark:aria-expanded:bg-gray-800"
                 >
                     <CalendarIcon data-icon="inline-start" className="size-4 opacity-50" />
                     {date ? format(date, 'PP') : 'Select date'}
@@ -98,7 +75,7 @@ export function DatePicker({
                     selected={date}
                     captionLayout="dropdown"
                     defaultMonth={date}
-                    disabled={{ before: new Date() }}
+                    disabled={(day) => !availableDates.has(format(day, 'yyyy-MM-dd'))}
                     onSelect={(d) => {
                         onDateChange(d);
                         setOpen(false);
@@ -111,101 +88,148 @@ export function DatePicker({
 
 // ─── Time Picker ──────────────────────────────────────────────────────────────
 
+const TIME_GROUPS = [
+    { label: 'Morning', matches: (hour: number) => hour < 12 },
+    { label: 'Afternoon', matches: (hour: number) => hour >= 12 && hour < 17 },
+    { label: 'Evening', matches: (hour: number) => hour >= 17 },
+] as const;
+
 export function TimePicker({
     value,
     onChange,
+    firstSlot,
+    lastSlot,
+    intervalMinutes,
 }: {
     value: string; // "HH:MM:00" 24h
     onChange: (v: string) => void;
+    firstSlot?: string;
+    lastSlot?: string;
+    intervalMinutes: number;
 }) {
-    const [open, setOpen] = React.useState(false);
+    const slots = React.useMemo(() => {
+        if (!firstSlot || !lastSlot || intervalMinutes <= 0) {
+            return [];
+        }
 
-    const [h24, m] = value.split(':').map(Number);
-    const isPm = h24 >= 12;
-    const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
+        const start = timeToMinutes(firstSlot);
+        const end = timeToMinutes(lastSlot);
+        const result: string[] = [];
 
-    const hours = Array.from({ length: 12 }, (_, i) => i + 1);
-    const minutes = Array.from(
-        { length: Math.ceil(60 / MINUTE_INTERVAL) },
-        (_, i) => i * MINUTE_INTERVAL,
+        for (let m = start; m <= end; m += intervalMinutes) {
+            result.push(minutesToValue(m));
+        }
+
+        return result;
+    }, [firstSlot, lastSlot, intervalMinutes]);
+
+    const groups = React.useMemo(
+        () =>
+            TIME_GROUPS.map((group) => ({
+                label: group.label,
+                slots: slots.filter((slot) =>
+                    group.matches(Math.floor(timeToMinutes(slot) / 60)),
+                ),
+            })).filter((group) => group.slots.length > 0),
+        [slots],
     );
 
-    const snapped = minutes.reduce(
-        (best, v) => (Math.abs(v - m) < Math.abs(best - m) ? v : best),
-        minutes[0],
-    );
+    const [openItem, setOpenItem] = React.useState('');
 
-    const [selHour, setSelHour] = React.useState(h12);
-    const [selMinute, setSelMinute] = React.useState(snapped);
-    const [selPm, setSelPm] = React.useState(isPm);
+    const scrollRef = React.useRef<HTMLDivElement>(null);
+    const [canScrollUp, setCanScrollUp] = React.useState(false);
+    const [canScrollDown, setCanScrollDown] = React.useState(false);
+
+    const updateScrollState = React.useCallback(() => {
+        const el = scrollRef.current;
+        if (!el) {
+            return;
+        }
+        setCanScrollUp(el.scrollTop > 0);
+        setCanScrollDown(el.scrollTop + el.clientHeight < el.scrollHeight - 1);
+    }, []);
 
     React.useEffect(() => {
-        const out24 = selPm
-            ? selHour === 12
-                ? 12
-                : selHour + 12
-            : selHour === 12
-              ? 0
-              : selHour;
-        const pad = (n: number) => String(n).padStart(2, '0');
-        onChange(`${pad(out24)}:${pad(selMinute)}:00`);
-    }, [selHour, selMinute, selPm]);
+        updateScrollState();
+        const el = scrollRef.current;
+        if (!el) {
+            return;
+        }
+        const observer = new ResizeObserver(updateScrollState);
+        observer.observe(el);
 
-    const label = `${String(selHour).padStart(2, '0')}:${String(selMinute).padStart(2, '0')} ${selPm ? 'PM' : 'AM'}`;
+        return () => observer.disconnect();
+    }, [groups, openItem, updateScrollState]);
+
+    if (groups.length === 0) {
+        return null;
+    }
+
+    const handleSelect = (slot: string) => {
+        onChange(slot);
+        setOpenItem('');
+    };
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    variant="outline"
-                    className="w-full justify-between border-input font-normal tabular-nums"
-                >
-                    <ClockIcon data-icon="inline-start" className="size-4 opacity-50" />
-                    {label}
-                    <ChevronDownIcon className="size-4 opacity-50" />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-44 p-4" align="start">
-                {/* drums */}
-                <div className="flex w-full items-start gap-3">
-                    <DrumColumn
-                        label="hour"
-                        values={hours}
-                        selected={selHour}
-                        onSelect={setSelHour}
-                        className="flex-1"
-                    />
-                    <span className="mt-18 text-xl font-light text-muted-foreground">
-                        :
+        <Accordion
+            type="single"
+            collapsible
+            value={openItem}
+            onValueChange={setOpenItem}
+            className="rounded-4xl border-input bg-input/30"
+        >
+            <AccordionItem value="time" className="data-open:bg-transparent">
+                <AccordionTrigger className="h-9 items-center px-3 py-0 hover:no-underline">
+                    <span className="flex items-center gap-2 font-normal">
+                        <ClockIcon className="size-4 text-muted-foreground" />
+                        <span className="tabular-nums">
+                            {formatLabel(value)}
+                        </span>
                     </span>
-                    <DrumColumn
-                        label="min"
-                        values={minutes}
-                        selected={selMinute}
-                        onSelect={setSelMinute}
-                        className="flex-1"
-                    />
-                </div>
-
-                {/* AM / PM below */}
-                <div className="mt-3 flex overflow-hidden rounded-md border border-input">
-                    {(['AM', 'PM'] as const).map((period) => (
-                        <button
-                            key={period}
-                            type="button"
-                            onClick={() => setSelPm(period === 'PM')}
-                            className={cn(
-                                'flex-1 py-1.5 text-sm font-medium transition-colors',
-                                selPm === (period === 'PM')
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'bg-background text-muted-foreground hover:bg-accent',
-                            )}
+                </AccordionTrigger>
+                <AccordionContent>
+                    <div className="relative">
+                        <div
+                            ref={scrollRef}
+                            onScroll={updateScrollState}
+                            className="max-h-72 space-y-4 overflow-y-auto pr-3"
                         >
-                            {period}
-                        </button>
-                    ))}
-                </div>
-            </PopoverContent>
-        </Popover>
+                            {groups.map((group) => (
+                                <div key={group.label}>
+                                    <p className="mb-2 text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+                                        {group.label}
+                                    </p>
+                                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                                        {group.slots.map((slot) => (
+                                            <button
+                                                key={slot}
+                                                type="button"
+                                                onClick={() =>
+                                                    handleSelect(slot)
+                                                }
+                                                className={cn(
+                                                    'flex min-h-10 items-center justify-center rounded-md border px-2 py-2 text-sm font-medium tabular-nums transition-colors',
+                                                    slot === value
+                                                        ? 'border-primary bg-primary text-primary-foreground'
+                                                        : 'border-input text-foreground hover:bg-accent hover:text-accent-foreground',
+                                                )}
+                                            >
+                                                {formatLabel(slot)}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        {canScrollUp && (
+                            <div className="pointer-events-none absolute inset-x-0 top-0 h-6 bg-gradient-to-b from-white to-transparent dark:from-gray-800" />
+                        )}
+                        {canScrollDown && (
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-white to-transparent dark:from-gray-800" />
+                        )}
+                    </div>
+                </AccordionContent>
+            </AccordionItem>
+        </Accordion>
     );
 }

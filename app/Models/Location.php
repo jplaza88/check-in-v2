@@ -89,6 +89,38 @@ final class Location extends Model
         return 'uuid';
     }
 
+    public function appointmentMaxBookingDaysAhead(): int
+    {
+        $cap = (int) config('app.appointment_booking.max_days_ahead');
+
+        return max(1, min((int) data_get($this->config, 'appointment.max_booking_days_ahead', $cap), $cap));
+    }
+
+    public function appointmentSlotIntervalMinutes(): int
+    {
+        $default = (int) config('app.appointment_booking.slot_interval_minutes.default');
+        $allowed = config('app.appointment_booking.slot_interval_minutes.allowed');
+        $value = (int) data_get($this->config, 'appointment.slot_interval_minutes', $default);
+
+        return in_array($value, $allowed, true) ? $value : $default;
+    }
+
+    public function appointmentMinLeadTimeMinutes(): int
+    {
+        $default = (int) config('app.appointment_booking.lead_time_minutes.default');
+        $max = (int) config('app.appointment_booking.lead_time_minutes.max');
+
+        return max(0, min((int) data_get($this->config, 'appointment.min_lead_time_minutes', $default), $max));
+    }
+
+    public function appointmentBufferBeforeCloseMinutes(): int
+    {
+        $default = (int) config('app.appointment_booking.buffer_before_close_minutes.default');
+        $max = (int) config('app.appointment_booking.buffer_before_close_minutes.max');
+
+        return max(0, min((int) data_get($this->config, 'appointment.buffer_before_close_minutes', $default), $max));
+    }
+
     protected function casts(): array
     {
         return [

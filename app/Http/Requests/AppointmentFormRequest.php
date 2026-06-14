@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Appointment\AppointmentAvailabilityResolver;
+use App\Appointment\AppointmentScheduleResolver;
 use App\Models\Location;
 use App\Queries\AppointmentLocation;
 use App\Session\AppointmentSession;
@@ -35,10 +36,13 @@ final class AppointmentFormRequest extends FormRequest
      *
      * @return array<int, callable>
      */
-    public function after(AppointmentAvailabilityResolver $resolver, AppointmentSession $session): array
-    {
+    public function after(
+        AppointmentAvailabilityResolver $availabilityResolver,
+        AppointmentScheduleResolver $scheduleResolver,
+        AppointmentSession $session,
+    ): array {
         return [
-            function (Validator $validator) use ($resolver, $session): void {
+            function (Validator $validator) use ($availabilityResolver, $scheduleResolver, $session): void {
                 $context = $session->getLocation();
 
                 $location = $context
@@ -53,10 +57,18 @@ final class AppointmentFormRequest extends FormRequest
 
                 $appointmentDateTime = Date::parse($validator->validated()['datetime'], $location->timezone);
 
-                $availability = $resolver->isAvailableForAppointment($location, $appointmentDateTime);
+                $availability = $availabilityResolver->isAvailableForAppointment($location, $appointmentDateTime);
 
                 if (! $availability->allowed) {
                     $validator->errors()->add('datetime', $availability->reason ?? __('messages.appointmentSelectLocation.invalidLocation'));
+
+                    return;
+                }
+
+                if (! $scheduleResolver->isBookableSlot($location, $appointmentDateTime)) {
+                    $validator->errors()->add('datetime', __('messages.appointmentBooking.outsideBookingWindow', [
+                        'days' => $location->appointmentMaxBookingDaysAhead(),
+                    ]));
                 }
             },
         ];

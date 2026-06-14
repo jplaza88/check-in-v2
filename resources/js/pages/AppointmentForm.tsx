@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router } from '@inertiajs/react';
 import { format } from 'date-fns';
 import { UserIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -30,6 +30,12 @@ import PublicLayout from '@/layouts/PublicLayout';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
+interface AvailabilityWindow {
+    date: string;
+    firstSlot: string;
+    lastSlot: string;
+}
+
 interface Location {
     id: string;
     name: string;
@@ -40,6 +46,8 @@ interface Location {
     hasOverride: boolean;
     isOverrideClosure: boolean;
     isClosingSoon: boolean | null;
+    availability: AvailabilityWindow[];
+    slotIntervalMinutes: number;
 }
 
 interface PageProps {
@@ -168,10 +176,10 @@ function LocationScheduleCard({ location }: { location: Location }) {
                                     </span>
                                 )}
                             </div>
-                            {location.hasException && location.reason && (
+                            {location.hasOverride && location.reason && (
                                 <span
                                     className={`self-start rounded-full px-2.5 py-1 text-xs font-medium ${
-                                        location.isExceptionClosure
+                                        location.isOverrideClosure
                                             ? 'bg-red-500/15 text-red-700 dark:text-red-400'
                                             : 'bg-amber-500/15 text-amber-700 dark:text-amber-400'
                                     }`}
@@ -192,17 +200,37 @@ function LocationScheduleCard({ location }: { location: Location }) {
 export default function ScheduleAppointment({ location }: PageProps) {
     const [processing, setProcessing] = useState(false);
 
-    const { control, handleSubmit, setError } = useForm<AppointmentForm>({
-        resolver: zodResolver(schema),
-        defaultValues: {
-            location_id: location.id,
-            date: '',
-            time: '10:00:00',
-            so_number: '',
-            drivers_name: '',
-            cellphone: '',
-        },
-    });
+    const availability = location.availability ?? [];
+    const hasAvailability = availability.length > 0;
+
+    const availableDates = useMemo(
+        () => new Set(availability.map((w) => w.date)),
+        [availability],
+    );
+    const windowByDate = useMemo(
+        () => new Map(availability.map((w) => [w.date, w])),
+        [availability],
+    );
+
+    const firstWindow = availability[0];
+
+    const { control, handleSubmit, setError, watch, setValue } =
+        useForm<AppointmentForm>({
+            resolver: zodResolver(schema),
+            defaultValues: {
+                location_id: location.id,
+                date: firstWindow?.date ?? '',
+                time: firstWindow?.firstSlot ?? '10:00:00',
+                so_number: '',
+                drivers_name: '',
+                cellphone: '',
+            },
+        });
+
+    const selectedDate = watch('date');
+    const currentWindow = selectedDate
+        ? windowByDate.get(selectedDate)
+        : undefined;
 
     const formatPhone = (raw: string) => {
         const digits = raw.replace(/\D/g, '').substring(0, 10);
@@ -276,75 +304,113 @@ return `(${area}`;
                                     <LocationScheduleCard location={location} />
                                 </div>
 
-                                {/* Date + Time row */}
-                                <div className="mt-5 grid grid-cols-2 gap-4">
-                                    <Controller
-                                        name="date"
-                                        control={control}
-                                        render={({ field, fieldState }) => (
-                                            <Field
-                                                data-invalid={
-                                                    fieldState.invalid
-                                                }
-                                            >
-                                                <FieldLabel htmlFor="date">
-                                                    Date
-                                                </FieldLabel>
-                                                <DatePicker
-                                                    date={
-                                                        field.value
-                                                            ? new Date(
-                                                                  field.value,
-                                                              )
-                                                            : undefined
+                                {/* Date + Time */}
+                                {hasAvailability ? (
+                                    <div className="mt-5 space-y-5">
+                                        <Controller
+                                            name="date"
+                                            control={control}
+                                            render={({ field, fieldState }) => (
+                                                <Field
+                                                    data-invalid={
+                                                        fieldState.invalid
                                                     }
-                                                    onDateChange={(d) =>
-                                                        field.onChange(
-                                                            d
+                                                >
+                                                    <FieldLabel htmlFor="date">
+                                                        Date
+                                                    </FieldLabel>
+                                                    <DatePicker
+                                                        availableDates={
+                                                            availableDates
+                                                        }
+                                                        date={
+                                                            field.value
+                                                                ? new Date(
+                                                                      field.value +
+                                                                          'T00:00:00',
+                                                                  )
+                                                                : undefined
+                                                        }
+                                                        onDateChange={(d) => {
+                                                            const ds = d
                                                                 ? format(
                                                                       d,
                                                                       'yyyy-MM-dd',
                                                                   )
-                                                                : '',
-                                                        )
-                                                    }
-                                                />
-                                                {fieldState.invalid && (
-                                                    <FieldError
-                                                        errors={[
-                                                            fieldState.error,
-                                                        ]}
+                                                                : '';
+                                                            field.onChange(ds);
+                                                            const w =
+                                                                windowByDate.get(
+                                                                    ds,
+                                                                );
+                                                            if (w) {
+                                                                setValue(
+                                                                    'time',
+                                                                    w.firstSlot,
+                                                                    {
+                                                                        shouldValidate:
+                                                                            true,
+                                                                    },
+                                                                );
+                                                            }
+                                                        }}
                                                     />
-                                                )}
-                                            </Field>
-                                        )}
-                                    />
+                                                    {fieldState.invalid && (
+                                                        <FieldError
+                                                            errors={[
+                                                                fieldState.error,
+                                                            ]}
+                                                        />
+                                                    )}
+                                                </Field>
+                                            )}
+                                        />
 
-                                    <Controller
-                                        name="time"
-                                        control={control}
-                                        render={({ field, fieldState }) => (
-                                            <Field
-                                                data-invalid={
-                                                    fieldState.invalid
-                                                }
-                                            >
-                                                <FieldLabel>Time</FieldLabel>
-                                                <TimePicker
-                                                    value={field.value}
-                                                    onChange={field.onChange}
-                                                />
-                                                {fieldState.invalid && (
-                                                    <FieldError
-                                                        errors={[
-                                                            fieldState.error,
-                                                        ]}
+                                        <Controller
+                                            name="time"
+                                            control={control}
+                                            render={({ field, fieldState }) => (
+                                                <Field
+                                                    data-invalid={
+                                                        fieldState.invalid
+                                                    }
+                                                >
+                                                    <FieldLabel>
+                                                        Time
+                                                    </FieldLabel>
+                                                    <TimePicker
+                                                        value={field.value}
+                                                        onChange={
+                                                            field.onChange
+                                                        }
+                                                        firstSlot={
+                                                            currentWindow?.firstSlot
+                                                        }
+                                                        lastSlot={
+                                                            currentWindow?.lastSlot
+                                                        }
+                                                        intervalMinutes={
+                                                            location.slotIntervalMinutes
+                                                        }
                                                     />
-                                                )}
-                                            </Field>
-                                        )}
-                                    />
-                                </div>
+                                                    {fieldState.invalid && (
+                                                        <FieldError
+                                                            errors={[
+                                                                fieldState.error,
+                                                            ]}
+                                                        />
+                                                    )}
+                                                </Field>
+                                            )}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className="mt-5 rounded-lg border border-amber-300/60 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300">
+                                        No appointment times are currently
+                                        available. Please check back later or
+                                        contact the location.
+                                    </div>
+                                )}
 
                                 {/* SO Number */}
                                 <div className="mt-4">
@@ -442,7 +508,7 @@ return `(${area}`;
                                                     Cellphone Number
                                                 </FieldLabel>
                                                 <div className="flex rounded-md shadow-xs">
-                                                    <span className="inline-flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground">
+                                                    <span className="inline-flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground dark:bg-input/30">
                                                         +1
                                                     </span>
                                                     <Input
@@ -491,7 +557,7 @@ return `(${area}`;
                             <div className="border-t border-gray-100 bg-gray-50 px-5 py-4 dark:border-gray-700/60 dark:bg-gray-800/60">
                                 <Button
                                     type="submit"
-                                    disabled={processing}
+                                    disabled={processing || !hasAvailability}
                                     className="w-full bg-brand-green text-white hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
                                 >
                                     {processing
