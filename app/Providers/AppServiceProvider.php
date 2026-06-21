@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\Appointment;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
@@ -53,6 +55,8 @@ final class AppServiceProvider extends ServiceProvider
         $this->strictModels();
 
         $this->unguardModels();
+
+        $this->enforceMorphMaps();
     }
 
     private function immutableDates(): void
@@ -112,5 +116,10 @@ final class AppServiceProvider extends ServiceProvider
     private function defaultTimezone(): void
     {
         date_default_timezone_set(config('app.timezone'));
+    }
+
+    private function enforceMorphMaps(): void
+    {
+        Relation::morphMap(['appointment' => Appointment::class]);
     }
 }

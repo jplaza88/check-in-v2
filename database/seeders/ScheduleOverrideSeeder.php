@@ -14,7 +14,7 @@ final class ScheduleOverrideSeeder extends Seeder
         $overrides = [
             [
                 'location_id' => 1,
-                'date' => '2026-04-06',
+                'override_date' => '2026-04-06',
                 'open_time' => '07:00:00',
                 'close_time' => '12:00:00',
                 'is_closed' => false,

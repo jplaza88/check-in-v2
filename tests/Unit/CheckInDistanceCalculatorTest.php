@@ -13,7 +13,7 @@ it('returns a DTO per location with its uuid and computed distance', function ()
         ->for(Address::factory()->state(['latitude' => 40.0, 'longitude' => -74.0]))
         ->create();
 
-    $result = app(CheckInDistanceCalculator::class)->resolve(40.0, -74.0);
+    $result = resolve(CheckInDistanceCalculator::class)->resolve(40.0, -74.0);
 
     expect($result)->toHaveCount(1)
         ->and($result->first())->toBeInstanceOf(CheckInDistanceDTO::class)
@@ -30,7 +30,7 @@ it('sorts locations nearest first', function (): void {
         ->for(Address::factory()->state(['latitude' => 34.0522, 'longitude' => -118.2437]))
         ->create();
 
-    $result = app(CheckInDistanceCalculator::class)->resolve(40.0, -74.0);
+    $result = resolve(CheckInDistanceCalculator::class)->resolve(40.0, -74.0);
 
     expect($result->pluck('id')->all())->toBe([$near->uuid, $far->uuid])
         ->and($result->first()->userDistance)->toBeLessThan($result->last()->userDistance);
@@ -39,7 +39,7 @@ it('sorts locations nearest first', function (): void {
 it('caches the distance list per coordinate set', function (): void {
     Location::factory()->create();
 
-    $calculator = app(CheckInDistanceCalculator::class);
+    $calculator = resolve(CheckInDistanceCalculator::class);
 
     $first = $calculator->resolve(40.0, -74.0);
 
@@ -56,7 +56,7 @@ it('caches the distance list per coordinate set', function (): void {
 it('recomputes the distance list for different coordinates', function (): void {
     Location::factory()->create();
 
-    $calculator = app(CheckInDistanceCalculator::class);
+    $calculator = resolve(CheckInDistanceCalculator::class);
 
     $first = $calculator->resolve(40.0, -74.0);
 
@@ -73,14 +73,14 @@ it('recomputes the distance list for different coordinates', function (): void {
 it('recomputes when the cached payload is not a valid collection of DTOs', function (): void {
     Location::factory()->create();
 
-    $sessionId = app(UserSession::class)->getId();
+    $sessionId = resolve(UserSession::class)->getId();
     $cacheKey = sprintf('checkin_distances:%s,%s:%s', 40.0, -74.0, $sessionId);
 
     // Simulate a stale/incompatible cache entry (e.g. an __PHP_Incomplete_Class
     // left by pre-refactor code).
     cache()->put($cacheKey, 'corrupted-payload', now()->addMinutes(5));
 
-    $result = app(CheckInDistanceCalculator::class)->resolve(40.0, -74.0);
+    $result = resolve(CheckInDistanceCalculator::class)->resolve(40.0, -74.0);
 
     expect($result)->toHaveCount(1)
         ->and($result->first())->toBeInstanceOf(CheckInDistanceDTO::class);
