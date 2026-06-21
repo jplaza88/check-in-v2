@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\StoreAppointmentAction;
 use App\Appointment\AppointmentScheduleResolver;
+use App\DTOs\AppointmentLocationDTO;
 use App\Http\Requests\AppointmentFormRequest;
 use App\Http\Requests\AppointmentLocationSelectRequest;
 use App\Models\Location;
 use App\Session\AppointmentSession;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
+use Throwable;
 
 final class AppointmentController extends Controller
 {
@@ -35,9 +38,21 @@ final class AppointmentController extends Controller
         ]);
     }
 
-    public function review(AppointmentFormRequest $request): Response
+    /**
+     * @throws Throwable
+     */
+    public function store(AppointmentFormRequest $request, StoreAppointmentAction $action): RedirectResponse
     {
-        return inertia('AppointmentForm', [
-        ]);
+        $locationDTO = $this->session->getLocation();
+        if (! $locationDTO instanceof AppointmentLocationDTO) {
+            return to_route('appointment.selectLocation');
+        }
+
+        $appointment = $action->handle($request->validated(), $locationDTO);
+
+        $this->session->forgetLocation();
+
+        // TODO: redirect to confirmation page once it exists
+        return to_route('appointment.form', $appointment->uuid);
     }
 }

@@ -18,7 +18,7 @@ final class CheckInController extends Controller
 
         // Proximity check has passed; issue a gate pass so the driver can
         // complete the (potentially long) form without re-validating coords.
-        $this->session->issueGatePass($request->location->uuid);
+        $this->session->issueGatePass($request->location->uuid ?? '');
 
         return inertia('CheckInForm', [
             'location' => $request->location,

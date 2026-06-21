@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Session\CheckInSession;
 
 it('issues a fresh gate pass for a location', function (): void {
-    $session = app(CheckInSession::class);
+    $session = resolve(CheckInSession::class);
 
     $session->issueGatePass('location-uuid');
 
@@ -13,7 +13,7 @@ it('issues a fresh gate pass for a location', function (): void {
 });
 
 it('does not honor a gate pass issued for a different location', function (): void {
-    $session = app(CheckInSession::class);
+    $session = resolve(CheckInSession::class);
 
     $session->issueGatePass('location-uuid');
 
@@ -21,11 +21,11 @@ it('does not honor a gate pass issued for a different location', function (): vo
 });
 
 it('returns false when no gate pass exists', function (): void {
-    expect(app(CheckInSession::class)->hasFreshGatePass('location-uuid'))->toBeFalse();
+    expect(resolve(CheckInSession::class)->hasFreshGatePass('location-uuid'))->toBeFalse();
 });
 
 it('expires the gate pass after the configured ttl', function (): void {
-    $session = app(CheckInSession::class);
+    $session = resolve(CheckInSession::class);
 
     $session->issueGatePass('location-uuid');
 
@@ -35,7 +35,7 @@ it('expires the gate pass after the configured ttl', function (): void {
 });
 
 it('keeps the gate pass fresh right up to the ttl boundary', function (): void {
-    $session = app(CheckInSession::class);
+    $session = resolve(CheckInSession::class);
 
     $session->issueGatePass('location-uuid');
 
@@ -45,7 +45,7 @@ it('keeps the gate pass fresh right up to the ttl boundary', function (): void {
 });
 
 it('forgets the gate pass', function (): void {
-    $session = app(CheckInSession::class);
+    $session = resolve(CheckInSession::class);
 
     $session->issueGatePass('location-uuid');
     $session->forgetGatePass();

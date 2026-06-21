@@ -25,7 +25,10 @@ return new class extends Migration
             $table->boolean('is_checkins_enabled');
             $table->boolean('is_appointments_enabled');
             $table->json('config')->nullable();
+
             $table->timestampsTz();
+
+            $table->softDeletes();
         });
     }
 

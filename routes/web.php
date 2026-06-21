@@ -50,7 +50,12 @@ Route::middleware(['setLocale'])
             ->post('/appointment/{uuid}', [AppointmentController::class, 'gate'])
             ->name('appointment.gate');
 
-        Route::middleware(['appointmentLocation'])
-            ->get('/appointment/{uuid}/book', [AppointmentController::class, 'form'])
-            ->name('appointment.form');
+        Route::middleware(['appointmentLocation'])->group(function (): void {
+            Route::get('/appointment/{uuid}/book', [AppointmentController::class, 'form'])
+                ->name('appointment.form');
+
+            Route::post('/appointment/{uuid}/book', [AppointmentController::class, 'store'])
+                ->middleware('throttle:10,1')
+                ->name('appointment.store');
+        });
     });

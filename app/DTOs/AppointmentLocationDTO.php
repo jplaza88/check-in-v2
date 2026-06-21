@@ -6,6 +6,9 @@ namespace App\DTOs;
 
 final readonly class AppointmentLocationDTO
 {
+    /**
+     * @param  list<AppointmentAvailabilityWindowDTO>  $availability
+     */
     public function __construct(
         public string $id,
         public string $name,
@@ -16,5 +19,7 @@ final readonly class AppointmentLocationDTO
         public bool $hasOverride,
         public bool $isOverrideClosure,
         public ?bool $isClosingSoon,
+        public array $availability,
+        public int $slotIntervalMinutes,
     ) {}
 }

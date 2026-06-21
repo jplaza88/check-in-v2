@@ -54,7 +54,7 @@ final readonly class CheckInScheduleResolver
         $localNow = $now->setTimezone($location->timezone);
 
         $override = $location->checkinScheduleOverrides
-            ->first(fn ($o): bool => $o->date === $localNow->toDateString());
+            ->first(fn ($o): bool => $o->override_date->isSameDay($localNow));
 
         $schedule = $location->checkinSchedule
             ->first(fn ($s): bool => $s->day_of_week === $localNow->dayOfWeek());

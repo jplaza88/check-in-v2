@@ -11,11 +11,12 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property-read int $id
  * @property-read int $location_id
- * @property-read string $date
+ * @property-read Carbon $override_date
  * @property-read string|null $open_time
  * @property-read string|null $close_time
  * @property-read bool $is_closed
@@ -24,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read CarbonImmutable $updated_at
  * @property-read Location $location
  */
-#[Fillable(['location_id', 'date', 'open_time', 'close_time', 'is_closed', 'reason'])]
+#[Fillable(['location_id', 'override_date', 'open_time', 'close_time', 'is_closed', 'reason'])]
 #[Table(name: 'checkin_schedule_overrides')]
 final class CheckInScheduleOverride extends Model
 {
@@ -42,7 +43,7 @@ final class CheckInScheduleOverride extends Model
     protected function casts(): array
     {
         return [
-            'date' => 'string',
+            'override_date' => 'date',
             'open_time' => 'string',
             'close_time' => 'string',
             'is_closed' => 'boolean',

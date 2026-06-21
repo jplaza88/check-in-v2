@@ -13,14 +13,14 @@ return new class extends Migration
         Schema::create('checkin_schedule_overrides', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('location_id')->constrained('locations')->cascadeOnDelete();
-            $table->date('date');
+            $table->date('override_date');
             $table->time('open_time')->nullable();
             $table->time('close_time')->nullable();
             $table->boolean('is_closed');
             $table->string('reason');
             $table->timestampsTz();
 
-            $table->unique(['location_id', 'date']);
+            $table->unique(['location_id', 'override_date']);
         });
     }
 

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\Appointment\AppointmentAvailabilityResolver;
+use App\Appointment\AppointmentScheduleResolver;
+use App\DTOs\AppointmentLocationDTO;
 use App\Models\Location;
 use App\Queries\AppointmentLocation;
 use App\Session\AppointmentSession;
@@ -20,12 +22,35 @@ final class AppointmentFormRequest extends FormRequest
     }
 
     /**
-     * @return array<string, array<string>>
+     * @return array<string, array<int, mixed>>
      */
     public function rules(): array
     {
         return [
             'datetime' => ['required', 'date', 'date_format:Y-m-d H:i:s', 'after_or_equal:today'],
+            'po_numbers' => ['required', 'array', 'min:1'],
+            'po_numbers.*' => ['required', 'string', 'distinct:ignore_case', 'regex:/^[A-Z]{2,3}-\d+$/i'],
+            'drivers_name' => ['required', 'string', 'min:2', 'max:100'],
+            'drivers_cellphone' => ['required', 'string', 'regex:/^\(\d{3}\) \d{3}-\d{4}$/'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'po_numbers.required' => __('messages.purchaseOrders.minOne'),
+            'po_numbers.min' => __('messages.purchaseOrders.minOne'),
+            'po_numbers.*.required' => __('messages.purchaseOrders.required'),
+            'po_numbers.*.regex' => __('messages.purchaseOrders.format'),
+            'po_numbers.*.distinct' => __('messages.purchaseOrders.duplicate'),
+            'drivers_name.required' => __('messages.appointmentForm.driversNameRequired'),
+            'drivers_name.min' => __('messages.appointmentForm.driversNameMin'),
+            'drivers_name.max' => __('messages.appointmentForm.driversNameMax'),
+            'drivers_cellphone.required' => __('messages.appointmentForm.cellphoneRequired'),
+            'drivers_cellphone.regex' => __('messages.appointmentForm.cellphoneInvalid'),
         ];
     }
 
@@ -35,13 +60,16 @@ final class AppointmentFormRequest extends FormRequest
      *
      * @return array<int, callable>
      */
-    public function after(AppointmentAvailabilityResolver $resolver, AppointmentSession $session): array
-    {
+    public function after(
+        AppointmentAvailabilityResolver $availabilityResolver,
+        AppointmentScheduleResolver $scheduleResolver,
+        AppointmentSession $session,
+    ): array {
         return [
-            function (Validator $validator) use ($resolver, $session): void {
+            function (Validator $validator) use ($availabilityResolver, $scheduleResolver, $session): void {
                 $context = $session->getLocation();
 
-                $location = $context
+                $location = $context instanceof AppointmentLocationDTO
                     ? resolve(AppointmentLocation::class)->execute($context->id)
                     : null;
 
@@ -53,10 +81,18 @@ final class AppointmentFormRequest extends FormRequest
 
                 $appointmentDateTime = Date::parse($validator->validated()['datetime'], $location->timezone);
 
-                $availability = $resolver->isAvailableForAppointment($location, $appointmentDateTime);
+                $availability = $availabilityResolver->isAvailableForAppointment($location, $appointmentDateTime);
 
                 if (! $availability->allowed) {
                     $validator->errors()->add('datetime', $availability->reason ?? __('messages.appointmentSelectLocation.invalidLocation'));
+
+                    return;
+                }
+
+                if (! $scheduleResolver->isBookableSlot($location, $appointmentDateTime)) {
+                    $validator->errors()->add('datetime', __('messages.appointmentBooking.outsideBookingWindow', [
+                        'days' => $location->appointmentMaxBookingDaysAhead(),
+                    ]));
                 }
             },
         ];

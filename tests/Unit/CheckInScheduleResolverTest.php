@@ -17,7 +17,7 @@ it('resolves an open schedule for a location open all week', function (): void {
     $location = Location::factory()->create(['timezone' => 'UTC']);
     $location->load(['address', 'checkinSchedule', 'checkinScheduleOverrides']);
 
-    $schedule = app(CheckInScheduleResolver::class)->resolveSchedule($location, Date::now('UTC'));
+    $schedule = resolve(CheckInScheduleResolver::class)->resolveSchedule($location, Date::now('UTC'));
 
     expect($schedule->isOpen)->toBeTrue()
         ->and($schedule->hasOverride)->toBeFalse();
@@ -29,7 +29,7 @@ it('resolves open on a weekday within the pickup window', function (): void {
     $location = Location::factory()->checkinWeekdayWindow()->create(['timezone' => 'UTC']);
     $location->load(['address', 'checkinSchedule', 'checkinScheduleOverrides']);
 
-    $schedule = app(CheckInScheduleResolver::class)->resolveSchedule($location, Date::now('UTC'));
+    $schedule = resolve(CheckInScheduleResolver::class)->resolveSchedule($location, Date::now('UTC'));
 
     expect($schedule->isOpen)->toBeTrue();
 });
@@ -40,7 +40,7 @@ it('resolves closed on a weekend with no pickup window', function (): void {
     $location = Location::factory()->checkinWeekdayWindow()->create(['timezone' => 'UTC']);
     $location->load(['address', 'checkinSchedule', 'checkinScheduleOverrides']);
 
-    $schedule = app(CheckInScheduleResolver::class)->resolveSchedule($location, Date::now('UTC'));
+    $schedule = resolve(CheckInScheduleResolver::class)->resolveSchedule($location, Date::now('UTC'));
 
     expect($schedule->isOpen)->toBeFalse()
         ->and($schedule->openTime)->toBeNull()
@@ -58,7 +58,7 @@ it('prefers an override closure over the regular schedule', function (): void {
         ->create(['reason' => 'Holiday']);
     $location->load(['address', 'checkinSchedule', 'checkinScheduleOverrides']);
 
-    $schedule = app(CheckInScheduleResolver::class)->resolveSchedule($location, Date::now('UTC'));
+    $schedule = resolve(CheckInScheduleResolver::class)->resolveSchedule($location, Date::now('UTC'));
 
     expect($schedule->isOpen)->toBeFalse()
         ->and($schedule->hasOverride)->toBeTrue()

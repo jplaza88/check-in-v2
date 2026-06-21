@@ -6,7 +6,6 @@ namespace App\Schedule;
 
 use App\DTOs\LocationScheduleDTO;
 use Carbon\CarbonInterface;
-use Illuminate\Support\Facades\Date;
 
 final readonly class LocationScheduleParser
 {
@@ -15,8 +14,8 @@ final readonly class LocationScheduleParser
      */
     public function resolveFromOverride(array $override, string $timezone, CarbonInterface $at): LocationScheduleDTO
     {
-        $openTime = $override['open_time'] ? Date::parse($override['open_time'], $timezone) : null;
-        $closeTime = $override['close_time'] ? Date::parse($override['close_time'], $timezone) : null;
+        $openTime = $override['open_time'] ? $at->copy()->setTimeFromTimeString($override['open_time']) : null;
+        $closeTime = $override['close_time'] ? $at->copy()->setTimeFromTimeString($override['close_time']) : null;
 
         if ($override['is_closed']) {
             return new LocationScheduleDTO(
@@ -44,8 +43,8 @@ final readonly class LocationScheduleParser
      */
     public function resolveFromSchedule(?array $schedule, string $timezone, CarbonInterface $at): LocationScheduleDTO
     {
-        $openTime = $schedule && $schedule['open_time'] ? Date::parse($schedule['open_time'], $timezone) : null;
-        $closeTime = $schedule && $schedule['close_time'] ? Date::parse($schedule['close_time'], $timezone) : null;
+        $openTime = $schedule && $schedule['open_time'] ? $at->copy()->setTimeFromTimeString($schedule['open_time']) : null;
+        $closeTime = $schedule && $schedule['close_time'] ? $at->copy()->setTimeFromTimeString($schedule['close_time']) : null;
 
         return new LocationScheduleDTO(
             isOpen: $openTime && $closeTime && $at->between($openTime, $closeTime),

@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property-read int $id
@@ -31,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read array<string, string>|null $config
  * @property-read CarbonImmutable $created_at
  * @property-read CarbonImmutable $updated_at
+ * @property-read CarbonImmutable|null $deleted_at
  * @property-read Address $address
  * @property-read Collection<int, CheckInSchedule> $checkinSchedule
  * @property-read Collection<int, CheckInScheduleOverride> $checkinScheduleOverrides
@@ -43,6 +46,8 @@ final class Location extends Model
 {
     /** @use HasFactory<LocationFactory> */
     use HasFactory;
+
+    use SoftDeletes;
 
     /**
      * @return BelongsTo<Address, $this>
@@ -84,9 +89,49 @@ final class Location extends Model
         return $this->hasMany(AppointmentScheduleOverride::class);
     }
 
+    /**
+     * @return MorphMany<PurchaseOrder, $this>
+     */
+    public function purchaseOrders(): MorphMany
+    {
+        return $this->morphMany(PurchaseOrder::class, 'purchasable');
+    }
+
     public function getRouteKeyName(): string
     {
         return 'uuid';
+    }
+
+    public function appointmentMaxBookingDaysAhead(): int
+    {
+        $cap = (int) config('app.appointment_booking.max_days_ahead');
+
+        return max(1, min((int) data_get($this->config, 'appointment.max_booking_days_ahead', $cap), $cap));
+    }
+
+    public function appointmentSlotIntervalMinutes(): int
+    {
+        $default = (int) config('app.appointment_booking.slot_interval_minutes.default');
+        $allowed = config('app.appointment_booking.slot_interval_minutes.allowed');
+        $value = (int) data_get($this->config, 'appointment.slot_interval_minutes', $default);
+
+        return in_array($value, $allowed, true) ? $value : $default;
+    }
+
+    public function appointmentMinLeadTimeMinutes(): int
+    {
+        $default = (int) config('app.appointment_booking.lead_time_minutes.default');
+        $max = (int) config('app.appointment_booking.lead_time_minutes.max');
+
+        return max(0, min((int) data_get($this->config, 'appointment.min_lead_time_minutes', $default), $max));
+    }
+
+    public function appointmentBufferBeforeCloseMinutes(): int
+    {
+        $default = (int) config('app.appointment_booking.buffer_before_close_minutes.default');
+        $max = (int) config('app.appointment_booking.buffer_before_close_minutes.max');
+
+        return max(0, min((int) data_get($this->config, 'appointment.buffer_before_close_minutes', $default), $max));
     }
 
     protected function casts(): array
