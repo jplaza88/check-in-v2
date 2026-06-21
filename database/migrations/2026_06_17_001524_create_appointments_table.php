@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestampTz('scheduled_for');
             $table->string('drivers_name');
             $table->string('drivers_cellphone');
+            $table->string('locale', 2)->default('en');
             $table->string('status')->default('scheduled');
             $table->timestampTz('cancelled_at')->nullable();
             $table->text('cancelled_reason')->nullable();

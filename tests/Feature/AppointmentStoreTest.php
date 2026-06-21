@@ -1,0 +1,116 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\Appointment;
+use App\Models\Location;
+use App\Models\PurchaseOrder;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
+
+use function Pest\Laravel\post;
+
+function passGate(Location $location): void
+{
+    post(route('appointment.gate', $location->uuid), ['uuid' => $location->uuid]);
+}
+
+function validPayload(array $overrides = []): array
+{
+    return array_merge([
+        'datetime' => now()->addHour()->startOfHour()->format('Y-m-d H:i:s'),
+        'po_numbers' => ['SO-00001'],
+        'drivers_name' => 'John Doe',
+        'drivers_cellphone' => '(555) 123-4567',
+    ], $overrides);
+}
+
+beforeEach(function (): void {
+    Date::setTestNow(Date::today('UTC')->setTime(8, 0));
+});
+
+it('creates an appointment with a single PO number', function (): void {
+    $location = Location::factory()->appointmentsOnly()->create();
+    passGate($location);
+
+    post(route('appointment.store', $location->uuid), validPayload())
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
+
+    expect(Appointment::query()->count())->toBe(1)
+        ->and(PurchaseOrder::query()->count())->toBe(1)
+        ->and(PurchaseOrder::query()->first()->number)->toBe('SO-00001');
+});
+
+it('creates an appointment with multiple PO numbers', function (): void {
+    $location = Location::factory()->appointmentsOnly()->create();
+    passGate($location);
+
+    post(route('appointment.store', $location->uuid), validPayload([
+        'po_numbers' => ['SO-00001', 'SO-00002', 'SO-00003'],
+    ]))
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
+
+    $appointment = Appointment::with('purchaseOrders')->first();
+
+    expect($appointment->purchaseOrders)->toHaveCount(3)
+        ->and($appointment->purchaseOrders->pluck('number')->sort()->values()->all())
+        ->toBe(['SO-00001', 'SO-00002', 'SO-00003']);
+});
+
+it('rejects an empty po_numbers array', function (): void {
+    $location = Location::factory()->appointmentsOnly()->create();
+    passGate($location);
+
+    post(route('appointment.store', $location->uuid), validPayload([
+        'po_numbers' => [],
+    ]))->assertSessionHasErrors('po_numbers');
+});
+
+it('accepts various valid PO prefixes', function (): void {
+    $location = Location::factory()->appointmentsOnly()->create();
+    passGate($location);
+
+    post(route('appointment.store', $location->uuid), validPayload([
+        'po_numbers' => ['PO-001', 'SO-002', 'PU-003'],
+    ]))
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
+
+    expect(Appointment::query()->first()->purchaseOrders)->toHaveCount(3);
+});
+
+it('rejects an invalid PO format', function (): void {
+    $location = Location::factory()->appointmentsOnly()->create();
+    passGate($location);
+
+    post(route('appointment.store', $location->uuid), validPayload([
+        'po_numbers' => ['INVALID'],
+    ]))->assertSessionHasErrors('po_numbers.0');
+});
+
+it('rejects duplicate PO numbers in the same request', function (): void {
+    $location = Location::factory()->appointmentsOnly()->create();
+    passGate($location);
+
+    post(route('appointment.store', $location->uuid), validPayload([
+        'po_numbers' => ['SO-00001', 'SO-00001'],
+    ]))->assertSessionHasErrors('po_numbers.1');
+});
+
+it('redirects when location does not exist', function (): void {
+    post(route('appointment.store', Str::uuid()->toString()), validPayload())
+        ->assertRedirect(route('appointment.selectLocation'));
+});
+
+it('persists the locale on appointment creation', function (): void {
+    $location = Location::factory()->appointmentsOnly()->create();
+    passGate($location);
+
+    post(route('appointment.store', $location->uuid), validPayload())
+        ->assertSessionHasNoErrors()
+        ->assertRedirect();
+
+    expect(Appointment::query()->first()->locale)->toBe('en');
+});
