@@ -507,8 +507,8 @@ return `(${area}`;
                                                 <FieldLabel htmlFor="cellphone">
                                                     Cellphone Number
                                                 </FieldLabel>
-                                                <div className="flex rounded-md shadow-xs">
-                                                    <span className="inline-flex items-center rounded-l-md border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground dark:bg-input/30">
+                                                <div className="flex rounded-4xl shadow-xs">
+                                                    <span className="inline-flex items-center rounded-l-4xl border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground dark:bg-input/30">
                                                         +1
                                                     </span>
                                                     <Input

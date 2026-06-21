@@ -82,8 +82,8 @@ final readonly class AppointmentScheduleResolver
                 continue;
             }
 
-            $first = Date::parse("{$window->date} {$window->firstSlot}", $location->timezone);
-            $last = Date::parse("{$window->date} {$window->lastSlot}", $location->timezone);
+            $first = Date::parse(sprintf('%s %s', $window->date, $window->firstSlot), $location->timezone);
+            $last = Date::parse(sprintf('%s %s', $window->date, $window->lastSlot), $location->timezone);
 
             if (! $localCandidate->betweenIncluded($first, $last)) {
                 return false;
@@ -104,7 +104,7 @@ final readonly class AppointmentScheduleResolver
         $localNow = $at->setTimezone($location->timezone);
 
         $override = $location->appointmentScheduleOverrides
-            ->first(fn ($o): bool => $o->date === $localNow->toDateString());
+            ->first(fn ($o): bool => $o->override_date->isSameDay($localNow));
 
         $schedule = $location->appointmentSchedule
             ->first(fn ($s): bool => $s->day_of_week === $localNow->dayOfWeek());
@@ -132,8 +132,15 @@ final readonly class AppointmentScheduleResolver
         for ($offset = 0; $offset <= $maxDaysAhead; $offset++) {
             $day = $localNow->copy()->addDays($offset)->startOfDay();
             $schedule = $this->resolveSchedule($location, $day);
+            if (! $schedule->openTime instanceof CarbonInterface) {
+                continue;
+            }
 
-            if (! $schedule->openTime || ! $schedule->closeTime || $schedule->isOverrideClosure) {
+            if (! $schedule->closeTime instanceof CarbonInterface) {
+                continue;
+            }
+
+            if ($schedule->isOverrideClosure) {
                 continue;
             }
 

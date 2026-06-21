@@ -6,6 +6,7 @@ namespace App\Http\Requests;
 
 use App\Appointment\AppointmentAvailabilityResolver;
 use App\Appointment\AppointmentScheduleResolver;
+use App\DTOs\AppointmentLocationDTO;
 use App\Models\Location;
 use App\Queries\AppointmentLocation;
 use App\Session\AppointmentSession;
@@ -45,7 +46,7 @@ final class AppointmentFormRequest extends FormRequest
             function (Validator $validator) use ($availabilityResolver, $scheduleResolver, $session): void {
                 $context = $session->getLocation();
 
-                $location = $context
+                $location = $context instanceof AppointmentLocationDTO
                     ? resolve(AppointmentLocation::class)->execute($context->id)
                     : null;
 
