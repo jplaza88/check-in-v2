@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property-read int $id
@@ -31,6 +33,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read array<string, string>|null $config
  * @property-read CarbonImmutable $created_at
  * @property-read CarbonImmutable $updated_at
+ * @property-read CarbonImmutable|null $deleted_at
  * @property-read Address $address
  * @property-read Collection<int, CheckInSchedule> $checkinSchedule
  * @property-read Collection<int, CheckInScheduleOverride> $checkinScheduleOverrides
@@ -43,6 +46,8 @@ final class Location extends Model
 {
     /** @use HasFactory<LocationFactory> */
     use HasFactory;
+
+    use SoftDeletes;
 
     /**
      * @return BelongsTo<Address, $this>
@@ -82,6 +87,14 @@ final class Location extends Model
     public function appointmentScheduleOverrides(): HasMany
     {
         return $this->hasMany(AppointmentScheduleOverride::class);
+    }
+
+    /**
+     * @return MorphMany<PurchaseOrder, $this>
+     */
+    public function purchaseOrders(): MorphMany
+    {
+        return $this->morphMany(PurchaseOrder::class, 'purchasable');
     }
 
     public function getRouteKeyName(): string
