@@ -42,7 +42,8 @@ final class AppServiceProvider extends ServiceProvider
 
         $this->defaultTimezone();
 
-        $this->prohibitDestructiveCommands();
+        // TODO: Enable once in prod
+        //$this->prohibitDestructiveCommands();
 
         $this->setPasswordDefault();
 
