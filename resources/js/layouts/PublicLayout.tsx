@@ -32,7 +32,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
         <main className="bg-white dark:bg-gray-900">
             <div className="relative flex">
                 {/* Left-side content */}
-                <div className="w-full md:w-[60%]">
+                <div className="w-full lg:w-[60%]">
                     <div className="flex h-full min-h-dvh flex-col">
                         <div className="shrink-0">
                             <Navbar />
@@ -53,7 +53,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                 {/* Right-side background image */}
                 <div
                     aria-hidden
-                    className="pointer-events-none absolute inset-y-0 right-0 hidden w-[40%] bg-side-image bg-cover bg-center bg-no-repeat md:block"
+                    className="pointer-events-none absolute inset-y-0 right-0 hidden w-[40%] bg-side-image bg-cover bg-center bg-no-repeat lg:block"
                 />
 
                 {/* Info Modal */}
