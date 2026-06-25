@@ -60,10 +60,10 @@ final readonly class CheckInScheduleResolver
             ->first(fn ($s): bool => $s->day_of_week === $localNow->dayOfWeek());
 
         if ($override) {
-            return $this->locationScheduleParser->resolveFromOverride($override->toArray(), $location->timezone, $localNow);
+            return $this->locationScheduleParser->resolveFromOverride($override->toArray(), $localNow);
         }
 
-        return $this->locationScheduleParser->resolveFromSchedule($schedule?->toArray(), $location->timezone, $localNow);
+        return $this->locationScheduleParser->resolveFromSchedule($schedule?->toArray(), $localNow);
     }
 
     private function formatOpenCloseTime(LocationScheduleDTO $schedule): string

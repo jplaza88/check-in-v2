@@ -16,7 +16,6 @@ it('returns open when the time falls within the day schedule', function (): void
 
     $result = $parser->resolveFromSchedule(
         ['open_time' => '09:00:00', 'close_time' => '17:00:00'],
-        'UTC',
         Date::now('UTC'),
     );
 
@@ -35,7 +34,6 @@ it('returns closed when the time is outside the day schedule', function (): void
 
     $result = $parser->resolveFromSchedule(
         ['open_time' => '09:00:00', 'close_time' => '17:00:00'],
-        'UTC',
         Date::now('UTC'),
     );
 
@@ -47,7 +45,7 @@ it('returns closed with null times when no schedule exists for the day', functio
 
     $parser = new LocationScheduleParser;
 
-    $result = $parser->resolveFromSchedule(null, 'UTC', Date::now('UTC'));
+    $result = $parser->resolveFromSchedule(null, Date::now('UTC'));
 
     expect($result->isOpen)->toBeFalse()
         ->and($result->openTime)->toBeNull()
@@ -62,7 +60,6 @@ it('evaluates the schedule against the location timezone', function (): void {
 
     $result = $parser->resolveFromSchedule(
         ['open_time' => '09:00:00', 'close_time' => '17:00:00'],
-        'America/New_York',
         Date::now('America/New_York'),
     );
 
@@ -81,7 +78,6 @@ it('marks an override closure as closed with its reason', function (): void {
             'is_closed' => true,
             'reason' => 'Holiday',
         ],
-        'UTC',
         Date::now('UTC'),
     );
 
@@ -103,7 +99,6 @@ it('returns open for an override with modified hours within range', function ():
             'is_closed' => false,
             'reason' => 'Half day',
         ],
-        'UTC',
         Date::now('UTC'),
     );
 
@@ -125,7 +120,6 @@ it('returns closed for an override with modified hours outside range', function 
             'is_closed' => false,
             'reason' => 'Half day',
         ],
-        'UTC',
         Date::now('UTC'),
     );
 

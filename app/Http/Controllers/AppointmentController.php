@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Actions\StoreAppointmentAction;
+use App\Actions\BookAppointmentAction;
 use App\Appointment\AppointmentScheduleResolver;
 use App\DTOs\AppointmentLocationDTO;
 use App\Http\Requests\AppointmentFormRequest;
@@ -41,7 +41,7 @@ final class AppointmentController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(AppointmentFormRequest $request, StoreAppointmentAction $action): RedirectResponse
+    public function store(AppointmentFormRequest $request, BookAppointmentAction $action): RedirectResponse
     {
         $locationDTO = $this->session->getLocation();
         if (! $locationDTO instanceof AppointmentLocationDTO) {

@@ -12,7 +12,7 @@ final readonly class LocationScheduleParser
     /**
      * @param  array<string, mixed>  $override
      */
-    public function resolveFromOverride(array $override, string $timezone, CarbonInterface $at): LocationScheduleDTO
+    public function resolveFromOverride(array $override, CarbonInterface $at): LocationScheduleDTO
     {
         $openTime = $override['open_time'] ? $at->copy()->setTimeFromTimeString($override['open_time']) : null;
         $closeTime = $override['close_time'] ? $at->copy()->setTimeFromTimeString($override['close_time']) : null;
@@ -41,7 +41,7 @@ final readonly class LocationScheduleParser
     /**
      * @param  ?array<string, mixed>  $schedule
      */
-    public function resolveFromSchedule(?array $schedule, string $timezone, CarbonInterface $at): LocationScheduleDTO
+    public function resolveFromSchedule(?array $schedule, CarbonInterface $at): LocationScheduleDTO
     {
         $openTime = $schedule && $schedule['open_time'] ? $at->copy()->setTimeFromTimeString($schedule['open_time']) : null;
         $closeTime = $schedule && $schedule['close_time'] ? $at->copy()->setTimeFromTimeString($schedule['close_time']) : null;

@@ -9,7 +9,6 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -43,7 +42,7 @@ final class AppServiceProvider extends ServiceProvider
         $this->defaultTimezone();
 
         // TODO: Enable once in prod
-        //$this->prohibitDestructiveCommands();
+        // $this->prohibitDestructiveCommands();
 
         $this->setPasswordDefault();
 
@@ -63,13 +62,6 @@ final class AppServiceProvider extends ServiceProvider
     private function immutableDates(): void
     {
         Date::use(CarbonImmutable::class);
-    }
-
-    private function prohibitDestructiveCommands(): void
-    {
-        DB::prohibitDestructiveCommands(
-            app()->isProduction(),
-        );
     }
 
     private function setPasswordDefault(): void

@@ -342,7 +342,7 @@ export default function ScheduleAppointment({ location }: PageProps) {
                 drivers_name: z
                     .string()
                     .min(2, t.driversNameMin)
-                    .max(100, t.driversNameMax),
+                    .max(28, t.driversNameMax),
                 drivers_cellphone: z
                     .string()
                     .regex(/^\(\d{3}\) \d{3}-\d{4}$/, t.cellphoneInvalid),
@@ -670,6 +670,7 @@ export default function ScheduleAppointment({ location }: PageProps) {
                                                         <Input
                                                             {...field}
                                                             id="drivers_name"
+                                                            maxLength={28}
                                                             aria-invalid={
                                                                 fieldState.invalid
                                                             }
