@@ -90,11 +90,12 @@ return [
 
     'purchaseOrders' => [
         'label' => 'PO Number(s)',
-        'placeholder' => 'e.g. PO-00123 or SO-00456',
+        'placeholder' => 'SO-, PO-, or PU- followed by 4-10 digits',
         'required' => 'PO Number is required.',
-        'format' => 'Must start with a 2-3 letter prefix, a dash, then digits (e.g. PO-00123).',
+        'format' => 'Must start with SO, PO, or PU, followed by 4-10 digits (e.g. PO-12345).',
         'duplicate' => 'Duplicate PO numbers are not allowed.',
         'minOne' => 'At least one PO Number is required.',
+        'maxReached' => 'You can add up to 10 PO numbers per appointment.',
         'addMore' => 'Add more',
         'removeAriaLabel' => 'Remove PO number :number',
     ],

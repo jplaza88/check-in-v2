@@ -28,10 +28,10 @@ final class AppointmentFormRequest extends FormRequest
     {
         return [
             'datetime' => ['required', 'date', 'date_format:Y-m-d H:i:s', 'after_or_equal:today'],
-            'po_numbers' => ['required', 'array', 'min:1'],
-            'po_numbers.*' => ['required', 'string', 'distinct:ignore_case', 'regex:/^[A-Z]{2,3}-\d+$/i'],
-            'drivers_name' => ['required', 'string', 'min:2', 'max:100'],
-            'drivers_cellphone' => ['required', 'string', 'regex:/^\(\d{3}\) \d{3}-\d{4}$/'],
+            'po_numbers' => ['required', 'array', 'min:1', 'max:10'],
+            'po_numbers.*' => ['required', 'string', 'distinct:ignore_case', 'min:7', 'max:13', 'regex:/^(SO|PO|PU)-\d{4,10}$/i'],
+            'drivers_name' => ['required', 'string', 'min:2', 'max:28'],
+            'drivers_cellphone' => ['required', 'string', 'min:14', 'max:14', 'regex:/^\(\d{3}\) \d{3}-\d{4}$/'],
         ];
     }
 

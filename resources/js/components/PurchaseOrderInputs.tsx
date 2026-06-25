@@ -1,11 +1,5 @@
 import { PlusIcon, Trash2Icon } from 'lucide-react';
-import {
-
-    Controller
-
-
-
-} from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import type {Control, FieldArrayWithId, UseFieldArrayAppend, UseFieldArrayRemove} from 'react-hook-form';
 import { z } from 'zod';
 
@@ -19,6 +13,7 @@ export interface PurchaseOrderTranslations {
     required: string;
     format: string;
     minOne: string;
+    maxReached: string;
     addMore: string;
     removeAriaLabel: string;
 }
@@ -36,6 +31,7 @@ export function poNumberSchema(t: {
     required: string;
     format: string;
     minOne: string;
+    maxReached: string;
 }) {
     return z
         .array(
@@ -43,10 +39,36 @@ export function poNumberSchema(t: {
                 value: z
                     .string()
                     .min(1, t.required)
-                    .regex(/^[A-Z]{2,3}-\d+$/i, t.format),
+                    .regex(/^(SO|PO|PU)-\d{4,10}$/i, t.format),
             }),
         )
-        .min(1, t.minOne);
+        .min(1, t.minOne)
+        .max(10, t.maxReached);
+}
+
+function formatPoNumber(raw: string): string {
+    const upper = raw.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+
+    let result = '';
+
+    for (const char of upper) {
+        if (result.length === 0) {
+            if (char === 'S' || char === 'P') {
+                result += char;
+            }
+        } else if (result.length === 1) {
+            if (
+                (result === 'S' && char === 'O') ||
+                (result === 'P' && (char === 'O' || char === 'U'))
+            ) {
+                result += char + '-';
+            }
+        } else if (result.length >= 3 && result.length < 13 && /\d/.test(char)) {
+            result += char;
+        }
+    }
+
+    return result;
 }
 
 export default function PurchaseOrderInputs({
@@ -71,6 +93,13 @@ export default function PurchaseOrderInputs({
                                 <div className="flex items-center gap-2">
                                     <Input
                                         {...inputField}
+                                        onChange={(e) =>
+                                            inputField.onChange(
+                                                formatPoNumber(
+                                                    e.target.value,
+                                                ),
+                                            )
+                                        }
                                         id={`${name}_${index}`}
                                         aria-invalid={fieldState.invalid}
                                         placeholder={translations.placeholder}
@@ -85,6 +114,7 @@ export default function PurchaseOrderInputs({
                                                 ':number',
                                                 String(index + 1),
                                             )}
+                                            className="cursor-pointer"
                                         >
                                             <Trash2Icon className="size-4 text-muted-foreground" />
                                         </Button>
@@ -100,16 +130,18 @@ export default function PurchaseOrderInputs({
                     />
                 ))}
             </div>
-            <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="mt-1.5 gap-1 text-xs text-muted-foreground"
-                onClick={() => append({ value: '' })}
-            >
-                <PlusIcon className="size-3.5" />
-                {translations.addMore}
-            </Button>
+            {fields.length < 10 && (
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="mt-1.5 gap-1 text-xs text-muted-foreground cursor-pointer dark:hover:bg-input/30"
+                    onClick={() => append({ value: '' })}
+                >
+                    <PlusIcon className="size-3.5" />
+                    {translations.addMore}
+                </Button>
+            )}
         </Field>
     );
 }

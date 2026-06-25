@@ -73,7 +73,7 @@ it('accepts various valid PO prefixes', function (): void {
     passGate($location);
 
     post(route('appointment.store', $location->uuid), validPayload([
-        'po_numbers' => ['PO-001', 'SO-002', 'PU-003'],
+        'po_numbers' => ['PO-00100', 'SO-00200', 'PU-00300'],
     ]))
         ->assertSessionHasNoErrors()
         ->assertRedirect();

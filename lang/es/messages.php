@@ -81,11 +81,12 @@ return [
 
     'purchaseOrders' => [
         'label' => 'Número(s) de orden de compra',
-        'placeholder' => 'ej. PO-00123 o SO-00456',
+        'placeholder' => 'SO-, PO- o PU- seguido de 4-10 dígitos',
         'required' => 'El número de orden de compra es obligatorio.',
-        'format' => 'Debe comenzar con un prefijo de 2-3 letras, un guion y luego dígitos (ej. PO-00123).',
+        'format' => 'Debe comenzar con SO, PO o PU, seguido de 4-10 dígitos (ej. PO-12345).',
         'duplicate' => 'No se permiten números de orden de compra duplicados.',
         'minOne' => 'Se requiere al menos un número de orden de compra.',
+        'maxReached' => 'Puede agregar hasta 10 números de orden de compra por cita.',
         'addMore' => 'Agregar más',
         'removeAriaLabel' => 'Eliminar orden de compra :number',
     ],

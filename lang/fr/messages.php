@@ -81,11 +81,12 @@ return [
 
     'purchaseOrders' => [
         'label' => 'Numéro(s) de bon de commande',
-        'placeholder' => 'ex. PO-00123 ou SO-00456',
+        'placeholder' => 'SO-, PO- ou PU- suivi de 4-10 chiffres',
         'required' => 'Le numéro de bon de commande est obligatoire.',
-        'format' => 'Doit commencer par un préfixe de 2-3 lettres, un tiret, puis des chiffres (ex. PO-00123).',
+        'format' => 'Doit commencer par SO, PO ou PU, suivi de 4-10 chiffres (ex. PO-12345).',
         'duplicate' => 'Les numéros de bon de commande en double ne sont pas autorisés.',
         'minOne' => 'Au moins un numéro de bon de commande est requis.',
+        'maxReached' => 'Vous pouvez ajouter jusqu\'à 10 numéros de bon de commande par rendez-vous.',
         'addMore' => 'Ajouter',
         'removeAriaLabel' => 'Supprimer le bon de commande :number',
     ],
