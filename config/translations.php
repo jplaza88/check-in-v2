@@ -6,4 +6,5 @@ return [
     'checkIn.selectLocation' => ['publicNavigation', 'checkInSelectLocation', 'locationRequiredModal'],
     'appointment.selectLocation' => ['publicNavigation', 'appointmentSelectLocation'],
     'appointment.form' => ['publicNavigation', 'appointmentForm', 'purchaseOrders'],
+    'appointment.confirmed' => ['publicNavigation', 'appointmentConfirmation'],
 ];

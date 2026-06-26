@@ -13,6 +13,7 @@ return new class extends Migration
         Schema::create('appointments', function (Blueprint $table): void {
             $table->id();
             $table->uuid()->unique();
+            $table->string('reference_number', 8)->unique();
             $table->foreignId('location_id')->constrained('locations')->restrictOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->timestampTz('scheduled_for');

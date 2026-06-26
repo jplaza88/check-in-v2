@@ -35,7 +35,7 @@ it('creates an appointment with a single PO number', function (): void {
 
     post(route('appointment.store', $location->uuid), validPayload())
         ->assertSessionHasNoErrors()
-        ->assertRedirect();
+        ->assertRedirectToRoute('appointment.confirmed', Appointment::query()->first()->uuid);
 
     expect(Appointment::query()->count())->toBe(1)
         ->and(PurchaseOrder::query()->count())->toBe(1)

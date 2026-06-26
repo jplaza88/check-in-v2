@@ -15,6 +15,7 @@ use http\Exception\RuntimeException;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
+use Random\RandomException;
 use Throwable;
 
 final readonly class CreateAppointmentAction
@@ -23,7 +24,6 @@ final readonly class CreateAppointmentAction
 
     /**
      * @param  array<string, mixed>  $validated
-     *
      * @throws Throwable
      */
     public function handle(
@@ -37,6 +37,7 @@ final readonly class CreateAppointmentAction
 
         return Appointment::query()->create([
             'uuid' => Str::uuid()->toString(),
+            'reference_number' => $this->generateReferenceNumber(),
             'location_id' => $location->id,
             'user_id' => $user?->id,
             'scheduled_for' => Date::parse($validated['datetime'], $location->timezone),
@@ -45,5 +46,22 @@ final readonly class CreateAppointmentAction
             'locale' => $this->localeManager->getLocale(request()),
             'status' => AppointmentStatus::Scheduled,
         ]);
+    }
+
+    /**
+     * @throws RandomException
+     */
+    private function generateReferenceNumber(): string
+    {
+        // Excludes ambiguous characters (0/O, 1/I/L) to make references easy to read and type.
+        $chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
+        do {
+            $reference = range(1, 8)
+                    |> (fn($x) => array_map(fn(): string => $chars[random_int(0, mb_strlen($chars) - 1)], $x,))
+                    |> (fn($x) => implode('', $x));
+        } while (Appointment::query()->where('reference_number', $reference)->exists());
+
+        return $reference;
     }
 }

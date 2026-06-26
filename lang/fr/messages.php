@@ -91,6 +91,26 @@ return [
         'removeAriaLabel' => 'Supprimer le bon de commande :number',
     ],
 
+    'appointmentConfirmation' => [
+        'pageTitle' => 'Rendez-vous confirmé',
+        'newAppointment' => 'Nouveau rendez-vous',
+        'confirmed' => 'Votre rendez-vous est confirmé !',
+        'subheading' => 'Nous avons hâte de vous voir.',
+        'reference' => 'Référence',
+        'bookingSummary' => 'Récapitulatif de la réservation',
+        'locationLabel' => 'Lieu',
+        'dateLabel' => 'Date',
+        'timeLabel' => 'Heure',
+        'poLabel' => 'Numéro(s) de bon de commande',
+        'driverLabel' => 'Conducteur',
+        'arrivalReminder' => "Veuillez arriver 5 à 10 minutes avant l'heure de votre rendez-vous.",
+        'needHelp' => 'Besoin d\'aide ?',
+        'registerHeading' => 'Accélérez votre prochain enregistrement',
+        'registerBody' => 'Créez un compte gratuit pour enregistrer vos informations et vous enregistrer plus rapidement la prochaine fois.',
+        'createAccount' => 'Créer un compte',
+        'signIn' => 'Se connecter',
+    ],
+
     'appointmentForm' => [
         'pageTitle' => 'Prendre un rendez-vous',
         'newAppointment' => 'Nouveau rendez-vous',

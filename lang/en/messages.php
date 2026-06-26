@@ -100,6 +100,26 @@ return [
         'removeAriaLabel' => 'Remove PO number :number',
     ],
 
+    'appointmentConfirmation' => [
+        'pageTitle' => 'Appointment Confirmed',
+        'newAppointment' => 'New Appointment',
+        'confirmed' => 'Your appointment is confirmed!',
+        'subheading' => 'We look forward to seeing you.',
+        'reference' => 'Reference',
+        'bookingSummary' => 'Booking Summary',
+        'locationLabel' => 'Location',
+        'dateLabel' => 'Date',
+        'timeLabel' => 'Time',
+        'poLabel' => 'PO Number(s)',
+        'driverLabel' => 'Driver',
+        'arrivalReminder' => 'Please arrive 5–10 minutes before your scheduled appointment time.',
+        'needHelp' => 'Need help?',
+        'registerHeading' => 'Speed up your next check-in',
+        'registerBody' => 'Create a free account to save your information and check in faster next time.',
+        'createAccount' => 'Create Account',
+        'signIn' => 'Sign In',
+    ],
+
     'appointmentForm' => [
         'pageTitle' => 'Book an Appointment',
         'newAppointment' => 'New Appointment',
