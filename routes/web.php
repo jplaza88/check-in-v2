@@ -50,6 +50,10 @@ Route::middleware(['setLocale'])
             ->post('/appointment/{uuid}', [AppointmentController::class, 'gate'])
             ->name('appointment.gate');
 
+        Route::get('/appointment/{uuid}/confirmed', [AppointmentController::class, 'confirmed'])
+            ->whereUuid('uuid')
+            ->name('appointment.confirmed');
+
         Route::middleware(['appointmentLocation'])->group(function (): void {
             Route::get('/appointment/{uuid}/book', [AppointmentController::class, 'form'])
                 ->name('appointment.form');

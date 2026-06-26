@@ -16,8 +16,14 @@ final class AppointmentFactory extends Factory
 
     public function definition(): array
     {
+        $chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
         return [
             'uuid' => $this->faker->uuid(),
+            'reference_number' => implode('', array_map(
+                fn (): string => $chars[random_int(0, mb_strlen($chars) - 1)],
+                range(1, 8),
+            )),
             'scheduled_for' => Date::now(),
             'drivers_name' => $this->faker->name(),
             'drivers_cellphone' => $this->faker->word(),

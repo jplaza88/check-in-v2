@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\BookAppointmentAction;
+use App\Address\AddressManager;
 use App\Appointment\AppointmentScheduleResolver;
 use App\DTOs\AppointmentLocationDTO;
+use App\Enums\AppointmentStatus;
 use App\Http\Requests\AppointmentFormRequest;
 use App\Http\Requests\AppointmentLocationSelectRequest;
+use App\Models\Appointment;
 use App\Models\Location;
 use App\Session\AppointmentSession;
 use Illuminate\Http\RedirectResponse;
@@ -52,7 +55,33 @@ final class AppointmentController extends Controller
 
         $this->session->forgetLocation();
 
-        // TODO: redirect to confirmation page once it exists
-        return to_route('appointment.form', $appointment->uuid);
+        return to_route('appointment.confirmed', $appointment->uuid);
+    }
+
+    public function confirmed(string $uuid, AddressManager $address): Response
+    {
+        $appointment = Appointment::with(['location.address', 'purchaseOrders'])
+            ->where('uuid', $uuid)
+            ->where('status', AppointmentStatus::Scheduled)
+            ->firstOrFail();
+
+        $scheduledFor = $appointment->scheduled_for->setTimezone($appointment->location->timezone);
+
+        return inertia('AppointmentConfirmation', [
+            'appointment' => [
+                'uuid' => $appointment->uuid,
+                'referenceNumber' => $appointment->reference_number,
+                'scheduledDate' => $scheduledFor->format('F j, Y'),
+                'scheduledTime' => $scheduledFor->format('g:i A'),
+                'driversName' => $appointment->drivers_name,
+                'locationName' => $appointment->location->name,
+                'locationAddress' => $address->buildAddress($appointment->location->address->toArray()),
+                'purchaseOrders' => $appointment->purchaseOrders->pluck('number')->all(),
+            ],
+            'contact' => [
+                'phone' => '(555) 555-5555',
+                'email' => 'martori@email.com',
+            ],
+        ]);
     }
 }

@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * @property-read int $id
  * @property-read string $uuid
+ * @property-read string $reference_number
  * @property-read int $location_id
  * @property-read int|null $user_id
  * @property-read CarbonImmutable $scheduled_for
@@ -35,7 +36,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read Location $location
  * @property-read User|null $user
  */
-#[Fillable(['uuid', 'location_id', 'user_id', 'scheduled_for', 'drivers_name', 'drivers_cellphone', 'locale', 'status', 'cancelled_at', 'cancelled_reason', 'claimed_at', 'claimed_via'])]
+#[Fillable(['uuid', 'reference_number', 'location_id', 'user_id', 'scheduled_for', 'drivers_name', 'drivers_cellphone', 'locale', 'status', 'cancelled_at', 'cancelled_reason', 'claimed_at', 'claimed_via'])]
 #[Hidden(['id'])]
 final class Appointment extends Model
 {

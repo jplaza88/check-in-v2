@@ -91,6 +91,26 @@ return [
         'removeAriaLabel' => 'Eliminar orden de compra :number',
     ],
 
+    'appointmentConfirmation' => [
+        'pageTitle' => 'Cita Confirmada',
+        'newAppointment' => 'Nueva cita',
+        'confirmed' => '¡Su cita está confirmada!',
+        'subheading' => 'Esperamos verle pronto.',
+        'reference' => 'Referencia',
+        'bookingSummary' => 'Resumen de la cita',
+        'locationLabel' => 'Ubicación',
+        'dateLabel' => 'Fecha',
+        'timeLabel' => 'Hora',
+        'poLabel' => 'Número(s) de orden de compra',
+        'driverLabel' => 'Conductor',
+        'arrivalReminder' => 'Por favor llegue 5–10 minutos antes de la hora de su cita.',
+        'needHelp' => '¿Necesita ayuda?',
+        'registerHeading' => 'Acelere su próximo registro',
+        'registerBody' => 'Cree una cuenta gratuita para guardar su información y registrarse más rápido la próxima vez.',
+        'createAccount' => 'Crear cuenta',
+        'signIn' => 'Iniciar sesión',
+    ],
+
     'appointmentForm' => [
         'pageTitle' => 'Reservar una cita',
         'newAppointment' => 'Nueva cita',
