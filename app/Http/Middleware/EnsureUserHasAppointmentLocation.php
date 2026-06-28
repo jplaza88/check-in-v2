@@ -33,6 +33,11 @@ final readonly class EnsureUserHasAppointmentLocation
             return $next($request);
         }
 
+        // Booking was just completed - block re-entry into the form if the user clicks/taps the back button.
+        if ($this->session->wasBookingJustCompleted()) {
+            return $this->redirectToSelectLocation();
+        }
+
         if (Str::isUuid($uuid)) {
             $location = resolve(AppointmentLocation::class)->execute($uuid);
 
