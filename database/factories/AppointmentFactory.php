@@ -26,7 +26,7 @@ final class AppointmentFactory extends Factory
             )),
             'scheduled_for' => Date::now(),
             'drivers_name' => $this->faker->name(),
-            'drivers_cellphone' => $this->faker->word(),
+            'drivers_cellphone' => '+1'.$this->faker->numerify('##########'),
             'status' => $this->faker->randomElement(AppointmentStatus::cases()),
             'cancelled_at' => Date::now(),
             'cancelled_reason' => $this->faker->word(),

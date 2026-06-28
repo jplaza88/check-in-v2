@@ -4,6 +4,7 @@ interface AlertBannerProps {
     type?: 'warning' | 'error' | 'success' | string;
     open?: boolean;
     title?: string;
+    className?: string;
     onClose: () => void;
     children: ReactNode;
 }
@@ -12,6 +13,7 @@ export default function AlertBanner({
     type = '',
     open = false,
     title,
+    className,
     onClose,
     children,
 }: AlertBannerProps) {
@@ -48,7 +50,7 @@ export default function AlertBanner({
     return (
         <div
             role="alert"
-            className={`flex items-start gap-3 rounded-lg px-4 py-3 ${styles.wrapper}`}
+            className={`flex items-start gap-3 rounded-lg px-4 py-3 ${styles.wrapper} ${className ?? ''}`}
         >
             {/* Icon */}
             <div className={`mt-0.5 shrink-0 ${styles.icon}`}>

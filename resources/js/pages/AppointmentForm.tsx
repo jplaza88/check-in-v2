@@ -561,8 +561,7 @@ export default function ScheduleAppointment({ location }: PageProps) {
                                                                         'time',
                                                                         w.firstSlot,
                                                                         {
-                                                                            shouldValidate:
-                                                                                true,
+                                                                            shouldValidate: true,
                                                                         },
                                                                     );
                                                                 }
@@ -653,10 +652,7 @@ export default function ScheduleAppointment({ location }: PageProps) {
                                         <Controller
                                             name="drivers_name"
                                             control={control}
-                                            render={({
-                                                field,
-                                                fieldState,
-                                            }) => (
+                                            render={({ field, fieldState }) => (
                                                 <Field
                                                     data-invalid={
                                                         fieldState.invalid
@@ -666,7 +662,7 @@ export default function ScheduleAppointment({ location }: PageProps) {
                                                         {t.driversNameLabel}
                                                     </FieldLabel>
                                                     <div className="relative">
-                                                        <UserIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                                                        <UserIcon className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                                                         <Input
                                                             {...field}
                                                             id="drivers_name"
@@ -695,10 +691,7 @@ export default function ScheduleAppointment({ location }: PageProps) {
                                         <Controller
                                             name="drivers_cellphone"
                                             control={control}
-                                            render={({
-                                                field,
-                                                fieldState,
-                                            }) => (
+                                            render={({ field, fieldState }) => (
                                                 <Field
                                                     data-invalid={
                                                         fieldState.invalid
@@ -759,7 +752,7 @@ export default function ScheduleAppointment({ location }: PageProps) {
                                     <Button
                                         type="submit"
                                         disabled={!hasAvailability}
-                                        className="w-full bg-brand-green text-white hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
+                                        className="w-full cursor-pointer bg-brand-green text-white hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
                                     >
                                         {t.reviewButton}
                                     </Button>
@@ -783,7 +776,7 @@ export default function ScheduleAppointment({ location }: PageProps) {
                                         <Button
                                             type="button"
                                             variant="outline"
-                                            className="flex-1"
+                                            className="flex-1 cursor-pointer"
                                             onClick={() => setStep('form')}
                                             disabled={processing}
                                         >
@@ -791,7 +784,7 @@ export default function ScheduleAppointment({ location }: PageProps) {
                                         </Button>
                                         <Button
                                             type="button"
-                                            className="flex-1 bg-brand-green text-white hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
+                                            className="flex-1 cursor-pointer bg-brand-green text-white hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
                                             onClick={onSubmit}
                                             disabled={processing}
                                         >

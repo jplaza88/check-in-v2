@@ -1,6 +1,7 @@
 import { Head, router, usePage } from '@inertiajs/react';
 import { useState } from 'react';
 import { gate } from '@/actions/App/Http/Controllers/AppointmentController';
+import AlertBanner from '@/components/AlertBanner';
 import PublicLayout from '@/layouts/PublicLayout';
 
 interface AppointmentSelectLocation {
@@ -19,6 +20,7 @@ interface Translations {
 interface PageProps {
     locations: Location[];
     translations: Translations;
+    errors: { uuid?: string };
     [key: string]: unknown;
 }
 
@@ -36,11 +38,11 @@ interface Location {
 
 export default function AppointmentSelectLocation() {
     // Translations
-    const { translations, locations } = usePage<PageProps>().props;
+    const { translations, locations, errors } = usePage<PageProps>().props;
     const pageTranslations: AppointmentSelectLocation = translations.appointmentSelectLocation;
 
     const [submittingLocationId, setSubmittingLocationId] = useState<string | null>(null);
-    const [appointmentError, setAppointmentError] = useState<string | null>(null);
+    const [appointmentError, setAppointmentError] = useState<string | null>(errors.uuid ?? null);
 
     const handleSelectLocation = (locationId: string) => {
         setAppointmentError(null);
@@ -74,6 +76,15 @@ export default function AppointmentSelectLocation() {
                     <h1 className="mb-6 text-3xl font-bold text-brand-grey dark:text-gray-100">
                         {pageTranslations.selectAnAppointmentLocation}:
                     </h1>
+
+                    <AlertBanner
+                        type="error"
+                        open={!!appointmentError}
+                        onClose={() => setAppointmentError(null)}
+                        className='mb-3'
+                    >
+                        {appointmentError}
+                    </AlertBanner>
 
                     <div className="space-y-3">
                         {/* Skeleton */}

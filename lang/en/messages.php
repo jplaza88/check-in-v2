@@ -112,7 +112,7 @@ return [
         'timeLabel' => 'Time',
         'poLabel' => 'PO Number(s)',
         'driverLabel' => 'Driver',
-        'arrivalReminder' => 'Please arrive 5–10 minutes before your scheduled appointment time.',
+        'arrivalReminder' => 'Please arrive 5-10 minutes before your scheduled appointment time.',
         'needHelp' => 'Need help?',
         'registerHeading' => 'Speed up your next check-in',
         'registerBody' => 'Create a free account to save your information and check in faster next time.',
