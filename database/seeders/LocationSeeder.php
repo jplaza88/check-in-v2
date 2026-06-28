@@ -31,7 +31,7 @@ final class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'appointment' => [
-                        'max_booking_days_ahead' => 2,
+                        'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
                         'min_lead_time_minutes' => 60,
                         'buffer_before_close_minutes' => 30,
@@ -52,7 +52,7 @@ final class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'appointment' => [
-                        'max_booking_days_ahead' => 2,
+                        'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
                         'min_lead_time_minutes' => 60,
                         'buffer_before_close_minutes' => 30,
@@ -73,7 +73,7 @@ final class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'appointment' => [
-                        'max_booking_days_ahead' => 2,
+                        'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
                         'min_lead_time_minutes' => 60,
                         'buffer_before_close_minutes' => 30,
@@ -94,7 +94,7 @@ final class LocationSeeder extends Seeder
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'appointment' => [
-                        'max_booking_days_ahead' => 2,
+                        'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
                         'min_lead_time_minutes' => 60,
                         'buffer_before_close_minutes' => 30,
@@ -122,7 +122,7 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_expiration_date' => false,
                     ],
                     'appointment' => [
-                        'max_booking_days_ahead' => 2,
+                        'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
                         'min_lead_time_minutes' => 60,
                         'buffer_before_close_minutes' => 30,
@@ -150,7 +150,7 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_expiration_date' => false,
                     ],
                     'appointment' => [
-                        'max_booking_days_ahead' => 2,
+                        'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
                         'min_lead_time_minutes' => 60,
                         'buffer_before_close_minutes' => 30,
@@ -178,7 +178,7 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_expiration_date' => false,
                     ],
                     'appointment' => [
-                        'max_booking_days_ahead' => 2,
+                        'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
                         'min_lead_time_minutes' => 60,
                         'buffer_before_close_minutes' => 30,
@@ -206,7 +206,7 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_expiration_date' => false,
                     ],
                     'appointment' => [
-                        'max_booking_days_ahead' => 2,
+                        'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
                         'min_lead_time_minutes' => 60,
                         'buffer_before_close_minutes' => 30,
@@ -234,7 +234,7 @@ final class LocationSeeder extends Seeder
                         'show_drivers_license_expiration_date' => false,
                     ],
                     'appointment' => [
-                        'max_booking_days_ahead' => 2,
+                        'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
                         'min_lead_time_minutes' => 60,
                         'buffer_before_close_minutes' => 30,
