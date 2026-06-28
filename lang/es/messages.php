@@ -103,7 +103,7 @@ return [
         'timeLabel' => 'Hora',
         'poLabel' => 'Número(s) de orden de compra',
         'driverLabel' => 'Conductor',
-        'arrivalReminder' => 'Por favor llegue 5–10 minutos antes de la hora de su cita.',
+        'arrivalReminder' => 'Por favor llegue 5-10 minutos antes de la hora de su cita.',
         'needHelp' => '¿Necesita ayuda?',
         'registerHeading' => 'Acelere su próximo registro',
         'registerBody' => 'Cree una cuenta gratuita para guardar su información y registrarse más rápido la próxima vez.',
