@@ -24,6 +24,7 @@ final readonly class CreateAppointmentAction
 
     /**
      * @param  array<string, mixed>  $validated
+     *
      * @throws Throwable
      */
     public function handle(
@@ -40,7 +41,7 @@ final readonly class CreateAppointmentAction
             'reference_number' => $this->generateReferenceNumber(),
             'location_id' => $location->id,
             'user_id' => $user?->id,
-            'scheduled_for' => Date::parse($validated['datetime'], $location->timezone),
+            'scheduled_for' => Date::parse($validated['datetime'], $location->timezone)->utc(),
             'drivers_name' => $validated['drivers_name'],
             'drivers_cellphone' => $validated['drivers_cellphone'],
             'locale' => $this->localeManager->getLocale(request()),
@@ -58,8 +59,8 @@ final readonly class CreateAppointmentAction
 
         do {
             $reference = range(1, 8)
-                    |> (fn($x) => array_map(fn(): string => $chars[random_int(0, mb_strlen($chars) - 1)], $x,))
-                    |> (fn($x) => implode('', $x));
+                    |> (fn ($x) => array_map(fn (): string => $chars[random_int(0, mb_strlen($chars) - 1)], $x))
+                    |> (fn ($x) => implode('', $x));
         } while (Appointment::query()->where('reference_number', $reference)->exists());
 
         return $reference;
