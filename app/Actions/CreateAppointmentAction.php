@@ -59,8 +59,8 @@ final readonly class CreateAppointmentAction
 
         do {
             $reference = range(1, 8)
-                    |> (fn ($x) => array_map(fn (): string => $chars[random_int(0, mb_strlen($chars) - 1)], $x))
-                    |> (fn ($x) => implode('', $x));
+                    |> (fn ($x): array => array_map(fn (): string => $chars[random_int(0, mb_strlen($chars) - 1)], $x))
+                    |> (fn ($x): string => implode('', $x));
         } while (Appointment::query()->where('reference_number', $reference)->exists());
 
         return $reference;

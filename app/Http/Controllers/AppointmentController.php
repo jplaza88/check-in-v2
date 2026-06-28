@@ -58,15 +58,13 @@ final class AppointmentController extends Controller
 
         $appointment = $action->handle($request->validated(), $locationDTO);
 
-        $this->session->markBookingComplete();
+        $this->session->forgetLocation();
 
         return to_route('appointment.confirmed', $appointment->uuid);
     }
 
     public function confirmed(string $uuid, AppointmentConfirmationResolver $resolver): Response
     {
-        inertia()->clearHistory();
-
         return inertia('AppointmentConfirmation', $resolver->resolve($uuid));
     }
 }

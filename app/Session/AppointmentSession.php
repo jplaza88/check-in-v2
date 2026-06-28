@@ -10,8 +10,6 @@ final readonly class AppointmentSession
 {
     private const string LOCATION_KEY = 'appointmentLocationContext';
 
-    private const string BOOKING_COMPLETE_KEY = 'appointmentBookingComplete';
-
     /**
      * Store the location selected at the appointment gate. Mirrors the
      * check-in gate pass: it proves the user cleared the gate and is bound to
@@ -63,16 +61,5 @@ final readonly class AppointmentSession
     public function forgetLocation(): void
     {
         session()->forget(self::LOCATION_KEY);
-    }
-
-    public function markBookingComplete(): void
-    {
-        $this->forgetLocation();
-        session()->put(self::BOOKING_COMPLETE_KEY, true);
-    }
-
-    public function wasBookingJustCompleted(): bool
-    {
-        return (bool) session()->pull(self::BOOKING_COMPLETE_KEY, false);
     }
 }

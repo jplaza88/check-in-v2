@@ -26,6 +26,9 @@ final readonly class AppointmentConfirmationResolver
         $location = $appointment->location;
         $scheduledFor = $appointment->scheduled_for->setTimezone($location->timezone);
 
+        /** @var list<string> $purchaseOrders */
+        $purchaseOrders = $appointment->purchaseOrders->pluck('number')->all();
+
         return [
             'appointment' => new AppointmentConfirmationDTO(
                 uuid: $appointment->uuid,
@@ -35,7 +38,7 @@ final readonly class AppointmentConfirmationResolver
                 driversName: $appointment->drivers_name,
                 locationName: $location->name,
                 locationAddress: $this->address->buildAddress($location->address->toArray()),
-                purchaseOrders: $appointment->purchaseOrders->pluck('number')->all(),
+                purchaseOrders: $purchaseOrders,
             ),
             'contact' => [
                 'phone' => $location->phone,
