@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AppointmentController;
-use App\Http\Controllers\AppointmentLocationSelectController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\CheckInDistanceController;
 use App\Http\Controllers\CheckInLocationSelectController;
@@ -43,7 +42,7 @@ Route::middleware(['setLocale'])
             ->whereUuid('uuid')
             ->name('checkIn.form');
 
-        Route::get('/appointment/select-location', AppointmentLocationSelectController::class)
+        Route::get('/appointment/select-location', [AppointmentController::class, 'selectLocation'])
             ->name('appointment.selectLocation');
 
         Route::middleware(['throttle:30,1'])

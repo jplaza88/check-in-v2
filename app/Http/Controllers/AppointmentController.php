@@ -20,6 +20,13 @@ final class AppointmentController extends Controller
 {
     public function __construct(private readonly AppointmentSession $session) {}
 
+    public function selectLocation(AppointmentScheduleResolver $resolver): Response
+    {
+        return inertia('AppointmentSelectLocation', [
+            'locations' => $resolver->getLocations(),
+        ]);
+    }
+
     public function gate(AppointmentLocationSelectRequest $request, AppointmentScheduleResolver $resolver): RedirectResponse
     {
         $request->validated();
