@@ -11,11 +11,11 @@ use App\Models\Appointment;
 use App\Models\Location;
 use App\Models\User;
 use App\Queries\AppointmentLocation;
-use http\Exception\RuntimeException;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Random\RandomException;
+use RuntimeException;
 use Throwable;
 
 final readonly class CreateAppointmentAction
