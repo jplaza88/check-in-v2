@@ -14,23 +14,24 @@ use Illuminate\Http\JsonResponse;
  *
  * Provides distances from the user's coordinates to each active check-in location.
  *
- * Used by the check-in select location flow: {@see CheckInSelectController} renders the page,
+ * Used by the check-in select location flow: {@see CheckInController} renders the page,
  * then the client requests this endpoint so the UI can sort or annotate locations by distance.
  */
 final class CheckInDistanceController extends Controller
 {
-    public function __invoke(
-        CheckInDistanceRequest $request
-    ): JsonResponse {
+    public function __construct(
+        private readonly CheckInDistanceCalculator $distance,
+        private readonly CheckInSession $session,
+    ) {}
+
+    public function __invoke(CheckInDistanceRequest $request): JsonResponse
+    {
         $userLat = $request->float('latitude');
         $userLng = $request->float('longitude');
 
-        $distance = resolve(CheckInDistanceCalculator::class);
-        $session = resolve(CheckInSession::class);
+        $distances = $this->distance->resolve($userLat, $userLng);
 
-        $distances = $distance->resolve($userLat, $userLng);
-
-        $session->setUserCoords($userLat, $userLng);
+        $this->session->setUserCoords($userLat, $userLng);
 
         return response()->json(['locations' => $distances]);
     }

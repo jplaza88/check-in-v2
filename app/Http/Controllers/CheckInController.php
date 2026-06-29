@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\CheckIn\CheckInScheduleResolver;
 use App\Http\Requests\CheckInLocationSelectRequest;
 use App\Session\CheckInSession;
 use Inertia\Response;
@@ -11,6 +12,13 @@ use Inertia\Response;
 final class CheckInController extends Controller
 {
     public function __construct(private readonly CheckInSession $session) {}
+
+    public function selectLocation(CheckInScheduleResolver $resolver): Response
+    {
+        return inertia('CheckInSelectLocation', [
+            'locations' => $resolver->getLocations(),
+        ]);
+    }
 
     public function gate(CheckInLocationSelectRequest $request): Response
     {

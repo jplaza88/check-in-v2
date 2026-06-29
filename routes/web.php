@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\CheckInDistanceController;
-use App\Http\Controllers\CheckInLocationSelectController;
 use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,7 +33,7 @@ Route::post('/check-in/distance', CheckInDistanceController::class)
 Route::middleware(['setLocale'])
     ->group(function (): void {
 
-        Route::get('/check-in/select-location', CheckInLocationSelectController::class)
+        Route::get('/check-in/select-location', [CheckInController::class, 'selectLocation'])
             ->name('checkIn.selectLocation');
 
         Route::middleware(['userCoordinates', 'throttle:30,1'])
