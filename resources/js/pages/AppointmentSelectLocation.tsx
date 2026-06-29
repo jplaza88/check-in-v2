@@ -120,7 +120,7 @@ export default function AppointmentSelectLocation() {
                                     aria-label={`Book appointment at ${location.name}, ${location.address}`}
                                 >
                                     <div
-                                        className={`flex min-h-22 items-stretch rounded-lg border border-l-4 border-gray-200 border-l-brand-green bg-white text-sm font-medium shadow-sm transition hover:border-brand-green/60 dark:border-gray-700/60 dark:bg-gray-800 dark:hover:border-brand-green/50`}
+                                        className={`flex min-h-22 items-stretch rounded-lg border border-l-4 border-gray-200 border-l-brand-green bg-white text-sm font-medium shadow-sm transition hover:border-brand-green/60 dark:border-gray-700/60 dark:bg-gray-800 dark:hover:border-brand-green/50 dark:border-l-brand-green/60`}
                                     >
                                         {/* Text */}
                                         <div className="flex flex-1 flex-col justify-center gap-0.5 p-4 text-left">
