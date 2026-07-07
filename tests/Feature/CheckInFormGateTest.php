@@ -13,11 +13,11 @@ afterEach(function (): void {
 it('redirects to location select when session coordinates are missing', function (): void {
     $location = Location::factory()->create();
 
-    $this->post(route('checkIn.form', $location))
+    $this->post(route('checkIn.gate', $location))
         ->assertRedirect(route('checkIn.selectLocation'));
 });
 
-it('passes validation and renders the check-in form after a successful gate post', function (): void {
+it('passes validation and redirects to the check-in form after a successful gate post', function (): void {
     $location = Location::factory()
         ->for(Address::factory()->state([
             'latitude' => 40.7128,
@@ -31,16 +31,11 @@ it('passes validation and renders the check-in form after a successful gate post
             'longitude' => -74.006,
             'storedAt' => now()->timestamp,
         ],
-    ])->post(route('checkIn.form', $location));
+    ])->post(route('checkIn.gate', $location));
 
-    $response->assertSuccessful();
+    $response->assertRedirect(route('checkIn.form', $location));
 
     $response->assertSessionHas('checkInGatePass.uuid', $location->uuid);
-
-    $page = $response->viewData('page');
-
-    expect($page['component'])->toBe('CheckInForm')
-        ->and($page['props']['location']['uuid'])->toBe($location->uuid);
 });
 
 it('rejects check-in when the distribution center has no operating hours', function (): void {
@@ -64,7 +59,7 @@ it('rejects check-in when the distribution center has no operating hours', funct
                 'storedAt' => now()->timestamp,
             ],
         ])
-        ->post(route('checkIn.form', $location))
+        ->post(route('checkIn.gate', $location))
         ->assertRedirect()
         ->assertSessionHasErrors([
             'uuid' => __('messages.checkInSelectLocation.closedForCheckInToday', ['name' => $location->name]),
@@ -92,7 +87,7 @@ it('rejects check-in when the driver arrives outside the weekday pickup window',
                 'storedAt' => now()->timestamp,
             ],
         ])
-        ->post(route('checkIn.form', $location))
+        ->post(route('checkIn.gate', $location))
         ->assertRedirect()
         ->assertSessionHasErrors([
             'uuid' => __('messages.checkInSelectLocation.outsideHours', [
@@ -123,7 +118,7 @@ it('rejects check-in when the driver is farther than the allowed yard radius', f
                 'storedAt' => now()->timestamp,
             ],
         ])
-        ->post(route('checkIn.form', $location))
+        ->post(route('checkIn.gate', $location))
         ->assertRedirect()
         ->assertSessionHasErrors([
             'uuid' => __('messages.checkInSelectLocation.tooFar', [

@@ -35,19 +35,29 @@ Route::middleware('setLocale')->group(function (): void {
     /**
      * Check-In
      */
-
     Route::get('/check-in/select-location', [CheckInController::class, 'selectLocation'])
         ->name('checkIn.selectLocation');
 
     Route::middleware(['userCoordinates', 'throttle:30,1'])
         ->post('/check-in/{uuid}', [CheckInController::class, 'gate'])
         ->whereUuid('uuid')
-        ->name('checkIn.form');
+        ->name('checkIn.gate');
+
+    Route::middleware('checkInGatePass')->group(function (): void {
+
+        Route::get('/check-in/{uuid}/form', [CheckInController::class, 'form'])
+            ->whereUuid('uuid')
+            ->name('checkIn.form');
+
+        Route::middleware('throttle:10,1')
+            ->post('/check-in/{uuid}/form', [CheckInController::class, 'store'])
+            ->whereUuid('uuid')
+            ->name('checkIn.store');
+    });
 
     /**
      * Appointment
      */
-
     Route::get('/appointment/select-location', [AppointmentController::class, 'selectLocation'])
         ->name('appointment.selectLocation');
 
@@ -56,6 +66,7 @@ Route::middleware('setLocale')->group(function (): void {
         ->name('appointment.gate');
 
     Route::middleware(['appointmentLocation'])->group(function (): void {
+
         Route::get('/appointment/{uuid}/book', [AppointmentController::class, 'form'])
             ->name('appointment.form');
 

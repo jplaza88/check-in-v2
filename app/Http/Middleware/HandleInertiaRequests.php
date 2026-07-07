@@ -13,6 +13,7 @@ final class HandleInertiaRequests extends Middleware
         'appointment.selectLocation',
         'appointment.form',
         'checkIn.selectLocation',
+        'checkIn.form',
         // 'checkIn.*',
         // 'appointment.*',
     ];

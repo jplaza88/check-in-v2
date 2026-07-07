@@ -47,12 +47,28 @@ export function DatePicker({
     date,
     onDateChange,
     availableDates,
+    minDate,
+    endMonth,
 }: {
     date: Date | undefined;
     onDateChange: (d: Date | undefined) => void;
-    availableDates: Set<string>;
+    availableDates?: Set<string>;
+    minDate?: Date;
+    endMonth?: Date;
 }) {
     const [open, setOpen] = React.useState(false);
+
+    const isDisabled = (day: Date) => {
+        if (availableDates) {
+            return !availableDates.has(format(day, 'yyyy-MM-dd'));
+        }
+
+        if (minDate) {
+            return day < minDate;
+        }
+
+        return false;
+    };
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -61,7 +77,10 @@ export function DatePicker({
                     variant="outline"
                     className="w-full justify-between border-input font-normal aria-expanded:bg-white dark:aria-expanded:bg-gray-800"
                 >
-                    <CalendarIcon data-icon="inline-start" className="size-4 opacity-50" />
+                    <CalendarIcon
+                        data-icon="inline-start"
+                        className="size-4 opacity-50"
+                    />
                     {date ? format(date, 'PP') : 'Select date'}
                     <ChevronDownIcon className="size-4 opacity-50" />
                 </Button>
@@ -75,7 +94,9 @@ export function DatePicker({
                     selected={date}
                     captionLayout="dropdown"
                     defaultMonth={date}
-                    disabled={(day) => !availableDates.has(format(day, 'yyyy-MM-dd'))}
+                    startMonth={minDate}
+                    endMonth={endMonth}
+                    disabled={isDisabled}
                     onSelect={(d) => {
                         onDateChange(d);
                         setOpen(false);
@@ -142,9 +163,11 @@ export function TimePicker({
 
     const updateScrollState = React.useCallback(() => {
         const el = scrollRef.current;
+
         if (!el) {
             return;
         }
+
         setCanScrollUp(el.scrollTop > 0);
         setCanScrollDown(el.scrollTop + el.clientHeight < el.scrollHeight - 1);
     }, []);
@@ -152,9 +175,11 @@ export function TimePicker({
     React.useEffect(() => {
         updateScrollState();
         const el = scrollRef.current;
+
         if (!el) {
             return;
         }
+
         const observer = new ResizeObserver(updateScrollState);
         observer.observe(el);
 

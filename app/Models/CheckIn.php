@@ -1,0 +1,114 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Models;
+
+use Carbon\CarbonImmutable;
+use Database\Factories\CheckInFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+/**
+ * @property-read int $id
+ * @property-read string $uuid
+ * @property-read string $reference_number
+ * @property-read int $location_id
+ * @property-read int|null $user_id
+ * @property-read int|null $appointment_id
+ * @property-read string $status
+ * @property-read string $erp_status
+ * @property-read string $customer
+ * @property-read string $destination_city
+ * @property-read string $destination_state
+ * @property-read string $destination_country
+ * @property-read string $truck_name
+ * @property-read string $truck_plate
+ * @property-read string|null $truck_color
+ * @property-read string|null $truck_plate_state
+ * @property-read string|null $truck_plate_country
+ * @property-read string $trailer_plate
+ * @property-read string|null $trailer_plate_state
+ * @property-read string|null $trailer_plate_country
+ * @property-read string $trailer_chute
+ * @property-read string|null $empty_weight_lbs
+ * @property-read string $drivers_name
+ * @property-read string $drivers_cellphone
+ * @property-read string|null $drivers_email
+ * @property-read string $drivers_license_number
+ * @property-read string|null $drivers_license_expiration_date
+ * @property-read string|null $drivers_license_state
+ * @property-read string|null $drivers_license_country
+ * @property-read string|null $loading_instructions
+ * @property-read string $locale
+ * @property-read CarbonImmutable $created_at
+ * @property-read CarbonImmutable $updated_at
+ * @property-read CarbonImmutable|null $deleted_at
+ * @property-read Location $location
+ * @property-read User|null $user
+ * @property-read Appointment|null $appointment
+ */
+#[Fillable(['uuid', 'reference_number', 'location_id', 'user_id', 'appointment_id', 'status', 'erp_status', 'customer',
+    'destination_city', 'destination_state', 'destination_country', 'truck_name', 'truck_plate', 'truck_color',
+    'truck_plate_state', 'truck_plate_country', 'trailer_plate', 'trailer_plate_state', 'trailer_plate_country',
+    'trailer_chute', 'empty_weight_lbs', 'drivers_name', 'drivers_cellphone', 'drivers_email', 'drivers_license_number',
+    'drivers_license_expiration_date', 'drivers_license_state', 'drivers_license_country', 'loading_instructions',
+    'locale'])
+]
+#[Hidden(['id'])]
+final class CheckIn extends Model
+{
+    /** @use HasFactory<CheckInFactory> */
+    use HasFactory;
+
+    use SoftDeletes;
+
+    /**
+     * @return BelongsTo<Location, $this>
+     */
+    public function location(): BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo<Appointment, $this>
+     */
+    public function appointment(): BelongsTo
+    {
+        return $this->belongsTo(Appointment::class);
+    }
+
+    /**
+     * @return MorphMany<PurchaseOrder, $this>
+     */
+    public function purchaseOrders(): MorphMany
+    {
+        return $this->morphMany(PurchaseOrder::class, 'purchasable');
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'uuid' => 'string',
+        ];
+    }
+}

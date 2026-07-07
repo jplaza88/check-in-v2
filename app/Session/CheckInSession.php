@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Session;
 
+use App\DTOs\CheckInLocationDTO;
+
 final readonly class CheckInSession
 {
     private const string GATE_PASS_KEY = 'checkInGatePass';
@@ -53,13 +55,19 @@ final readonly class CheckInSession
 
     /**
      * Issue a gate pass for a location once the proximity check has passed.
-     * This authorizes form completion without re-validating live coordinates.
+     * The resolved location DTO and form-field flags are stored alongside it so
+     * the (potentially long) form can be rendered without re-querying, while the
+     * pass authorizes completion without re-validating live coordinates.
+     *
+     * @param  array<string, bool>  $fields
      */
-    public function issueGatePass(string $locationUuid): void
+    public function issueGatePass(CheckInLocationDTO $location, array $fields): void
     {
         session([
             self::GATE_PASS_KEY => [
-                'uuid' => $locationUuid,
+                'uuid' => $location->id,
+                'location' => $location,
+                'fields' => $fields,
                 'storedAt' => now()->timestamp,
             ],
         ]);
@@ -67,24 +75,59 @@ final readonly class CheckInSession
 
     public function hasFreshGatePass(string $locationUuid): bool
     {
-        $pass = session(self::GATE_PASS_KEY);
+        $pass = $this->freshGatePass();
 
-        if (! $pass || ($pass['uuid'] ?? null) !== $locationUuid) {
-            return false;
-        }
+        return $pass !== null && ($pass['uuid'] ?? null) === $locationUuid;
+    }
 
-        if (now()->timestamp - $pass['storedAt'] > config('app.checkin_gate_pass_ttl')) {
-            $this->forgetGatePass();
+    /**
+     * The location resolved at the gate, or null once the pass has expired.
+     * Mirrors AppointmentSession::getLocation().
+     */
+    public function getLocation(): ?CheckInLocationDTO
+    {
+        $location = $this->freshGatePass()['location'] ?? null;
 
-            return false;
-        }
+        return $location instanceof CheckInLocationDTO ? $location : null;
+    }
 
-        return true;
+    /**
+     * The form-field flags resolved at the gate, or null once the pass has
+     * expired.
+     *
+     * @return array<string, bool>|null
+     */
+    public function getCheckInFormFields(): ?array
+    {
+        return $this->freshGatePass()['fields'] ?? null;
     }
 
     public function forgetGatePass(): void
     {
         session()->forget(self::GATE_PASS_KEY);
+    }
+
+    /**
+     * The stored gate pass if it exists and is within its TTL, otherwise null.
+     * Expired passes are forgotten so freshness is folded into every read.
+     *
+     * @return array{uuid: string, location: CheckInLocationDTO, fields: array<string, bool>, storedAt: int}|null
+     */
+    private function freshGatePass(): ?array
+    {
+        $pass = session(self::GATE_PASS_KEY);
+
+        if (! $pass) {
+            return null;
+        }
+
+        if (now()->timestamp - $pass['storedAt'] > config('app.checkin_gate_pass_ttl')) {
+            $this->forgetGatePass();
+
+            return null;
+        }
+
+        return $pass;
     }
 
     public function forgetUserCoords(): void
