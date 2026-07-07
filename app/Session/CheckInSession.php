@@ -77,7 +77,7 @@ final readonly class CheckInSession
     {
         $pass = $this->freshGatePass();
 
-        return $pass !== null && ($pass['uuid'] ?? null) === $locationUuid;
+        return $pass !== null && $pass['uuid'] === $locationUuid;
     }
 
     /**
