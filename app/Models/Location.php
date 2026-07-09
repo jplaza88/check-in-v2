@@ -134,6 +134,46 @@ final class Location extends Model
         return max(0, min((int) data_get($this->config, 'appointment.buffer_before_close_minutes', $default), $max));
     }
 
+    /**
+     * Addresses notified when an appointment is booked at this location.
+     *
+     * @return list<string>
+     */
+    public function appointmentEmailAddresses(): array
+    {
+        $emails = data_get($this->config, 'appointment.email_addresses', []);
+
+        if (! is_array($emails)) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            $emails,
+            fn (mixed $email): bool => is_string($email) && filter_var($email, FILTER_VALIDATE_EMAIL) !== false,
+        ));
+    }
+
+    /**
+     * Config-driven flags controlling which optional fields the check-in form
+     * collects at this location. Missing flags default to hidden.
+     *
+     * @return array{showTruckColor: bool, showEmptyWeightLbs: bool, showTruckPlateState: bool, showTruckPlateCountry: bool, showTrailerPlateState: bool, showTrailerPlateCountry: bool, showDriversLicenseState: bool, showDriversLicenseCountry: bool, showDriversLicenseExpirationDate: bool}
+     */
+    public function checkInFormFields(): array
+    {
+        return [
+            'showTruckColor' => (bool) data_get($this->config, 'checkin.show_truck_color', false),
+            'showEmptyWeightLbs' => (bool) data_get($this->config, 'checkin.show_empty_weight_lbs', false),
+            'showTruckPlateState' => (bool) data_get($this->config, 'checkin.show_truck_plate_state', false),
+            'showTruckPlateCountry' => (bool) data_get($this->config, 'checkin.show_truck_plate_country', false),
+            'showTrailerPlateState' => (bool) data_get($this->config, 'checkin.show_trailer_plate_state', false),
+            'showTrailerPlateCountry' => (bool) data_get($this->config, 'checkin.show_trailer_plate_country', false),
+            'showDriversLicenseState' => (bool) data_get($this->config, 'checkin.show_drivers_license_state', false),
+            'showDriversLicenseCountry' => (bool) data_get($this->config, 'checkin.show_drivers_license_country', false),
+            'showDriversLicenseExpirationDate' => (bool) data_get($this->config, 'checkin.show_drivers_license_expiration_date', false),
+        ];
+    }
+
     protected function casts(): array
     {
         return [

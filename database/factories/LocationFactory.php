@@ -69,6 +69,28 @@ final class LocationFactory extends Factory
     }
 
     /**
+     * Config flags that show every optional check-in form field.
+     */
+    public function checkinAllOptionalFields(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'config' => [
+                'checkin' => [
+                    'show_truck_color' => true,
+                    'show_empty_weight_lbs' => true,
+                    'show_truck_plate_state' => true,
+                    'show_truck_plate_country' => true,
+                    'show_trailer_plate_state' => true,
+                    'show_trailer_plate_country' => true,
+                    'show_drivers_license_state' => true,
+                    'show_drivers_license_country' => true,
+                    'show_drivers_license_expiration_date' => true,
+                ],
+            ],
+        ]);
+    }
+
+    /**
      * No open hours on any day (distribution center appears closed for check-in).
      */
     public function checkinClosedAllWeek(): static

@@ -16,6 +16,7 @@ final readonly class BookAppointmentAction
     public function __construct(
         private CreateAppointmentAction $createAppointment,
         private CreatePurchaseOrdersAction $createPurchaseOrders,
+        private SendAppointmentBookedEmailAction $sendAppointmentBookedEmail,
     ) {}
 
     /**
@@ -25,12 +26,18 @@ final readonly class BookAppointmentAction
      */
     public function handle(array $validated, AppointmentLocationDTO $locationDTO, #[CurrentUser] ?User $user = null): Appointment
     {
-        return DB::transaction(function () use ($validated, $locationDTO, $user): Appointment {
+        $appointment = DB::transaction(function () use ($validated, $locationDTO, $user): Appointment {
 
             $appointment = $this->createAppointment->handle($validated, $locationDTO, $user);
             $this->createPurchaseOrders->handle($appointment, $validated['po_numbers']);
 
             return $appointment;
         });
+
+        // Queued after the commit so the notification never references an
+        // appointment that was rolled back.
+        $this->sendAppointmentBookedEmail->handle($appointment);
+
+        return $appointment;
     }
 }

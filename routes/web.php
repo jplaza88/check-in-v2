@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\CheckInDistanceController;
-use App\Http\Controllers\CheckInLocationSelectController;
 use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,38 +26,57 @@ Route::prefix('locale')->group(function () use ($locales): void {
 });
 
 // JSON endpoint, no translations needed
-Route::post('/check-in/distance', CheckInDistanceController::class)
-    ->middleware('throttle:30,1')
+Route::middleware('throttle:30,1')
+    ->post('/check-in/distance', CheckInDistanceController::class)
     ->name('checkIn.distance');
 
-Route::middleware(['setLocale'])
-    ->group(function (): void {
+Route::middleware('setLocale')->group(function (): void {
 
-        Route::get('/check-in/select-location', CheckInLocationSelectController::class)
-            ->name('checkIn.selectLocation');
+    /**
+     * Check-In
+     */
+    Route::get('/check-in/select-location', [CheckInController::class, 'selectLocation'])
+        ->name('checkIn.selectLocation');
 
-        Route::middleware(['userCoordinates', 'throttle:30,1'])
-            ->post('/check-in/{uuid}', [CheckInController::class, 'gate'])
+    Route::middleware(['userCoordinates', 'throttle:30,1'])
+        ->post('/check-in/{uuid}', [CheckInController::class, 'gate'])
+        ->whereUuid('uuid')
+        ->name('checkIn.gate');
+
+    Route::middleware('checkInGatePass')->group(function (): void {
+
+        Route::get('/check-in/{uuid}/form', [CheckInController::class, 'form'])
             ->whereUuid('uuid')
             ->name('checkIn.form');
 
-        Route::get('/appointment/select-location', [AppointmentController::class, 'selectLocation'])
-            ->name('appointment.selectLocation');
-
-        Route::middleware(['throttle:30,1'])
-            ->post('/appointment/{uuid}', [AppointmentController::class, 'gate'])
-            ->name('appointment.gate');
-
-        Route::get('/appointment/{uuid}/confirmed', [AppointmentController::class, 'confirmed'])
+        Route::middleware('throttle:10,1')
+            ->post('/check-in/{uuid}/form', [CheckInController::class, 'store'])
             ->whereUuid('uuid')
-            ->name('appointment.confirmed');
-
-        Route::middleware(['appointmentLocation'])->group(function (): void {
-            Route::get('/appointment/{uuid}/book', [AppointmentController::class, 'form'])
-                ->name('appointment.form');
-
-            Route::post('/appointment/{uuid}/book', [AppointmentController::class, 'store'])
-                ->middleware('throttle:10,1')
-                ->name('appointment.store');
-        });
+            ->name('checkIn.store');
     });
+
+    /**
+     * Appointment
+     */
+    Route::get('/appointment/select-location', [AppointmentController::class, 'selectLocation'])
+        ->name('appointment.selectLocation');
+
+    Route::middleware('throttle:30,1')
+        ->post('/appointment/{uuid}', [AppointmentController::class, 'gate'])
+        ->name('appointment.gate');
+
+    Route::middleware(['appointmentLocation'])->group(function (): void {
+
+        Route::get('/appointment/{uuid}/book', [AppointmentController::class, 'form'])
+            ->name('appointment.form');
+
+        Route::middleware('throttle:10,1')
+            ->post('/appointment/{uuid}/book', [AppointmentController::class, 'store'])
+            ->name('appointment.store');
+    });
+
+    Route::middleware('throttle:20,1')
+        ->get('/appointment/{uuid}/confirmed', [AppointmentController::class, 'confirmed'])
+        ->whereUuid('uuid')
+        ->name('appointment.confirmed');
+});

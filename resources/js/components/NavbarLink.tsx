@@ -3,7 +3,7 @@ import { Link, usePage } from '@inertiajs/react';
 interface NavbarLinkProps {
     href: string;
     name: string;
-    activeRoute: string;
+    activeRoute: string | string[];
     variant?: 'desktop' | 'mobile';
 }
 
@@ -19,7 +19,9 @@ export default function NavbarLink({
     variant = 'desktop',
 }: NavbarLinkProps) {
     const { currentRoute } = usePage<PageProps>().props;
-    const isActive = currentRoute === activeRoute;
+    const isActive = Array.isArray(activeRoute)
+        ? activeRoute.includes(currentRoute)
+        : currentRoute === activeRoute;
 
     if (variant === 'mobile') {
         return (

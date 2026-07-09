@@ -1,6 +1,13 @@
 import { PlusIcon, Trash2Icon } from 'lucide-react';
 import { Controller } from 'react-hook-form';
-import type {Control, FieldArrayWithId, UseFieldArrayAppend, UseFieldArrayRemove} from 'react-hook-form';
+import type {
+    Control,
+    FieldArrayWithId,
+    FieldPath,
+    FieldValues,
+    UseFieldArrayAppend,
+    UseFieldArrayRemove,
+} from 'react-hook-form';
 import { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
@@ -18,8 +25,8 @@ export interface PurchaseOrderTranslations {
     removeAriaLabel: string;
 }
 
-interface PurchaseOrderInputsProps {
-    control: Control<any>;
+interface PurchaseOrderInputsProps<TFieldValues extends FieldValues> {
+    control: Control<TFieldValues, unknown, TFieldValues>;
     fields: FieldArrayWithId[];
     append: UseFieldArrayAppend<any>;
     remove: UseFieldArrayRemove;
@@ -63,7 +70,11 @@ function formatPoNumber(raw: string): string {
             ) {
                 result += char + '-';
             }
-        } else if (result.length >= 3 && result.length < 13 && /\d/.test(char)) {
+        } else if (
+            result.length >= 3 &&
+            result.length < 13 &&
+            /\d/.test(char)
+        ) {
             result += char;
         }
     }
@@ -71,14 +82,14 @@ function formatPoNumber(raw: string): string {
     return result;
 }
 
-export default function PurchaseOrderInputs({
+export default function PurchaseOrderInputs<TFieldValues extends FieldValues>({
     control,
     fields,
     append,
     remove,
     name = 'po_numbers',
     translations,
-}: PurchaseOrderInputsProps) {
+}: PurchaseOrderInputsProps<TFieldValues>) {
     return (
         <Field>
             <FieldLabel>{translations.label}</FieldLabel>
@@ -86,7 +97,9 @@ export default function PurchaseOrderInputs({
                 {fields.map((field, index) => (
                     <Controller
                         key={field.id}
-                        name={`${name}.${index}.value`}
+                        name={
+                            `${name}.${index}.value` as FieldPath<TFieldValues>
+                        }
                         control={control}
                         render={({ field: inputField, fieldState }) => (
                             <div>
@@ -95,9 +108,7 @@ export default function PurchaseOrderInputs({
                                         {...inputField}
                                         onChange={(e) =>
                                             inputField.onChange(
-                                                formatPoNumber(
-                                                    e.target.value,
-                                                ),
+                                                formatPoNumber(e.target.value),
                                             )
                                         }
                                         id={`${name}_${index}`}
@@ -121,9 +132,7 @@ export default function PurchaseOrderInputs({
                                     )}
                                 </div>
                                 {fieldState.invalid && (
-                                    <FieldError
-                                        errors={[fieldState.error]}
-                                    />
+                                    <FieldError errors={[fieldState.error]} />
                                 )}
                             </div>
                         )}
@@ -135,7 +144,7 @@ export default function PurchaseOrderInputs({
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="mt-1.5 gap-1 text-xs text-muted-foreground cursor-pointer dark:hover:bg-input/30"
+                    className="mt-1.5 cursor-pointer gap-1 text-xs text-muted-foreground dark:hover:bg-input/30"
                     onClick={() => append({ value: '' })}
                 >
                     <PlusIcon className="size-3.5" />

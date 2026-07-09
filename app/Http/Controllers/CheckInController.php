@@ -4,24 +4,66 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\CheckIn\CheckInScheduleResolver;
+use App\DTOs\CheckInLocationDTO;
+use App\Http\Requests\CheckInFormRequest;
 use App\Http\Requests\CheckInLocationSelectRequest;
+use App\Models\Location;
 use App\Session\CheckInSession;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 
 final class CheckInController extends Controller
 {
     public function __construct(private readonly CheckInSession $session) {}
 
-    public function gate(CheckInLocationSelectRequest $request): Response
+    public function selectLocation(CheckInScheduleResolver $resolver): Response
+    {
+        return inertia('CheckInSelectLocation', [
+            'locations' => $resolver->getLocations(),
+        ]);
+    }
+
+    public function gate(CheckInLocationSelectRequest $request, CheckInScheduleResolver $resolver): RedirectResponse
     {
         $request->validated();
 
-        // Proximity check has passed; issue a gate pass so the driver can
-        // complete the (potentially long) form without re-validating coords.
-        $this->session->issueGatePass($request->location->uuid ?? '');
+        $location = $request->location;
+        assert($location instanceof Location);
+
+        // Proximity check has passed; issue a gate pass carrying the resolved
+        // location so the driver can complete the (potentially long) form
+        // without re-querying or re-validating coords.
+        $this->session->issueGatePass(
+            $resolver->buildDTO($location, now()),
+            $location->checkInFormFields(),
+        );
+
+        return to_route('checkIn.form', $location->uuid);
+    }
+
+    public function form(): RedirectResponse|Response
+    {
+        $location = $this->session->getLocation();
+
+        if (! $location instanceof CheckInLocationDTO) {
+            return to_route('checkIn.selectLocation')
+                ->withErrors(['uuid' => __('messages.checkInSelectLocation.invalidLocation')]);
+        }
 
         return inertia('CheckInForm', [
-            'location' => $request->location,
+            'location' => $location,
+            'fields' => $this->session->getCheckInFormFields() ?? [],
         ]);
+    }
+
+    public function store(CheckInFormRequest $request): RedirectResponse
+    {
+        $request->validated();
+
+        $this->session->forgetGatePass();
+
+        // TODO: Persist the check-in (CreateCheckInAction) and redirect to a confirmation page.
+        return to_route('checkIn.selectLocation');
     }
 }
