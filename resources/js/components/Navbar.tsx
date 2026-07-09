@@ -60,12 +60,12 @@ export default function Navbar() {
                         <NavbarLink
                             href={checkIn.selectLocation().url}
                             name={nav.checkIn}
-                            activeRoute="checkIn.selectLocation"
+                            activeRoute={['checkIn.selectLocation', 'checkIn.form']}
                         />
                         <NavbarLink
                             href={appointment.selectLocation().url}
                             name={nav.appointment}
-                            activeRoute="appointment.selectLocation"
+                            activeRoute={['appointment.selectLocation', 'appointment.form', 'appointment.confirmed']}
                         />
                         <NavbarLink
                             href="#"
@@ -134,13 +134,13 @@ export default function Navbar() {
                     <NavbarLink
                         href={checkIn.selectLocation().url}
                         name={nav.checkIn}
-                        activeRoute="checkIn.selectLocation"
+                        activeRoute={['checkIn.selectLocation', 'checkIn.form']}
                         variant="mobile"
                     />
                     <NavbarLink
                         href={appointment.selectLocation().url}
                         name={nav.appointment}
-                        activeRoute="appointment.selectLocation"
+                        activeRoute={['appointment.selectLocation', 'appointment.form', 'appointment.confirmed']}
                         variant="mobile"
                     />
                     <NavbarLink
