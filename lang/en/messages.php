@@ -15,6 +15,27 @@ return [
     |
     */
 
+    // Landing page
+    'home' => [
+        'eyebrow' => 'Driver Check-In',
+        'headingLine1' => 'Farm fresh,',
+        'headingLine2' => 'ready to roll.',
+        'subheading' => 'You are here to pick up a load headed for Walmart, Publix, Wegmans and grocers across the country. Check in when you reach the gate- or reserve your pickup window ahead of time.',
+        'checkInCardTitle' => 'Check-In',
+        'checkInCardDescription' => 'At the gate to pick up your load? Confirm your location and check in for your pickup in seconds.',
+        'checkInCardCta' => 'Check in now',
+        'appointmentCardTitle' => 'Appointment',
+        'appointmentCardDescription' => 'Planning your route? Reserve a pickup window and skip the wait when you arrive.',
+        'appointmentCardCta' => 'Book a time',
+        'howItWorks' => 'How it works',
+        'step1Title' => 'Choose your location',
+        'step1Description' => 'Select the Martori Farms facility where you are picking up.',
+        'step2Title' => 'Confirm you are on-site',
+        'step2Description' => 'We check your location so our crew knows you have arrived.',
+        'step3Title' => 'Complete check-in',
+        'step3Description' => 'Fill out a short form and you are cleared to load — no paperwork, no lines.',
+    ],
+
     // Header navigation bar & footer navigation bar
     'publicNavigation' => [
         'checkIn' => 'Check-In',

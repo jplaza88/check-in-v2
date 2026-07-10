@@ -26,7 +26,7 @@ final class AppointmentBooked extends Mailable implements ShouldQueue
 
         return new Envelope(
             subject: sprintf(
-                'New Appointment %s — %s',
+                'New Appointment %s - %s',
                 $this->appointment->reference_number,
                 $this->appointment->location->name,
             ),

@@ -15,6 +15,27 @@ return [
     |
     */
 
+    // Landing page
+    'home' => [
+        'eyebrow' => 'Enregistrement des chauffeurs',
+        'headingLine1' => 'Fraîcheur des champs,',
+        'headingLine2' => 'prête à partir.',
+        'subheading' => 'Vous êtes ici pour récupérer un chargement destiné à Walmart, Publix, Wegmans et aux supermarchés de tout le pays. Enregistrez-vous à votre arrivée au portail, ou réservez votre créneau de ramassage à l\'avance.',
+        'checkInCardTitle' => 'Enregistrement',
+        'checkInCardDescription' => 'Au portail pour récupérer votre chargement ? Confirmez votre emplacement et enregistrez-vous en quelques secondes.',
+        'checkInCardCta' => 'S\'enregistrer',
+        'appointmentCardTitle' => 'Rendez-vous',
+        'appointmentCardDescription' => 'Vous planifiez votre trajet ? Réservez un créneau de ramassage et évitez l\'attente à votre arrivée.',
+        'appointmentCardCta' => 'Réserver un créneau',
+        'howItWorks' => 'Comment ça marche',
+        'step1Title' => 'Choisissez votre emplacement',
+        'step1Description' => 'Sélectionnez le site Martori Farms où vous effectuez le ramassage.',
+        'step2Title' => 'Confirmez votre présence',
+        'step2Description' => 'Nous vérifions votre emplacement pour que notre équipe sache que vous êtes arrivé.',
+        'step3Title' => 'Terminez l\'enregistrement',
+        'step3Description' => 'Remplissez un court formulaire et vous serez prêt à charger — sans paperasse, sans file d\'attente.',
+    ],
+
     'publicNavigation' => [
         'checkIn' => 'Enregistrement',
         'appointment' => 'Rendez-vous',
