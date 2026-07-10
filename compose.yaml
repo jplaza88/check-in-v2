@@ -33,6 +33,21 @@ services:
             - pgsql
             - redis
             - mailpit
+    horizon:
+        image: 'sail-8.5/app'
+        command: php artisan horizon
+        environment:
+            WWWUSER: '${WWWUSER:-501}'
+            LARAVEL_SAIL: 1
+            TZ: '${APP_TIMEZONE:-UTC}'
+        volumes:
+            - '.:/var/www/html'
+        networks:
+            - sail
+        restart: unless-stopped
+        depends_on:
+            - pgsql
+            - redis
     pgsql:
         image: 'postgres:18-alpine'
         ports:
