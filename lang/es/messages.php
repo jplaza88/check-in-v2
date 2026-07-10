@@ -33,7 +33,7 @@ return [
         'step2Title' => 'Confirme que está en el sitio',
         'step2Description' => 'Verificamos su ubicación para que nuestro equipo sepa que ha llegado.',
         'step3Title' => 'Complete el registro',
-        'step3Description' => 'Llene un formulario breve y estará listo para cargar — sin papeleo, sin filas.',
+        'step3Description' => 'Llene un formulario breve y estará listo para cargar - sin papeleo, sin filas.',
     ],
 
     'publicNavigation' => [

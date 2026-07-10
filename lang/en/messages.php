@@ -33,7 +33,7 @@ return [
         'step2Title' => 'Confirm you are on-site',
         'step2Description' => 'We check your location so our crew knows you have arrived.',
         'step3Title' => 'Complete check-in',
-        'step3Description' => 'Fill out a short form and you are cleared to load — no paperwork, no lines.',
+        'step3Description' => 'Fill out a short form and you are cleared to load - no paperwork, no lines.',
     ],
 
     // Header navigation bar & footer navigation bar

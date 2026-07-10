@@ -33,7 +33,7 @@ return [
         'step2Title' => 'Confirmez votre présence',
         'step2Description' => 'Nous vérifions votre emplacement pour que notre équipe sache que vous êtes arrivé.',
         'step3Title' => 'Terminez l\'enregistrement',
-        'step3Description' => 'Remplissez un court formulaire et vous serez prêt à charger — sans paperasse, sans file d\'attente.',
+        'step3Description' => 'Remplissez un court formulaire et vous serez prêt à charger - sans paperasse, sans file d\'attente.',
     ],
 
     'publicNavigation' => [

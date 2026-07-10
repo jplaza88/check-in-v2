@@ -6,7 +6,7 @@ use App\Models\Location;
 use Inertia\Testing\AssertableInertia;
 
 // Drivers use route context `checkin` for load pickup at DCs. `appointment` is a separate scheduled-visit flow;
-// locations can enable check-in, appointments, or both — the second test below covers the appointment-only case.
+// locations can enable check-in, appointments, or both - the second test below covers the appointment-only case.
 
 it('renders the check-in location select page with check-in-enabled locations', function (): void {
     $checkInLocation = Location::factory()->create(['name' => 'Everglades Watermelons']);
