@@ -24,7 +24,7 @@ interface PageProps {
     [key: string]: unknown;
 }
 
-export default function Footer() {
+export default function Footer({ hideLogin = false }: { hideLogin?: boolean }) {
     const appName = import.meta.env.VITE_APP_NAME;
 
     const { translations } = usePage<PageProps>().props;
@@ -76,13 +76,15 @@ export default function Footer() {
                             >
                                 {pageTranslations.contact}
                             </Link>
-                            <Link
-                                href="#"
-                                className="text-sm text-gray-500 transition-colors hover:text-brand-green"
-                                prefetch
-                            >
-                                {pageTranslations.login}
-                            </Link>
+                            {!hideLogin && (
+                                <Link
+                                    href="#"
+                                    className="text-sm text-gray-500 transition-colors hover:text-brand-green"
+                                    prefetch
+                                >
+                                    {pageTranslations.login}
+                                </Link>
+                            )}
                         </div>
                     </div>
 

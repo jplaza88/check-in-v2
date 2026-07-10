@@ -8,7 +8,7 @@ use App\Http\Controllers\CheckInDistanceController;
 use App\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'Welcome')->name('home');
+Route::inertia('/', 'Welcome')->middleware('setLocale')->name('home');
 
 Route::get('/about', static function (): string|false {
     ob_start();

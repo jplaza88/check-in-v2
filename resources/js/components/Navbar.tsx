@@ -24,7 +24,7 @@ interface PageProps {
     [key: string]: unknown;
 }
 
-export default function Navbar() {
+export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
     const {
         currentLocale,
         localesLabels = {},
@@ -67,11 +67,13 @@ export default function Navbar() {
                             name={nav.appointment}
                             activeRoute={['appointment.selectLocation', 'appointment.form', 'appointment.confirmed']}
                         />
-                        <NavbarLink
-                            href="#"
-                            name={nav.login}
-                            activeRoute="login"
-                        />
+                        {!hideLogin && (
+                            <NavbarLink
+                                href="#"
+                                name={nav.login}
+                                activeRoute="login"
+                            />
+                        )}
                     </div>
                 </div>
 
@@ -143,12 +145,14 @@ export default function Navbar() {
                         activeRoute={['appointment.selectLocation', 'appointment.form', 'appointment.confirmed']}
                         variant="mobile"
                     />
-                    <NavbarLink
-                        href="/login"
-                        name={nav.login}
-                        activeRoute="login"
-                        variant="mobile"
-                    />
+                    {!hideLogin && (
+                        <NavbarLink
+                            href="/login"
+                            name={nav.login}
+                            activeRoute="login"
+                            variant="mobile"
+                        />
+                    )}
                 </div>
             )}
         </nav>

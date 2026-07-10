@@ -15,6 +15,27 @@ return [
     |
     */
 
+    // Landing page
+    'home' => [
+        'eyebrow' => 'Registro de conductores',
+        'headingLine1' => 'Fresco del campo,',
+        'headingLine2' => 'listo para rodar.',
+        'subheading' => 'Está aquí para recoger un cargamento destinado a Walmart, Publix, Wegmans y supermercados de todo el país. Regístrese al llegar a la puerta, o reserve su horario de recogida con anticipación.',
+        'checkInCardTitle' => 'Registro',
+        'checkInCardDescription' => '¿En la puerta para recoger su carga? Confirme su ubicación y regístrese para su recogida en segundos.',
+        'checkInCardCta' => 'Registrarse ahora',
+        'appointmentCardTitle' => 'Cita',
+        'appointmentCardDescription' => '¿Planea su ruta? Reserve un horario de recogida y evite la espera al llegar.',
+        'appointmentCardCta' => 'Reservar una hora',
+        'howItWorks' => 'Cómo funciona',
+        'step1Title' => 'Elija su ubicación',
+        'step1Description' => 'Seleccione la instalación de Martori Farms donde va a recoger.',
+        'step2Title' => 'Confirme que está en el sitio',
+        'step2Description' => 'Verificamos su ubicación para que nuestro equipo sepa que ha llegado.',
+        'step3Title' => 'Complete el registro',
+        'step3Description' => 'Llene un formulario breve y estará listo para cargar - sin papeleo, sin filas.',
+    ],
+
     'publicNavigation' => [
         'checkIn' => 'Registro',
         'appointment' => 'Cita',
