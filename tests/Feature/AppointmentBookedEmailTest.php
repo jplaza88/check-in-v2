@@ -27,7 +27,7 @@ function bookAppointment(Location $location): void
         'datetime' => now()->addHour()->startOfHour()->format('Y-m-d H:i:s'),
         'po_numbers' => ['SO-00001'],
         'drivers_name' => 'John Doe',
-        'drivers_cellphone' => '(555) 123-4567',
+        'drivers_cellphone' => '(201) 555-0123',
     ])->assertSessionHasNoErrors();
 }
 
@@ -99,6 +99,6 @@ it('renders the appointment details in the notification', function (): void {
             && str_contains($html, $mail->appointment->location->name)
             && str_contains($html, 'SO-00001')
             && str_contains($html, 'John Doe')
-            && str_contains($html, '+1 (555) 123-4567');
+            && str_contains($html, '+1 (201) 555-0123');
     });
 });

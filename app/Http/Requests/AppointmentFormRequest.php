@@ -31,7 +31,7 @@ final class AppointmentFormRequest extends FormRequest
             'po_numbers' => ['required', 'array', 'min:1', 'max:10'],
             'po_numbers.*' => ['required', 'string', 'distinct:ignore_case', 'min:7', 'max:13', 'regex:/^(SO|PO|PU)-\d{4,10}$/i'],
             'drivers_name' => ['required', 'string', 'min:2', 'max:28'],
-            'drivers_cellphone' => ['required', 'string', 'min:12', 'max:12', 'regex:/^\+1\d{10}$/'],
+            'drivers_cellphone' => ['required', 'string', 'min:12', 'max:12', 'phone:US,PR,mobile'],
         ];
     }
 
@@ -50,7 +50,9 @@ final class AppointmentFormRequest extends FormRequest
             'drivers_name.min' => __('messages.appointmentForm.driversNameMin'),
             'drivers_name.max' => __('messages.appointmentForm.driversNameMax'),
             'drivers_cellphone.required' => __('messages.appointmentForm.cellphoneRequired'),
-            'drivers_cellphone.regex' => __('messages.appointmentForm.cellphoneInvalid'),
+            'drivers_cellphone.min' => __('messages.appointmentForm.cellphoneInvalid'),
+            'drivers_cellphone.max' => __('messages.appointmentForm.cellphoneInvalid'),
+            'drivers_cellphone.phone' => __('messages.appointmentForm.cellphoneRegion'),
         ];
     }
 

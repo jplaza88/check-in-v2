@@ -151,6 +151,7 @@ return [
         'cellphonePlaceholder' => '(555) 000-0000',
         'cellphoneRequired' => 'El número de celular es obligatorio.',
         'cellphoneInvalid' => 'Ingrese un número de teléfono válido de 10 dígitos.',
+        'cellphoneRegion' => 'Solo aceptamos números de teléfono de EE. UU., incluido Puerto Rico.',
         'cellphoneConsent' => 'Aviso: Al proporcionar mi información de contacto, reconozco y doy mi consentimiento explícito para ser contactado por SMS y recibir correos electrónicos para diversos fines, que pueden incluir contenido de marketing y promocional. Pueden aplicarse tarifas por mensajes y datos. La frecuencia de los mensajes puede variar. Responda STOP para cancelar. Consulte nuestra Política de Privacidad para más información.',
         'todaysHours' => 'Horario de hoy',
         'noAvailability' => 'No hay horarios de cita disponibles actualmente. Por favor, vuelva más tarde o comuníquese con la ubicación.',

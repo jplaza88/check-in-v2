@@ -160,6 +160,7 @@ return [
         'cellphonePlaceholder' => '(555) 000-0000',
         'cellphoneRequired' => 'Cellphone number is required.',
         'cellphoneInvalid' => 'Enter a valid 10-digit US phone number.',
+        'cellphoneRegion' => 'We only accept U.S. phone numbers, including Puerto Rico.',
         'cellphoneConsent' => 'Disclaimer: By providing my contact information, I acknowledge and give my explicit consent to be contacted via SMS and receive emails for various purposes, which may include marketing and promotional content. Message and data rates may apply. Message frequency may vary. Reply STOP to opt out. Refer to our Privacy Policy for more information.',
         'todaysHours' => "Today's Hours",
         'noAvailability' => 'No appointment times are currently available. Please check back later or contact the location.',

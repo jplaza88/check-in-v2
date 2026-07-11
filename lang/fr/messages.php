@@ -151,6 +151,7 @@ return [
         'cellphonePlaceholder' => '(555) 000-0000',
         'cellphoneRequired' => 'Le numéro de téléphone portable est obligatoire.',
         'cellphoneInvalid' => 'Entrez un numéro de téléphone américain valide à 10 chiffres.',
+        'cellphoneRegion' => 'Nous acceptons uniquement les numéros de téléphone américains, y compris Porto Rico.',
         'cellphoneConsent' => "Avertissement : En fournissant mes coordonnées, je reconnais et donne mon consentement explicite à être contacté par SMS et à recevoir des courriels à diverses fins, pouvant inclure du contenu marketing et promotionnel. Des frais de messagerie et de données peuvent s'appliquer. La fréquence des messages peut varier. Répondez STOP pour vous désabonner. Consultez notre Politique de confidentialité pour plus d'informations.",
         'todaysHours' => "Horaires d'aujourd'hui",
         'noAvailability' => "Aucun créneau de rendez-vous n'est actuellement disponible. Veuillez réessayer plus tard ou contacter l'établissement.",
