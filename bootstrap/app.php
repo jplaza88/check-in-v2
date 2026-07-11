@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use App\Http\Middleware\EnsureUserHasAppointmentLocation;
+use App\Http\Middleware\EnsureUserHasAppointmentGatePass;
 use App\Http\Middleware\EnsureUserHasCheckInGatePass;
 use App\Http\Middleware\EnsureUserHasCoordinates;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -27,7 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'setLocale' => SetLocale::class,
             'userCoordinates' => EnsureUserHasCoordinates::class,
-            'appointmentLocation' => EnsureUserHasAppointmentLocation::class,
+            'appointmentGatePass' => EnsureUserHasAppointmentGatePass::class,
             'checkInGatePass' => EnsureUserHasCheckInGatePass::class,
         ]);
 
