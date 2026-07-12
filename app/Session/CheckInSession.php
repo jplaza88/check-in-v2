@@ -107,6 +107,11 @@ final readonly class CheckInSession
         session()->forget(self::GATE_PASS_KEY);
     }
 
+    public function forgetUserCoords(): void
+    {
+        session()->forget(self::USER_COORDINATES_KEY);
+    }
+
     /**
      * The stored gate pass if it exists and is within its TTL, otherwise null.
      * Expired passes are forgotten so freshness is folded into every read.
@@ -128,10 +133,5 @@ final readonly class CheckInSession
         }
 
         return $pass;
-    }
-
-    public function forgetUserCoords(): void
-    {
-        session()->forget(self::USER_COORDINATES_KEY);
     }
 }

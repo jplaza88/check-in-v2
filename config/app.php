@@ -234,6 +234,33 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Public Contact Details
+    |--------------------------------------------------------------------------
+    |
+    | The phone number and email shown on the public contact page. Set these
+    | via the CONTACT_PHONE and CONTACT_EMAIL environment variables.
+    |
+    */
+
+    'contact_phone' => env('CONTACT_PHONE', '(800) 555-0100'),
+
+    'contact_email' => env('CONTACT_EMAIL', 'dispatch@martorifarms.com'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Weekly Schedule Cache
+    |--------------------------------------------------------------------------
+    |
+    | How long (in minutes) the public weekly schedule payload is cached. The
+    | cache is flushed immediately whenever schedule data changes, so this TTL
+    | only bounds how stale the live "open now" / "today" indicators can get.
+    |
+    */
+
+    'schedule_cache_ttl' => (int) env('SCHEDULE_CACHE_TTL', 10),
+
+    /*
+    |--------------------------------------------------------------------------
     | Appointment Booking Safeguards
     |--------------------------------------------------------------------------
     |

@@ -36,6 +36,33 @@ return [
         'step3Description' => 'Fill out a short form and you are cleared to load - no paperwork, no lines.',
     ],
 
+    // Schedule page
+    'schedule' => [
+        'eyebrow' => 'Location hours',
+        'title' => 'Weekly schedule',
+        'subheading' => 'Operating hours for every Martori Farms facility, updated for this week.',
+        'openNow' => 'Open now',
+        'closed' => 'Closed',
+        'today' => 'Today',
+        'todaysHours' => "Today's hours",
+        'notAvailableCheckIn' => 'Check-in is not offered at this location.',
+        'notAvailableAppointment' => 'Appointments are not offered at this location.',
+        'noLocations' => 'No locations are currently available.',
+        'directions' => 'Get directions',
+    ],
+
+    // Contact page
+    'contact' => [
+        'eyebrow' => 'Get in touch',
+        'title' => 'Contact us',
+        'subheading' => 'Questions about a pickup, an appointment, or your load? Our dispatch team is ready to help.',
+        'phoneLabel' => 'Call us',
+        'phoneHelp' => 'Speak with dispatch',
+        'emailLabel' => 'Email us',
+        'emailHelp' => 'We reply within one business day',
+        'bannerTitle' => 'Fresh from the field, on your schedule.',
+    ],
+
     // Header navigation bar & footer navigation bar
     'publicNavigation' => [
         'checkIn' => 'Check-In',
@@ -160,6 +187,7 @@ return [
         'cellphonePlaceholder' => '(555) 000-0000',
         'cellphoneRequired' => 'Cellphone number is required.',
         'cellphoneInvalid' => 'Enter a valid 10-digit US phone number.',
+        'cellphoneRegion' => 'We only accept U.S. phone numbers, including Puerto Rico.',
         'cellphoneConsent' => 'Disclaimer: By providing my contact information, I acknowledge and give my explicit consent to be contacted via SMS and receive emails for various purposes, which may include marketing and promotional content. Message and data rates may apply. Message frequency may vary. Reply STOP to opt out. Refer to our Privacy Policy for more information.',
         'todaysHours' => "Today's Hours",
         'noAvailability' => 'No appointment times are currently available. Please check back later or contact the location.',

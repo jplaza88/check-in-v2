@@ -21,7 +21,7 @@ function validPayload(array $overrides = []): array
         'datetime' => now()->addHour()->startOfHour()->format('Y-m-d H:i:s'),
         'po_numbers' => ['SO-00001'],
         'drivers_name' => 'John Doe',
-        'drivers_cellphone' => '(555) 123-4567',
+        'drivers_cellphone' => '(201) 555-0123',
     ], $overrides);
 }
 
@@ -113,4 +113,16 @@ it('persists the locale on appointment creation', function (): void {
         ->assertRedirect();
 
     expect(Appointment::query()->first()->locale)->toBe('en');
+});
+
+it('rejects a valid +1 phone number from outside the US and PR', function (): void {
+    $location = Location::factory()->appointmentsOnly()->create();
+    passGate($location);
+
+    // Valid Canadian number (New Brunswick): correct +1 10-digit format, wrong region.
+    post(route('appointment.store', $location->uuid), validPayload([
+        'drivers_cellphone' => '(506) 234-5678',
+    ]))->assertSessionHasErrors([
+        'drivers_cellphone' => __('messages.appointmentForm.cellphoneRegion'),
+    ]);
 });

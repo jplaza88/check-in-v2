@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
-final readonly class EnsureUserHasAppointmentLocation
+final readonly class EnsureUserHasAppointmentGatePass
 {
     public function __construct(
         private AppointmentSession $session,

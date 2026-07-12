@@ -3,10 +3,11 @@
 declare(strict_types=1);
 
 use App\CheckIn\CheckInScheduleResolver;
+use App\DTOs\CheckInLocationDTO;
 use App\Models\Location;
 
 /**
- * @return array{checkInGatePass: array{uuid: string, location: App\DTOs\CheckInLocationDTO, fields: array<string, bool>, storedAt: int}}
+ * @return array{checkInGatePass: array{uuid: string, location: CheckInLocationDTO, fields: array<string, bool>, storedAt: int}}
  */
 function freshGatePass(Location $location): array
 {

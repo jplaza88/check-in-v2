@@ -5,10 +5,20 @@ declare(strict_types=1);
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\CheckInDistanceController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->middleware('setLocale')->name('home');
+
+Route::middleware('setLocale')
+    ->get('/schedule', [ScheduleController::class, 'index'])
+    ->name('schedule');
+
+Route::middleware('setLocale')
+    ->get('/contact', [ContactController::class, 'index'])
+    ->name('contact');
 
 Route::get('/about', static function (): string|false {
     ob_start();
@@ -65,7 +75,7 @@ Route::middleware('setLocale')->group(function (): void {
         ->post('/appointment/{uuid}', [AppointmentController::class, 'gate'])
         ->name('appointment.gate');
 
-    Route::middleware(['appointmentLocation'])->group(function (): void {
+    Route::middleware(['appointmentGatePass'])->group(function (): void {
 
         Route::get('/appointment/{uuid}/book', [AppointmentController::class, 'form'])
             ->name('appointment.form');

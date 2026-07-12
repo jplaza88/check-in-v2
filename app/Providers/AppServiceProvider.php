@@ -5,6 +5,12 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\Appointment;
+use App\Models\AppointmentSchedule;
+use App\Models\AppointmentScheduleOverride;
+use App\Models\CheckInSchedule;
+use App\Models\CheckInScheduleOverride;
+use App\Models\Location;
+use App\Schedule\WeeklyScheduleResolver;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -57,6 +63,33 @@ final class AppServiceProvider extends ServiceProvider
         $this->unguardModels();
 
         $this->enforceMorphMaps();
+
+        $this->flushScheduleCacheOnDataChanges();
+    }
+
+    /**
+     * Invalidate the cached weekly schedule whenever any location or schedule
+     * record changes, so admin edits are reflected on the next request.
+     */
+    private function flushScheduleCacheOnDataChanges(): void
+    {
+        $models = [
+            Location::class,
+            CheckInSchedule::class,
+            CheckInScheduleOverride::class,
+            AppointmentSchedule::class,
+            AppointmentScheduleOverride::class,
+        ];
+
+        foreach ($models as $model) {
+            $model::saved(static function (): void {
+                WeeklyScheduleResolver::flushCache();
+            });
+
+            $model::deleted(static function (): void {
+                WeeklyScheduleResolver::flushCache();
+            });
+        }
     }
 
     private function immutableDates(): void
