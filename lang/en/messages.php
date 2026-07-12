@@ -36,6 +36,33 @@ return [
         'step3Description' => 'Fill out a short form and you are cleared to load - no paperwork, no lines.',
     ],
 
+    // Schedule page
+    'schedule' => [
+        'eyebrow' => 'Location hours',
+        'title' => 'Weekly schedule',
+        'subheading' => 'Operating hours for every Martori Farms facility, updated for this week.',
+        'openNow' => 'Open now',
+        'closed' => 'Closed',
+        'today' => 'Today',
+        'todaysHours' => "Today's hours",
+        'notAvailableCheckIn' => 'Check-in is not offered at this location.',
+        'notAvailableAppointment' => 'Appointments are not offered at this location.',
+        'noLocations' => 'No locations are currently available.',
+        'directions' => 'Get directions',
+    ],
+
+    // Contact page
+    'contact' => [
+        'eyebrow' => 'Get in touch',
+        'title' => 'Contact us',
+        'subheading' => 'Questions about a pickup, an appointment, or your load? Our dispatch team is ready to help.',
+        'phoneLabel' => 'Call us',
+        'phoneHelp' => 'Speak with dispatch',
+        'emailLabel' => 'Email us',
+        'emailHelp' => 'We reply within one business day',
+        'bannerTitle' => 'Fresh from the field, on your schedule.',
+    ],
+
     // Header navigation bar & footer navigation bar
     'publicNavigation' => [
         'checkIn' => 'Check-In',

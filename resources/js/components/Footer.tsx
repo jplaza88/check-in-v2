@@ -1,5 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import Logo from '@/components/Logo';
+import { contact, schedule } from '@/routes';
 
 interface PublicNavigation {
     checkIn: string;
@@ -63,14 +64,14 @@ export default function Footer({ hideLogin = false }: { hideLogin?: boolean }) {
                         </p>
                         <div className="flex flex-col gap-2.5">
                             <Link
-                                href="#"
+                                href={schedule().url}
                                 className="text-sm text-gray-500 transition-colors hover:text-brand-green"
                                 prefetch
                             >
                                 {pageTranslations.schedule}
                             </Link>
                             <Link
-                                href="#"
+                                href={contact().url}
                                 className="text-sm text-gray-500 transition-colors hover:text-brand-green"
                                 prefetch
                             >

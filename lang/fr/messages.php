@@ -36,6 +36,33 @@ return [
         'step3Description' => 'Remplissez un court formulaire et vous serez prêt à charger - sans paperasse, sans file d\'attente.',
     ],
 
+    // Schedule page
+    'schedule' => [
+        'eyebrow' => 'Horaires des sites',
+        'title' => 'Horaire hebdomadaire',
+        'subheading' => 'Heures d\'ouverture de chaque site Martori Farms, mises à jour pour cette semaine.',
+        'openNow' => 'Ouvert maintenant',
+        'closed' => 'Fermé',
+        'today' => 'Aujourd\'hui',
+        'todaysHours' => 'Horaires du jour',
+        'notAvailableCheckIn' => 'Ce site ne propose pas d\'enregistrement.',
+        'notAvailableAppointment' => 'Ce site ne propose pas de rendez-vous.',
+        'noLocations' => 'Aucun site n\'est actuellement disponible.',
+        'directions' => 'Itinéraire',
+    ],
+
+    // Contact page
+    'contact' => [
+        'eyebrow' => 'Contactez-nous',
+        'title' => 'Nous contacter',
+        'subheading' => 'Des questions sur un ramassage, un rendez-vous ou votre chargement ? Notre équipe de répartition est prête à vous aider.',
+        'phoneLabel' => 'Appelez-nous',
+        'phoneHelp' => 'Parlez à la répartition',
+        'emailLabel' => 'Écrivez-nous',
+        'emailHelp' => 'Nous répondons sous un jour ouvrable',
+        'bannerTitle' => 'Fraîcheur des champs, selon votre horaire.',
+    ],
+
     'publicNavigation' => [
         'checkIn' => 'Enregistrement',
         'appointment' => 'Rendez-vous',

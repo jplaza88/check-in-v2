@@ -36,6 +36,33 @@ return [
         'step3Description' => 'Llene un formulario breve y estará listo para cargar - sin papeleo, sin filas.',
     ],
 
+    // Schedule page
+    'schedule' => [
+        'eyebrow' => 'Horario de ubicaciones',
+        'title' => 'Horario semanal',
+        'subheading' => 'Horario de atención de cada instalación de Martori Farms, actualizado para esta semana.',
+        'openNow' => 'Abierto ahora',
+        'closed' => 'Cerrado',
+        'today' => 'Hoy',
+        'todaysHours' => 'Horario de hoy',
+        'notAvailableCheckIn' => 'Esta ubicación no ofrece registro.',
+        'notAvailableAppointment' => 'Esta ubicación no ofrece citas.',
+        'noLocations' => 'No hay ubicaciones disponibles actualmente.',
+        'directions' => 'Cómo llegar',
+    ],
+
+    // Contact page
+    'contact' => [
+        'eyebrow' => 'Póngase en contacto',
+        'title' => 'Contáctenos',
+        'subheading' => '¿Preguntas sobre una recogida, una cita o su carga? Nuestro equipo de despacho está listo para ayudar.',
+        'phoneLabel' => 'Llámenos',
+        'phoneHelp' => 'Hable con despacho',
+        'emailLabel' => 'Escríbanos',
+        'emailHelp' => 'Respondemos en un día hábil',
+        'bannerTitle' => 'Fresco del campo, a su horario.',
+    ],
+
     'publicNavigation' => [
         'checkIn' => 'Registro',
         'appointment' => 'Cita',
