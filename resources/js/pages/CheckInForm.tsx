@@ -1,14 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Head, router, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { UserIcon } from 'lucide-react';
+import { ChevronDownIcon, UserIcon } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Controller, useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { store } from '@/actions/App/Http/Controllers/CheckInController';
 import AlertBanner from '@/components/AlertBanner';
+import CountryDisplay from '@/components/CountryDisplay';
 import { DatePicker } from '@/components/DatePickerTime';
+import LocationAutocomplete from '@/components/LocationAutocomplete';
 import LocationScheduleCard from '@/components/LocationScheduleCard';
 import PurchaseOrderInputs, {
     poNumberSchema,
@@ -26,6 +28,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import PublicLayout from '@/layouts/PublicLayout';
+import { countryFlag, countryName } from '@/lib/countryFlag';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -75,6 +78,9 @@ interface CheckInFormTranslations {
     destinationStatePlaceholder: string;
     destinationStateRequired: string;
     destinationStateMin: string;
+    destinationCountryLabel: string;
+    destinationCountryPlaceholder: string;
+    destinationCountryRequired: string;
     destinationLabel: string;
     truckNameLabel: string;
     truckNamePlaceholder: string;
@@ -87,8 +93,7 @@ interface CheckInFormTranslations {
     truckColorLabel: string;
     truckColorPlaceholder: string;
     truckColorRequired: string;
-    truckColorMin: string;
-    truckColorMax: string;
+    truckColors: Record<string, string>;
     truckPlateStateLabel: string;
     truckPlateCountryLabel: string;
     trailerPlateLabel: string;
@@ -103,9 +108,9 @@ interface CheckInFormTranslations {
     countryCodeRequired: string;
     countryCodeInvalid: string;
     trailerChuteLabel: string;
-    trailerChutePlaceholder: string;
-    trailerChuteRequired: string;
-    trailerChuteMax: string;
+    trailerChuteNa: string;
+    trailerChuteCenter: string;
+    trailerChuteSide: string;
     emptyWeightLabel: string;
     emptyWeightPlaceholder: string;
     emptyWeightRequired: string;
@@ -151,6 +156,7 @@ interface PageProps {
     location: Location;
     fields: FieldFlags;
     translations: Translations;
+    truckColors: string[];
     [key: string]: unknown;
 }
 
@@ -183,12 +189,6 @@ const formatPlate = (raw: string) =>
         .replace(/[^A-Z0-9 -]/g, '')
         .substring(0, 10);
 
-const formatTwoLetterCode = (raw: string) =>
-    raw
-        .toUpperCase()
-        .replace(/[^A-Z]/g, '')
-        .substring(0, 2);
-
 const formatDigits = (raw: string, maxLength: number) =>
     raw.replace(/\D/g, '').substring(0, maxLength);
 
@@ -198,6 +198,7 @@ interface ReviewValues {
     customer: string;
     destination_city: string;
     destination_state: string;
+    destination_country: string;
     loading_instructions?: string;
     po_numbers: { value: string }[];
     truck_name: string;
@@ -251,6 +252,12 @@ function ReviewSummary({
           )
         : '';
 
+    const trailerChuteLabels: Record<string, string> = {
+        'n/a': t.trailerChuteNa,
+        'center-chute': t.trailerChuteCenter,
+        'side-chute': t.trailerChuteSide,
+    };
+
     return (
         <div className="space-y-5 px-5 pt-5 pb-6">
             <SectionHeader step={1} label={t.reviewTitle} />
@@ -271,7 +278,11 @@ function ReviewSummary({
                     />
                     <ReviewRow
                         label={t.destinationLabel}
-                        value={`${values.destination_city}, ${values.destination_state}`}
+                        value={`${values.destination_city}, ${values.destination_state}${
+                            values.destination_country
+                                ? ` ${countryFlag(values.destination_country)} ${countryName(values.destination_country)}`
+                                : ''
+                        }`}
                     />
                     {!!values.loading_instructions && (
                         <ReviewRow
@@ -292,7 +303,12 @@ function ReviewSummary({
                     {fields.showTruckColor && (
                         <ReviewRow
                             label={t.truckColorLabel}
-                            value={values.truck_color ?? ''}
+                            value={
+                                values.truck_color
+                                    ? (t.truckColors[values.truck_color] ??
+                                      values.truck_color)
+                                    : ''
+                            }
                         />
                     )}
                     <ReviewRow
@@ -329,7 +345,10 @@ function ReviewSummary({
                     )}
                     <ReviewRow
                         label={t.trailerChuteLabel}
-                        value={values.trailer_chute}
+                        value={
+                            trailerChuteLabels[values.trailer_chute] ??
+                            values.trailer_chute
+                        }
                     />
                     {fields.showEmptyWeightLbs && (
                         <ReviewRow
@@ -375,10 +394,25 @@ function ReviewSummary({
 
 // ── Page ─────────────────────────────────────────────────────────────────────
 
-export default function CheckInForm({ location, fields }: PageProps) {
+export default function CheckInForm({
+    location,
+    fields,
+    truckColors,
+}: PageProps) {
     const { translations } = usePage<PageProps>().props;
     const t = translations.checkInForm;
     const poT = translations.purchaseOrders;
+
+    const trailerChuteOptions = [
+        { value: 'n/a', label: t.trailerChuteNa },
+        { value: 'center-chute', label: t.trailerChuteCenter },
+        { value: 'side-chute', label: t.trailerChuteSide },
+    ];
+
+    const truckColorOptions = truckColors.map((slug) => ({
+        value: slug,
+        label: t.truckColors[slug] ?? slug,
+    }));
 
     const [processing, setProcessing] = useState(false);
     const [step, setStep] = useState<'form' | 'review'>('form');
@@ -421,6 +455,9 @@ export default function CheckInForm({ location, fields }: PageProps) {
                 .min(1, t.destinationStateRequired)
                 .min(2, t.destinationStateMin)
                 .max(30, t.destinationStateMin),
+            destination_country: z
+                .string()
+                .min(1, t.destinationCountryRequired),
             loading_instructions: z
                 .string()
                 .max(500, t.loadingInstructionsMax)
@@ -451,11 +488,7 @@ export default function CheckInForm({ location, fields }: PageProps) {
             ),
             truck_color: optionalUnless(
                 fields.showTruckColor,
-                z
-                    .string()
-                    .min(1, t.truckColorRequired)
-                    .min(3, t.truckColorMin)
-                    .max(20, t.truckColorMax),
+                z.string().min(1, t.truckColorRequired),
             ),
             trailer_plate: z
                 .string()
@@ -476,10 +509,7 @@ export default function CheckInForm({ location, fields }: PageProps) {
                     .min(1, t.countryCodeRequired)
                     .regex(/^[A-Z]{2}$/, t.countryCodeInvalid),
             ),
-            trailer_chute: z
-                .string()
-                .min(1, t.trailerChuteRequired)
-                .max(10, t.trailerChuteMax),
+            trailer_chute: z.enum(['n/a', 'center-chute', 'side-chute']),
             empty_weight_lbs: optionalUnless(
                 fields.showEmptyWeightLbs,
                 z
@@ -530,12 +560,14 @@ export default function CheckInForm({ location, fields }: PageProps) {
 
     type FormValues = z.infer<typeof schema>;
 
-    const { control, handleSubmit, setError, getValues } = useForm<FormValues>({
+    const { control, handleSubmit, setError, getValues, setValue } =
+        useForm<FormValues>({
         resolver: zodResolver(schema),
         defaultValues: {
             customer: '',
             destination_city: '',
             destination_state: '',
+            destination_country: '',
             loading_instructions: '',
             po_numbers: [{ value: '' }],
             truck_name: '',
@@ -546,7 +578,7 @@ export default function CheckInForm({ location, fields }: PageProps) {
             trailer_plate: '',
             trailer_plate_state: '',
             trailer_plate_country: '',
-            trailer_chute: '',
+            trailer_chute: 'n/a',
             empty_weight_lbs: '',
             drivers_name: '',
             drivers_cellphone: '',
@@ -574,6 +606,7 @@ export default function CheckInForm({ location, fields }: PageProps) {
         'customer',
         'destination_city',
         'destination_state',
+        'destination_country',
         'loading_instructions',
         'truck_name',
         'truck_plate',
@@ -602,6 +635,7 @@ export default function CheckInForm({ location, fields }: PageProps) {
             customer: values.customer,
             destination_city: values.destination_city,
             destination_state: values.destination_state,
+            destination_country: values.destination_country,
             loading_instructions: values.loading_instructions ?? '',
             po_numbers: values.po_numbers.map((po) => po.value),
             truck_name: values.truck_name,
@@ -715,6 +749,197 @@ export default function CheckInForm({ location, fields }: PageProps) {
         />
     );
 
+    const renderSelectField = (
+        name: keyof FormValues,
+        label: string,
+        selectOptions: { value: string; label: string }[],
+        placeholder?: string,
+    ) => (
+        <Controller
+            name={name}
+            control={control}
+            render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                    <div className="relative">
+                        <select
+                            {...field}
+                            value={(field.value as string) ?? ''}
+                            id={name}
+                            aria-invalid={fieldState.invalid}
+                            className="h-9 w-full appearance-none rounded-4xl border border-input bg-input/30 px-3.5 pr-9 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20 md:text-sm dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40"
+                        >
+                            {placeholder && (
+                                <option value="" disabled>
+                                    {placeholder}
+                                </option>
+                            )}
+                            {selectOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                        <ChevronDownIcon className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground" />
+                    </div>
+                    {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                    )}
+                </Field>
+            )}
+        />
+    );
+
+    // Read-only country: populated only by the location autocomplete.
+    const renderCountryDisplay = (
+        name: keyof FormValues,
+        label: string,
+        placeholder: string,
+    ) => (
+        <Controller
+            name={name}
+            control={control}
+            render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                    <CountryDisplay
+                        id={name}
+                        value={(field.value as string) ?? ''}
+                        invalid={fieldState.invalid}
+                        placeholder={placeholder}
+                    />
+                    {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                    )}
+                </Field>
+            )}
+        />
+    );
+
+    // Read-only text field (e.g. destination state) filled only by the city pick.
+    const renderReadOnlyField = (
+        name: keyof FormValues,
+        label: string,
+        placeholder: string,
+    ) => (
+        <Controller
+            name={name}
+            control={control}
+            render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                    <div
+                        id={name}
+                        aria-invalid={fieldState.invalid || undefined}
+                        className="flex h-9 w-full items-center rounded-4xl border border-input bg-muted/40 px-3.5 text-sm shadow-xs aria-invalid:border-destructive"
+                    >
+                        {field.value ? (
+                            <span className="text-foreground">
+                                {field.value as string}
+                            </span>
+                        ) : (
+                            <span className="text-muted-foreground">
+                                {placeholder}
+                            </span>
+                        )}
+                    </div>
+                    {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                    )}
+                </Field>
+            )}
+        />
+    );
+
+    const renderCityAutocomplete = (
+        name: keyof FormValues,
+        stateField: keyof FormValues,
+        countryField: keyof FormValues,
+        label: string,
+        placeholder: string,
+    ) => (
+        <Controller
+            name={name}
+            control={control}
+            render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                    <LocationAutocomplete
+                        level="city"
+                        id={name}
+                        value={(field.value as string) ?? ''}
+                        onChange={(value) => {
+                            field.onChange(value);
+                            // Typing invalidates the derived fields — they only
+                            // ever come from a dropdown pick.
+                            setValue(stateField, '', { shouldDirty: true });
+                            setValue(countryField, '', { shouldDirty: true });
+                        }}
+                        onBlur={field.onBlur}
+                        placeholder={placeholder}
+                        maxLength={30}
+                        invalid={fieldState.invalid}
+                        onSelect={(result) => {
+                            field.onChange(result.city ?? '');
+                            setValue(stateField, result.state, {
+                                shouldValidate: true,
+                                shouldDirty: true,
+                            });
+                            setValue(countryField, result.countryCode, {
+                                shouldValidate: true,
+                                shouldDirty: true,
+                            });
+                        }}
+                    />
+                    {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                    )}
+                </Field>
+            )}
+        />
+    );
+
+    const renderStateAutocomplete = (
+        name: keyof FormValues,
+        countryField: keyof FormValues,
+        label: string,
+        placeholder: string,
+    ) => (
+        <Controller
+            name={name}
+            control={control}
+            render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={name}>{label}</FieldLabel>
+                    <LocationAutocomplete
+                        level="state"
+                        id={name}
+                        value={(field.value as string) ?? ''}
+                        onChange={(value) => {
+                            field.onChange(value);
+                            // Typing invalidates the derived country.
+                            setValue(countryField, '', { shouldDirty: true });
+                        }}
+                        onBlur={field.onBlur}
+                        placeholder={placeholder}
+                        maxLength={30}
+                        invalid={fieldState.invalid}
+                        onSelect={(result) => {
+                            field.onChange(result.state);
+                            setValue(countryField, result.countryCode, {
+                                shouldValidate: true,
+                                shouldDirty: true,
+                            });
+                        }}
+                    />
+                    {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                    )}
+                </Field>
+            )}
+        />
+    );
+
     return (
         <PublicLayout>
             <Head title={t.pageTitle} />
@@ -782,18 +1007,24 @@ export default function CheckInForm({ location, fields }: PageProps) {
                                             { maxLength: 40 },
                                         )}
 
-                                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:[&>:last-child:nth-child(odd)]:col-span-2">
-                                            {renderTextField(
-                                                'destination_city',
-                                                t.destinationCityLabel,
-                                                t.destinationCityPlaceholder,
-                                                { maxLength: 30 },
-                                            )}
-                                            {renderTextField(
+                                        {renderCityAutocomplete(
+                                            'destination_city',
+                                            'destination_state',
+                                            'destination_country',
+                                            t.destinationCityLabel,
+                                            t.destinationCityPlaceholder,
+                                        )}
+
+                                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                            {renderReadOnlyField(
                                                 'destination_state',
                                                 t.destinationStateLabel,
                                                 t.destinationStatePlaceholder,
-                                                { maxLength: 30 },
+                                            )}
+                                            {renderCountryDisplay(
+                                                'destination_country',
+                                                t.destinationCountryLabel,
+                                                t.destinationCountryPlaceholder,
                                             )}
                                         </div>
 
@@ -866,11 +1097,11 @@ export default function CheckInForm({ location, fields }: PageProps) {
                                                 { maxLength: 30 },
                                             )}
                                             {fields.showTruckColor &&
-                                                renderTextField(
+                                                renderSelectField(
                                                     'truck_color',
                                                     t.truckColorLabel,
+                                                    truckColorOptions,
                                                     t.truckColorPlaceholder,
-                                                    { maxLength: 20 },
                                                 )}
                                         </div>
 
@@ -885,21 +1116,17 @@ export default function CheckInForm({ location, fields }: PageProps) {
                                                 },
                                             )}
                                             {fields.showTruckPlateState &&
-                                                renderTextField(
+                                                renderStateAutocomplete(
                                                     'truck_plate_state',
+                                                    'truck_plate_country',
                                                     t.truckPlateStateLabel,
                                                     t.statePlaceholder,
-                                                    { maxLength: 30 },
                                                 )}
                                             {fields.showTruckPlateCountry &&
-                                                renderTextField(
+                                                renderCountryDisplay(
                                                     'truck_plate_country',
                                                     t.truckPlateCountryLabel,
-                                                    t.countryCodePlaceholder,
-                                                    {
-                                                        maxLength: 2,
-                                                        format: formatTwoLetterCode,
-                                                    },
+                                                    t.destinationCountryPlaceholder,
                                                 )}
                                         </div>
 
@@ -914,30 +1141,25 @@ export default function CheckInForm({ location, fields }: PageProps) {
                                                 },
                                             )}
                                             {fields.showTrailerPlateState &&
-                                                renderTextField(
+                                                renderStateAutocomplete(
                                                     'trailer_plate_state',
+                                                    'trailer_plate_country',
                                                     t.trailerPlateStateLabel,
                                                     t.statePlaceholder,
-                                                    { maxLength: 30 },
                                                 )}
                                             {fields.showTrailerPlateCountry &&
-                                                renderTextField(
+                                                renderCountryDisplay(
                                                     'trailer_plate_country',
                                                     t.trailerPlateCountryLabel,
-                                                    t.countryCodePlaceholder,
-                                                    {
-                                                        maxLength: 2,
-                                                        format: formatTwoLetterCode,
-                                                    },
+                                                    t.destinationCountryPlaceholder,
                                                 )}
                                         </div>
 
                                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:[&>:last-child:nth-child(odd)]:col-span-2">
-                                            {renderTextField(
+                                            {renderSelectField(
                                                 'trailer_chute',
                                                 t.trailerChuteLabel,
-                                                t.trailerChutePlaceholder,
-                                                { maxLength: 10 },
+                                                trailerChuteOptions,
                                             )}
                                             {fields.showEmptyWeightLbs &&
                                                 renderTextField(
@@ -1074,21 +1296,17 @@ export default function CheckInForm({ location, fields }: PageProps) {
                                                 { maxLength: 20 },
                                             )}
                                             {fields.showDriversLicenseState &&
-                                                renderTextField(
+                                                renderStateAutocomplete(
                                                     'drivers_license_state',
+                                                    'drivers_license_country',
                                                     t.licenseStateLabel,
                                                     t.statePlaceholder,
-                                                    { maxLength: 30 },
                                                 )}
                                             {fields.showDriversLicenseCountry &&
-                                                renderTextField(
+                                                renderCountryDisplay(
                                                     'drivers_license_country',
                                                     t.licenseCountryLabel,
-                                                    t.countryCodePlaceholder,
-                                                    {
-                                                        maxLength: 2,
-                                                        format: formatTwoLetterCode,
-                                                    },
+                                                    t.destinationCountryPlaceholder,
                                                 )}
                                         </div>
 

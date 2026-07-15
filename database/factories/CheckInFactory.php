@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\TrailerChute;
 use App\Models\CheckIn;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -31,13 +32,13 @@ final class CheckInFactory extends Factory
             'destination_country' => $this->faker->countryCode(),
             'truck_name' => $this->faker->word(),
             'truck_plate' => mb_strtoupper($this->faker->bothify('???###')),
-            'truck_color' => $this->faker->safeColorName(),
+            'truck_color' => $this->faker->randomElement((array) config('app.truck_colors')),
             'truck_plate_state' => $this->faker->stateAbbr(),
             'truck_plate_country' => $this->faker->countryCode(),
             'trailer_plate' => mb_strtoupper($this->faker->bothify('???###')),
             'trailer_plate_state' => $this->faker->stateAbbr(),
             'trailer_plate_country' => $this->faker->countryCode(),
-            'trailer_chute' => $this->faker->word(),
+            'trailer_chute' => $this->faker->randomElement(TrailerChute::cases()),
             'empty_weight_lbs' => null,
             'drivers_name' => $this->faker->name(),
             'drivers_cellphone' => '+1'.$this->faker->numerify('##########'),

@@ -30,12 +30,13 @@ function validCheckInPayload(): array
         'customer' => 'Acme Produce',
         'destination_city' => 'Phoenix',
         'destination_state' => 'Arizona',
+        'destination_country' => 'US',
         'loading_instructions' => 'Dock 4, call on arrival.',
         'po_numbers' => ['PO-12345'],
         'truck_name' => 'Truck 42',
         'truck_plate' => 'ABC1234',
         'trailer_plate' => 'XYZ9876',
-        'trailer_chute' => '4',
+        'trailer_chute' => 'center-chute',
         'drivers_name' => 'John Driver',
         'drivers_cellphone' => '(555) 123-4567',
         'drivers_license_number' => 'D12345678',
@@ -105,11 +106,11 @@ it('validates the required check-in fields', function (): void {
             'customer',
             'destination_city',
             'destination_state',
+            'destination_country',
             'po_numbers',
             'truck_name',
             'truck_plate',
             'trailer_plate',
-            'trailer_chute',
             'drivers_name',
             'drivers_cellphone',
             'drivers_license_number',
@@ -124,6 +125,31 @@ it('accepts a valid submission when optional fields are hidden', function (): vo
         ->post(route('checkIn.store', $location), validCheckInPayload())
         ->assertSessionHasNoErrors()
         ->assertRedirect(route('checkIn.selectLocation'));
+});
+
+it('accepts a submission that omits the optional trailer chute', function (): void {
+    $location = Location::factory()->create();
+
+    $payload = validCheckInPayload();
+    unset($payload['trailer_chute']);
+
+    $this->withSession(freshGatePass($location))
+        ->from(route('checkIn.form', $location))
+        ->post(route('checkIn.store', $location), $payload)
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('checkIn.selectLocation'));
+});
+
+it('rejects a trailer chute value outside the allowed set', function (): void {
+    $location = Location::factory()->create();
+
+    $this->withSession(freshGatePass($location))
+        ->from(route('checkIn.form', $location))
+        ->post(route('checkIn.store', $location), [
+            ...validCheckInPayload(),
+            'trailer_chute' => 'top-chute',
+        ])
+        ->assertSessionHasErrors(['trailer_chute']);
 });
 
 it('requires the optional fields when the location config shows them', function (): void {
@@ -151,7 +177,7 @@ it('accepts a valid submission including the config-driven fields', function ():
 
     $payload = [
         ...validCheckInPayload(),
-        'truck_color' => 'White',
+        'truck_color' => 'white',
         'truck_plate_state' => 'Arizona',
         'truck_plate_country' => 'us',
         'trailer_plate_state' => 'Sonora',
@@ -174,7 +200,7 @@ it('rejects an expired drivers license', function (): void {
 
     $payload = [
         ...validCheckInPayload(),
-        'truck_color' => 'White',
+        'truck_color' => 'white',
         'truck_plate_state' => 'Arizona',
         'truck_plate_country' => 'US',
         'trailer_plate_state' => 'Sonora',

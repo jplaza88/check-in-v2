@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\TrailerChute;
 use Carbon\CarbonImmutable;
 use Database\Factories\CheckInFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -35,7 +36,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read string $trailer_plate
  * @property-read string|null $trailer_plate_state
  * @property-read string|null $trailer_plate_country
- * @property-read string $trailer_chute
+ * @property-read TrailerChute $trailer_chute
  * @property-read string|null $empty_weight_lbs
  * @property-read string $drivers_name
  * @property-read string $drivers_cellphone
@@ -109,6 +110,7 @@ final class CheckIn extends Model
     {
         return [
             'uuid' => 'string',
+            'trailer_chute' => TrailerChute::class,
         ];
     }
 }

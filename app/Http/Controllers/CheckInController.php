@@ -54,6 +54,7 @@ final class CheckInController extends Controller
         return inertia('CheckInForm', [
             'location' => $location,
             'fields' => $this->session->getCheckInFormFields() ?? [],
+            'truckColors' => config('app.truck_colors'),
         ]);
     }
 

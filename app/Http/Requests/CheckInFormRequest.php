@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\Enums\TrailerChute;
 use App\Models\Location;
 use App\Queries\CheckInLocation;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 final class CheckInFormRequest extends FormRequest
@@ -37,6 +39,7 @@ final class CheckInFormRequest extends FormRequest
             'customer' => ['required', 'string', 'min:2', 'max:40'],
             'destination_city' => ['required', 'string', 'min:2', 'max:30'],
             'destination_state' => ['required', 'string', 'min:2', 'max:30'],
+            'destination_country' => ['required', 'string', 'size:2', 'alpha'],
             'po_numbers' => ['required', 'array', 'min:1', 'max:10'],
             'po_numbers.*' => ['required', 'string', 'distinct:ignore_case', 'min:7', 'max:13', 'regex:/^(SO|PO|PU)-\d{4,10}$/i'],
             'truck_name' => ['required', 'string', 'min:1', 'max:30'],
@@ -48,7 +51,7 @@ final class CheckInFormRequest extends FormRequest
                 ? ['required', 'string', 'size:2', 'alpha']
                 : ['exclude'],
             'truck_color' => ($fields['showTruckColor'] ?? false)
-                ? ['required', 'string', 'min:3', 'max:20']
+                ? ['required', 'string', Rule::in((array) config('app.truck_colors'))]
                 : ['exclude'],
             'trailer_plate' => ['required', 'string', 'regex:/^[A-Z0-9 -]{2,10}$/'],
             'trailer_plate_state' => ($fields['showTrailerPlateState'] ?? false)
@@ -57,7 +60,7 @@ final class CheckInFormRequest extends FormRequest
             'trailer_plate_country' => ($fields['showTrailerPlateCountry'] ?? false)
                 ? ['required', 'string', 'size:2', 'alpha']
                 : ['exclude'],
-            'trailer_chute' => ['required', 'string', 'min:1', 'max:10'],
+            'trailer_chute' => ['nullable', Rule::enum(TrailerChute::class)],
             'empty_weight_lbs' => ($fields['showEmptyWeightLbs'] ?? false)
                 ? ['required', 'integer', 'min:1000', 'max:99999']
                 : ['exclude'],
@@ -90,6 +93,9 @@ final class CheckInFormRequest extends FormRequest
             'destination_city.min' => __('messages.checkInForm.destinationCityMin'),
             'destination_state.required' => __('messages.checkInForm.destinationStateRequired'),
             'destination_state.min' => __('messages.checkInForm.destinationStateMin'),
+            'destination_country.required' => __('messages.checkInForm.destinationCountryRequired'),
+            'destination_country.size' => __('messages.checkInForm.destinationCountryRequired'),
+            'destination_country.alpha' => __('messages.checkInForm.destinationCountryRequired'),
             'po_numbers.required' => __('messages.purchaseOrders.minOne'),
             'po_numbers.min' => __('messages.purchaseOrders.minOne'),
             'po_numbers.*.required' => __('messages.purchaseOrders.required'),
@@ -106,8 +112,6 @@ final class CheckInFormRequest extends FormRequest
             'truck_plate_country.size' => __('messages.checkInForm.countryCodeInvalid'),
             'truck_plate_country.alpha' => __('messages.checkInForm.countryCodeInvalid'),
             'truck_color.required' => __('messages.checkInForm.truckColorRequired'),
-            'truck_color.min' => __('messages.checkInForm.truckColorMin'),
-            'truck_color.max' => __('messages.checkInForm.truckColorMax'),
             'trailer_plate.required' => __('messages.checkInForm.trailerPlateRequired'),
             'trailer_plate.regex' => __('messages.checkInForm.plateInvalid'),
             'trailer_plate_state.required' => __('messages.checkInForm.stateRequired'),
@@ -116,8 +120,6 @@ final class CheckInFormRequest extends FormRequest
             'trailer_plate_country.required' => __('messages.checkInForm.countryCodeRequired'),
             'trailer_plate_country.size' => __('messages.checkInForm.countryCodeInvalid'),
             'trailer_plate_country.alpha' => __('messages.checkInForm.countryCodeInvalid'),
-            'trailer_chute.required' => __('messages.checkInForm.trailerChuteRequired'),
-            'trailer_chute.max' => __('messages.checkInForm.trailerChuteMax'),
             'empty_weight_lbs.required' => __('messages.checkInForm.emptyWeightRequired'),
             'empty_weight_lbs.integer' => __('messages.checkInForm.emptyWeightInvalid'),
             'empty_weight_lbs.min' => __('messages.checkInForm.emptyWeightInvalid'),
