@@ -16,6 +16,7 @@ A web application that manages truck drivers' check-ins across Martori Farms loc
 | Database | PostgreSQL 18                                 |
 | Frontend | React · TypeScript · Inertia.js · Tailwind CSS |
 | Cache / Queue | Redis                                         |
+| Queue Dashboard | Laravel Horizon                             |
 | Mail | Mailpit                                       |
 
 ## Laravel Packages & Tooling
@@ -27,6 +28,8 @@ A web application that manages truck drivers' check-ins across Martori Farms loc
 | Pint | PHP code style fixer (Wrapper built ontop of PHP-CS-Fixer) |
 | Larastan | Static analysis (PHPStan for Laravel)               |
 | Rector | Automated code refactoring (Driftingly/Laravel Rector) |
+| Horizon | Redis queue monitoring & worker management dashboard |
+| Laravel Phone | Phone number validation (Propaganistas wrapper around Google's libphonenumber) |
 
 ## Requirements
 
@@ -72,6 +75,7 @@ cp .env.example .env
 | Service | URL                       |
 |---|---------------------------|
 | Web application | https://martori.localhost |
+| Horizon dashboard | https://martori.localhost/horizon |
 | Mailpit inbox | http://localhost:8025     |
 
 ## Development
@@ -83,6 +87,17 @@ cp .env.example .env
 ```bash
 ./vendor/bin/sail npm run dev
 ```
+
+### Queues (Horizon)
+
+Background jobs are processed by [Laravel Horizon](https://laravel.com/docs/horizon), which manages the Redis queue workers and provides a monitoring dashboard at `/horizon`.
+
+```bash
+./vendor/bin/sail artisan horizon        # start the Horizon workers
+./vendor/bin/sail artisan horizon:status # check the master supervisor status
+```
+
+Worker supervisors, queues, and balancing strategies are configured in `config/horizon.php`. Dashboard access is authorized via the `viewHorizon` gate.
 
 ### Code Style (Pint)
 
