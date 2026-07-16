@@ -13,7 +13,7 @@ final readonly class SearchCities
      * country. LOWER(...) LIKE keeps it portable across Postgres (prod) and the
      * SQLite test database.
      *
-     * @return list<array{city: string, state: string, stateCode: ?string, country: string, countryCode: string}>
+     * @return array<int, array{city: string, state: string, stateCode: string, country: string, countryCode: string}>
      */
     public function execute(string $query): array
     {
@@ -33,7 +33,13 @@ final readonly class SearchCities
                 'countries.name as country',
                 'countries.short_name as countryCode',
             ])
-            ->map(fn (object $row): array => (array) $row)
+            ->map(fn (object $row): array => [
+                'city' => $row->city,
+                'state' => $row->state,
+                'stateCode' => $row->stateCode,
+                'country' => $row->country,
+                'countryCode' => $row->countryCode,
+            ])
             ->all();
     }
 }

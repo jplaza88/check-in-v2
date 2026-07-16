@@ -11,7 +11,7 @@ final readonly class SearchStates
     /**
      * Case-insensitive prefix search across states, joined to their country.
      *
-     * @return list<array{state: string, stateCode: ?string, country: string, countryCode: string}>
+     * @return array<int, array{state: string, stateCode: string, country: string, countryCode: string}>
      */
     public function execute(string $query): array
     {
@@ -29,7 +29,12 @@ final readonly class SearchStates
                 'countries.name as country',
                 'countries.short_name as countryCode',
             ])
-            ->map(fn (object $row): array => (array) $row)
+            ->map(fn (object $row): array => [
+                'state' => $row->state,
+                'stateCode' => $row->stateCode,
+                'country' => $row->country,
+                'countryCode' => $row->countryCode,
+            ])
             ->all();
     }
 }
