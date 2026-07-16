@@ -20,6 +20,10 @@ RUN install-php-extensions pcntl pdo_pgsql redis intl zip bcmath \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+# Vite inlines VITE_* vars into the JS bundle at build time; the runtime .env
+# cannot change them afterwards. Must be present before `npm run build`.
+ARG VITE_APP_NAME="Martori Farms"
+ENV VITE_APP_NAME=${VITE_APP_NAME}
 COPY --from=vendor /app/vendor ./vendor
 COPY . .
 RUN npm ci && npm run build
