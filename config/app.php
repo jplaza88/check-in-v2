@@ -280,4 +280,35 @@ return [
         'lead_time_minutes' => ['default' => 60, 'max' => 480],
         'buffer_before_close_minutes' => ['default' => 30, 'max' => 480],
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Truck Colors
+    |--------------------------------------------------------------------------
+    |
+    | Allowlist of truck colors offered in the check-in form's optional color
+    | dropdown. The order here is the order shown in the UI and the backend
+    | validation allowlist. Display labels are translated per-locale in
+    | lang/{locale}/messages.php under checkInForm.truckColors — keep those
+    | keys in sync with the slugs below.
+    |
+    */
+
+    'truck_colors' => [
+        'white',
+        'black',
+        'gray',
+        'red',
+        'orange',
+        'yellow',
+        'green',
+        'blue',
+        'purple',
+        'brown',
+        'beige',
+        'maroon',
+        'gold',
+        'multicolor',
+        'other',
+    ],
 ];

@@ -16,6 +16,7 @@ A web application that manages truck drivers' check-ins across Martori Farms loc
 | Database | PostgreSQL 18                                 |
 | Frontend | React · TypeScript · Inertia.js · Tailwind CSS |
 | Cache / Queue | Redis                                         |
+| Queue Dashboard | Laravel Horizon                             |
 | Mail | Mailpit                                       |
 
 ## Laravel Packages & Tooling
@@ -27,6 +28,8 @@ A web application that manages truck drivers' check-ins across Martori Farms loc
 | Pint | PHP code style fixer (Wrapper built ontop of PHP-CS-Fixer) |
 | Larastan | Static analysis (PHPStan for Laravel)               |
 | Rector | Automated code refactoring (Driftingly/Laravel Rector) |
+| Horizon | Redis queue monitoring & worker management dashboard |
+| Laravel Phone | Phone number validation (Propaganistas wrapper around Google's libphonenumber) |
 
 ## Requirements
 
@@ -72,6 +75,7 @@ cp .env.example .env
 | Service | URL                       |
 |---|---------------------------|
 | Web application | https://martori.localhost |
+| Horizon dashboard | https://martori.localhost/horizon |
 | Mailpit inbox | http://localhost:8025     |
 
 ## Development
@@ -83,6 +87,17 @@ cp .env.example .env
 ```bash
 ./vendor/bin/sail npm run dev
 ```
+
+### Queues (Horizon)
+
+Background jobs are processed by [Laravel Horizon](https://laravel.com/docs/horizon), which manages the Redis queue workers and provides a monitoring dashboard at `/horizon`.
+
+```bash
+./vendor/bin/sail artisan horizon        # start the Horizon workers
+./vendor/bin/sail artisan horizon:status # check the master supervisor status
+```
+
+Worker supervisors, queues, and balancing strategies are configured in `config/horizon.php`. Dashboard access is authorized via the `viewHorizon` gate.
 
 ### Code Style (Pint)
 
@@ -116,6 +131,24 @@ Uses [Driftingly/Laravel Rector](https://github.com/driftingly/rector-laravel) w
 ```bash
 ./vendor/bin/sail artisan test                                              # all tests
 ./vendor/bin/sail artisan test --compact                                    # compact output
+./vendor/bin/sail artisan test --parallel                                   # run tests in parallel (faster)
+./vendor/bin/sail artisan test --parallel --compact                         # parallel + compact output
 ./vendor/bin/sail pest --filter "switches locale when locale is available"  # specific test
 ./vendor/bin/sail pest tests/Unit/LocaleSwitchTest.php                      # specific file
+```
+
+#### Browser tests (Playwright)
+
+Browser tests live in `tests/Browser` and drive a real Chromium instance via Playwright. The browser binaries must be installed inside the Sail container once (they live in the container filesystem, so reinstall after a container rebuild):
+
+```bash
+./vendor/bin/sail npx playwright install chromium               # download the Chromium binary
+docker compose exec -u root checkin npx playwright install-deps chromium  # install system libraries (as root)
+```
+
+Then run the browser suite:
+
+```bash
+./vendor/bin/sail artisan test tests/Browser                    # all browser tests
+./vendor/bin/sail artisan test --parallel tests/Browser         # browser tests in parallel
 ```

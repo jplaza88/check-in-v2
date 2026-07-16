@@ -139,7 +139,7 @@ function ActionCard({
     );
 }
 
-export default function Welcome() {
+export default function Home() {
     const { translations } = usePage<PageProps>().props;
     const t = translations.home;
     const appName = import.meta.env.VITE_APP_NAME;
@@ -152,7 +152,7 @@ export default function Welcome() {
 
     return (
         <>
-            <Head title={appName} />
+            <Head title="Home" />
 
             <div className="flex min-h-dvh flex-col bg-white dark:bg-gray-900">
                 <Navbar hideLogin />

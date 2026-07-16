@@ -15,18 +15,20 @@ final class ScheduleSeeder extends Seeder
         $now = now();
 
         // Carbon: 0 = Sunday, 1 = Monday, ..., 6 = Saturday
-        $weekdaySchedule = [
+        $weeklySchedule = [
+            0 => ['open_time' => '07:00:00', 'close_time' => '17:00:00'],
             1 => ['open_time' => '07:00:00', 'close_time' => '17:00:00'],
             2 => ['open_time' => '07:00:00', 'close_time' => '17:00:00'],
             3 => ['open_time' => '07:00:00', 'close_time' => '17:00:00'],
             4 => ['open_time' => '07:00:00', 'close_time' => '17:00:00'],
             5 => ['open_time' => '07:00:00', 'close_time' => '17:00:00'],
+            6 => ['open_time' => '07:00:00', 'close_time' => '17:00:00'],
         ];
 
         $rows = [];
 
         foreach ($locationIds as $locationId) {
-            foreach ($weekdaySchedule as $dayOfWeek => $hours) {
+            foreach ($weeklySchedule as $dayOfWeek => $hours) {
                 $rows[] = [
                     'location_id' => $locationId,
                     'day_of_week' => $dayOfWeek,
