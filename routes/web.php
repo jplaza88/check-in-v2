@@ -11,26 +11,10 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'Home')->middleware('setLocale')->name('home');
-
-Route::middleware('setLocale')
-    ->get('/schedule', [ScheduleController::class, 'index'])
-    ->name('schedule');
-
-Route::middleware('setLocale')
-    ->get('/contact', [ContactController::class, 'index'])
-    ->name('contact');
-
-Route::get('/about', static function (): string|false {
-    ob_start();
-    phpinfo();
-
-    return ob_get_clean();
-});
-
 $locales = implode('|', config('app.locales'));
 
 Route::prefix('locale')->group(function () use ($locales): void {
+
     Route::post('/{locale}', LocaleController::class)
         ->where('locale', $locales)
         ->name('localeSwitch');
@@ -43,11 +27,22 @@ Route::middleware('throttle:30,1')
 
 // JSON geo-autocomplete endpoints, no translations needed
 Route::middleware('throttle:60,1')->group(function (): void {
+
     Route::get('/geo/cities', [GeoController::class, 'cities'])->name('geo.cities');
+
     Route::get('/geo/states', [GeoController::class, 'states'])->name('geo.states');
 });
 
 Route::middleware('setLocale')->group(function (): void {
+
+    /**
+     * Public
+     */
+    Route::inertia('/', 'Home')->name('home');
+
+    Route::get('/schedule', [ScheduleController::class, 'index'])->name('schedule');
+
+    Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 
     /**
      * Check-In
