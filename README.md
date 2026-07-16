@@ -131,6 +131,24 @@ Uses [Driftingly/Laravel Rector](https://github.com/driftingly/rector-laravel) w
 ```bash
 ./vendor/bin/sail artisan test                                              # all tests
 ./vendor/bin/sail artisan test --compact                                    # compact output
+./vendor/bin/sail artisan test --parallel                                   # run tests in parallel (faster)
+./vendor/bin/sail artisan test --parallel --compact                         # parallel + compact output
 ./vendor/bin/sail pest --filter "switches locale when locale is available"  # specific test
 ./vendor/bin/sail pest tests/Unit/LocaleSwitchTest.php                      # specific file
+```
+
+#### Browser tests (Playwright)
+
+Browser tests live in `tests/Browser` and drive a real Chromium instance via Playwright. The browser binaries must be installed inside the Sail container once (they live in the container filesystem, so reinstall after a container rebuild):
+
+```bash
+./vendor/bin/sail npx playwright install chromium               # download the Chromium binary
+docker compose exec -u root checkin npx playwright install-deps chromium  # install system libraries (as root)
+```
+
+Then run the browser suite:
+
+```bash
+./vendor/bin/sail artisan test tests/Browser                    # all browser tests
+./vendor/bin/sail artisan test --parallel tests/Browser         # browser tests in parallel
 ```
