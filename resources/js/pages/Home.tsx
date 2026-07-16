@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 
+import BuildStamp from '@/components/BuildStamp';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import appointment from '@/routes/appointment';
@@ -254,6 +255,8 @@ export default function Home() {
 
                 <Footer hideLogin />
             </div>
+
+            <BuildStamp />
         </>
     );
 }
