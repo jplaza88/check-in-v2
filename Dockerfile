@@ -44,6 +44,9 @@ RUN { \
       echo "opcache.max_accelerated_files=20000"; \
     } > /usr/local/etc/php/conf.d/zz-opcache.ini
 WORKDIR /app
+# Deployed commit SHA, surfaced in-app via config('app.commit').
+ARG GIT_COMMIT=unknown
+ENV GIT_COMMIT=${GIT_COMMIT}
 COPY --chown=www-data:www-data . .
 COPY --from=vendor --chown=www-data:www-data /app/vendor ./vendor
 COPY --from=frontend --chown=www-data:www-data /app/public/build ./public/build

@@ -19,6 +19,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Deployed Commit
+    |--------------------------------------------------------------------------
+    |
+    | The Git commit SHA baked into the image at build time (GIT_COMMIT build
+    | arg). Read through config so it survives `config:cache` — env() outside a
+    | config file returns null once the config is cached. Null in local dev.
+    |
+    */
+
+    'commit' => env('GIT_COMMIT'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |

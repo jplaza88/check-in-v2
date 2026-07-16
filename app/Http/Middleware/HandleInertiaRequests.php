@@ -50,6 +50,7 @@ final class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'commit' => $this->getShortCommit(...),
             'auth' => [
                 'user' => $request->user(...),
             ],
@@ -59,6 +60,20 @@ final class HandleInertiaRequests extends Middleware
             'localesAvailable' => fn () => config('app.locales'),
             'localesLabels' => fn () => config('app.locales_labels'),
         ];
+    }
+
+    /**
+     * The short (7-char) deployed commit SHA, or null in local dev.
+     */
+    private function getShortCommit(): ?string
+    {
+        if (request()->route()?->getName() !== 'home') {
+            return null;
+        }
+
+        $commit = config('app.commit');
+
+        return is_string($commit) && $commit !== '' ? mb_substr($commit, 0, 7) : null;
     }
 
     private function getCurrentRouteName(): ?string
