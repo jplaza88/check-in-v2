@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import BuildStamp from '@/components/BuildStamp';
 import Logo from '@/components/Logo';
 import { contact, schedule } from '@/routes';
 
@@ -117,10 +118,13 @@ export default function Footer({ hideLogin = false }: { hideLogin?: boolean }) {
                     <Link href="/" prefetch>
                         <Logo size="sm" />
                     </Link>
-                    <span className="text-xs text-gray-400">
-                        © {new Date().getFullYear()} {appName}.{' '}
-                        {pageTranslations.allRightsReserved}.
-                    </span>
+                    <div className="flex flex-col items-end gap-1">
+                        <span className="text-xs text-gray-400">
+                            © {new Date().getFullYear()} {appName}.{' '}
+                            {pageTranslations.allRightsReserved}.
+                        </span>
+                        <BuildStamp />
+                    </div>
                 </div>
             </div>
         </footer>

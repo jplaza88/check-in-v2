@@ -1,9 +1,8 @@
 import { usePage } from '@inertiajs/react';
 
 /**
- * Renders the deployed commit SHA in a subtle fixed badge at the bottom-right.
- * Sourced from the `commit` shared prop; hidden entirely in local dev where it
- * is null.
+ * Renders the deployed commit SHA as small muted text. Sourced from the
+ * `commit` shared prop; renders nothing in local dev where it is null.
  */
 export default function BuildStamp() {
     const { commit } = usePage().props;
@@ -13,10 +12,7 @@ export default function BuildStamp() {
     }
 
     return (
-        <span
-            className="pointer-events-none fixed right-2 bottom-2 z-50 select-none font-mono text-[10px] tracking-wide text-gray-400/70 dark:text-gray-500/70"
-            title="Deployed commit"
-        >
+        <span className="font-mono text-[10px] tracking-wide text-gray-400 select-none dark:text-gray-500">
             {commit}
         </span>
     );
