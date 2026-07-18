@@ -204,8 +204,8 @@ function LocationCard({
                         </span>
 
                         <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                                <h2 className="truncate text-base font-bold text-brand-grey dark:text-gray-100">
+                            <div className="flex min-w-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-2">
+                                <h2 className="min-w-0 truncate text-base font-bold text-brand-grey dark:text-gray-100">
                                     {location.name}
                                 </h2>
                                 {enabled && isOpenNow && (
