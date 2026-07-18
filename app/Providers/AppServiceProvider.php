@@ -49,9 +49,7 @@ final class AppServiceProvider extends ServiceProvider
         $this->app->singleton('db.encrypter', function (): Encrypter {
             $key = (string) config('app.db_encryption_key');
 
-            if ($key === '') {
-                throw new RuntimeException('DB_ENCRYPTION_KEY is not set. Generate one with: php -r "echo \'base64:\'.base64_encode(random_bytes(32));"');
-            }
+            throw_if($key === '', RuntimeException::class, 'DB_ENCRYPTION_KEY is not set. Generate one with: php -r "echo \'base64:\'.base64_encode(random_bytes(32));"');
 
             $encrypter = new Encrypter($this->parseEncryptionKey($key), config('app.cipher'));
 

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Requests;
 
 use App\CheckIn\CheckInAvailabilityResolver;
-use App\CheckIn\CheckInScheduleResolver;
 use App\DTOs\CheckInLocationDTO;
 use App\Enums\TrailerChute;
 use App\Models\Location;
@@ -161,8 +160,7 @@ final class CheckInFormRequest extends FormRequest
     public function after(
         CheckInAvailabilityResolver $availabilityResolver,
         CheckInSession $session,
-    ): array
-    {
+    ): array {
         return [
             function (Validator $validator) use ($availabilityResolver, $session): void {
                 $context = $session->getLocation();
