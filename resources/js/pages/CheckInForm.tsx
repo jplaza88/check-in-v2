@@ -258,6 +258,15 @@ function ReviewSummary({
         'side-chute': t.trailerChuteSide,
     };
 
+    // Combines a state and country into one line, e.g. "Arizona, United States".
+    const stateCountry = (
+        state?: string | null,
+        country?: string | null,
+    ): string =>
+        [state, country ? countryName(country) : null]
+            .filter(Boolean)
+            .join(', ');
+
     return (
         <div className="space-y-5 px-5 pt-5 pb-6">
             <SectionHeader step={1} label={t.reviewTitle} />
@@ -315,32 +324,28 @@ function ReviewSummary({
                         label={t.truckPlateLabel}
                         value={values.truck_plate}
                     />
-                    {fields.showTruckPlateState && (
+                    {(fields.showTruckPlateState ||
+                        fields.showTruckPlateCountry) && (
                         <ReviewRow
                             label={t.truckPlateStateLabel}
-                            value={values.truck_plate_state ?? ''}
-                        />
-                    )}
-                    {fields.showTruckPlateCountry && (
-                        <ReviewRow
-                            label={t.truckPlateCountryLabel}
-                            value={values.truck_plate_country ?? ''}
+                            value={stateCountry(
+                                values.truck_plate_state,
+                                values.truck_plate_country,
+                            )}
                         />
                     )}
                     <ReviewRow
                         label={t.trailerPlateLabel}
                         value={values.trailer_plate}
                     />
-                    {fields.showTrailerPlateState && (
+                    {(fields.showTrailerPlateState ||
+                        fields.showTrailerPlateCountry) && (
                         <ReviewRow
                             label={t.trailerPlateStateLabel}
-                            value={values.trailer_plate_state ?? ''}
-                        />
-                    )}
-                    {fields.showTrailerPlateCountry && (
-                        <ReviewRow
-                            label={t.trailerPlateCountryLabel}
-                            value={values.trailer_plate_country ?? ''}
+                            value={stateCountry(
+                                values.trailer_plate_state,
+                                values.trailer_plate_country,
+                            )}
                         />
                     )}
                     <ReviewRow
@@ -368,16 +373,14 @@ function ReviewSummary({
                         label={t.licenseNumberLabel}
                         value={values.drivers_license_number}
                     />
-                    {fields.showDriversLicenseState && (
+                    {(fields.showDriversLicenseState ||
+                        fields.showDriversLicenseCountry) && (
                         <ReviewRow
                             label={t.licenseStateLabel}
-                            value={values.drivers_license_state ?? ''}
-                        />
-                    )}
-                    {fields.showDriversLicenseCountry && (
-                        <ReviewRow
-                            label={t.licenseCountryLabel}
-                            value={values.drivers_license_country ?? ''}
+                            value={stateCountry(
+                                values.drivers_license_state,
+                                values.drivers_license_country,
+                            )}
                         />
                     )}
                     {fields.showDriversLicenseExpirationDate && (

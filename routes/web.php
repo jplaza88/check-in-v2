@@ -44,6 +44,10 @@ Route::middleware('setLocale')->group(function (): void {
 
     Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 
+    Route::inertia('/privacy', 'PrivacyPolicy')->name('privacy');
+
+    Route::inertia('/terms', 'TermsOfService')->name('terms');
+
     /**
      * Check-In
      */
@@ -66,6 +70,11 @@ Route::middleware('setLocale')->group(function (): void {
             ->whereUuid('uuid')
             ->name('checkIn.store');
     });
+
+    Route::middleware('throttle:20,1')
+        ->get('/check-in/{uuid}/confirmed', [CheckInController::class, 'confirmed'])
+        ->whereUuid('uuid')
+        ->name('checkIn.confirmed');
 
     /**
      * Appointment

@@ -141,16 +141,17 @@ final class Location extends Model
      */
     public function appointmentEmailAddresses(): array
     {
-        $emails = data_get($this->config, 'appointment.email_addresses', []);
+        return $this->emailAddresses('appointment.email_addresses');
+    }
 
-        if (! is_array($emails)) {
-            return [];
-        }
-
-        return array_values(array_filter(
-            $emails,
-            fn (mixed $email): bool => is_string($email) && filter_var($email, FILTER_VALIDATE_EMAIL) !== false,
-        ));
+    /**
+     * Addresses notified when a driver checks in at this location.
+     *
+     * @return list<string>
+     */
+    public function checkInEmailAddresses(): array
+    {
+        return $this->emailAddresses('checkin.email_addresses');
     }
 
     /**
@@ -183,5 +184,24 @@ final class Location extends Model
             'is_appointments_enabled' => 'boolean',
             'config' => 'array',
         ];
+    }
+
+    /**
+     * Read and validate a list of email addresses from the location config.
+     *
+     * @return list<string>
+     */
+    private function emailAddresses(string $configKey): array
+    {
+        $emails = data_get($this->config, $configKey, []);
+
+        if (! is_array($emails)) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            $emails,
+            fn (mixed $email): bool => is_string($email) && filter_var($email, FILTER_VALIDATE_EMAIL) !== false,
+        ));
     }
 }

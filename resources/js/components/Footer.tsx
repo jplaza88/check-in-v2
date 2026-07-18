@@ -96,14 +96,14 @@ export default function Footer({ hideLogin = false }: { hideLogin?: boolean }) {
                         </p>
                         <div className="flex flex-col gap-2.5">
                             <Link
-                                href="#"
+                                href="/privacy"
                                 className="text-sm text-gray-500 transition-colors hover:text-brand-green"
                                 prefetch
                             >
                                 {pageTranslations.privacyPolicy}
                             </Link>
                             <Link
-                                href="#"
+                                href="/terms"
                                 className="text-sm text-gray-500 transition-colors hover:text-brand-green"
                                 prefetch
                             >

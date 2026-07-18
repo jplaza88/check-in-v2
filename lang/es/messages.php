@@ -160,6 +160,26 @@ return [
         'signIn' => 'Iniciar sesión',
     ],
 
+    'checkInConfirmation' => [
+        'pageTitle' => 'Registro completado',
+        'newCheckIn' => 'Nuevo registro',
+        'confirmed' => '¡Su registro está completo!',
+        'subheading' => 'Por favor espere más instrucciones.',
+        'reference' => 'Referencia',
+        'summary' => 'Resumen del registro',
+        'locationLabel' => 'Ubicación',
+        'customerLabel' => 'Cliente',
+        'destinationLabel' => 'Destino',
+        'poLabel' => 'Número(s) de orden de compra',
+        'driverLabel' => 'Conductor',
+        'nextSteps' => 'Tenga este número de referencia a mano mientras esté en las instalaciones.',
+        'needHelp' => '¿Necesita ayuda?',
+        'registerHeading' => 'Acelere su próximo registro',
+        'registerBody' => 'Cree una cuenta gratuita para guardar su información y registrarse más rápido la próxima vez.',
+        'createAccount' => 'Crear cuenta',
+        'signIn' => 'Iniciar sesión',
+    ],
+
     'appointmentForm' => [
         'pageTitle' => 'Reservar una cita',
         'newAppointment' => 'Nueva cita',

@@ -160,6 +160,26 @@ return [
         'signIn' => 'Se connecter',
     ],
 
+    'checkInConfirmation' => [
+        'pageTitle' => 'Enregistrement terminé',
+        'newCheckIn' => 'Nouvel enregistrement',
+        'confirmed' => 'Votre enregistrement est terminé !',
+        'subheading' => 'Veuillez attendre les instructions.',
+        'reference' => 'Référence',
+        'summary' => "Récapitulatif de l'enregistrement",
+        'locationLabel' => 'Lieu',
+        'customerLabel' => 'Client',
+        'destinationLabel' => 'Destination',
+        'poLabel' => 'Numéro(s) de bon de commande',
+        'driverLabel' => 'Conducteur',
+        'nextSteps' => 'Gardez ce numéro de référence à portée de main pendant votre présence sur le site.',
+        'needHelp' => 'Besoin d\'aide ?',
+        'registerHeading' => 'Accélérez votre prochain enregistrement',
+        'registerBody' => 'Créez un compte gratuit pour enregistrer vos informations et vous enregistrer plus rapidement la prochaine fois.',
+        'createAccount' => 'Créer un compte',
+        'signIn' => 'Se connecter',
+    ],
+
     'appointmentForm' => [
         'pageTitle' => 'Prendre un rendez-vous',
         'newAppointment' => 'Nouveau rendez-vous',
