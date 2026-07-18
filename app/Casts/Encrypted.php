@@ -42,6 +42,6 @@ final class Encrypted implements CastsAttributes
 
     private function encrypter(): Encrypter
     {
-        return app('db.encrypter');
+        return resolve('db.encrypter');
     }
 }
