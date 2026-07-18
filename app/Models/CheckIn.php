@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Casts\Encrypted;
+use App\Enums\CheckInErpStatus;
+use App\Enums\CheckInStatus;
 use App\Enums\TrailerChute;
 use Carbon\CarbonImmutable;
 use Database\Factories\CheckInFactory;
@@ -22,8 +25,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read int $location_id
  * @property-read int|null $user_id
  * @property-read int|null $appointment_id
- * @property-read string $status
- * @property-read string $erp_status
+ * @property-read CheckInStatus $status
+ * @property-read CheckInErpStatus $erp_status
  * @property-read string $customer
  * @property-read string $destination_city
  * @property-read string $destination_state
@@ -36,7 +39,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read string $trailer_plate
  * @property-read string|null $trailer_plate_state
  * @property-read string|null $trailer_plate_country
- * @property-read TrailerChute $trailer_chute
+ * @property-read TrailerChute|null $trailer_chute
  * @property-read string|null $empty_weight_lbs
  * @property-read string $drivers_name
  * @property-read string $drivers_cellphone
@@ -110,7 +113,10 @@ final class CheckIn extends Model
     {
         return [
             'uuid' => 'string',
+            'status' => CheckInStatus::class,
+            'erp_status' => CheckInErpStatus::class,
             'trailer_chute' => TrailerChute::class,
+            'drivers_license_number' => Encrypted::class,
         ];
     }
 }

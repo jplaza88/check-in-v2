@@ -19,6 +19,21 @@ const ThemeContext = createContext<ThemeContextType>({
     changeCurrentTheme: () => {},
 });
 
+// Keeps the browser UI / iOS status-bar + safe-area tint matched to the active
+// theme. Matches the page background (white / gray-900).
+function setThemeColorMeta(color: string): void {
+    let meta =
+        document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+
+    if (!meta) {
+        meta = document.createElement('meta');
+        meta.name = 'theme-color';
+        document.head.appendChild(meta);
+    }
+
+    meta.content = color;
+}
+
 export default function ThemeProvider({ children }: { children: ReactNode }) {
     const [theme, setTheme] = useState<string>(() => {
         if (typeof window === 'undefined') {
@@ -43,6 +58,8 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
             document.documentElement.classList.add('dark');
             document.documentElement.style.colorScheme = 'dark';
         }
+
+        setThemeColorMeta(theme === 'light' ? '#ffffff' : '#111827');
 
         const transitionTimeout = setTimeout(() => {
             document.documentElement.classList.remove('**:transition-none!');

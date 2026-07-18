@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\CheckInErpStatus;
+use App\Enums\CheckInStatus;
 use App\Enums\TrailerChute;
 use App\Models\CheckIn;
 use App\Models\Location;
@@ -24,8 +26,8 @@ final class CheckInFactory extends Factory
                 fn (): string => $chars[random_int(0, mb_strlen($chars) - 1)],
                 range(1, 8),
             )),
-            'status' => 'pending',
-            'erp_status' => 'pending',
+            'status' => CheckInStatus::Pending,
+            'erp_status' => CheckInErpStatus::Pending,
             'customer' => $this->faker->company(),
             'destination_city' => $this->faker->city(),
             'destination_state' => $this->faker->stateAbbr(),

@@ -31,12 +31,13 @@ return new class extends Migration
             $table->string('trailer_plate');
             $table->string('trailer_plate_state')->nullable();
             $table->string('trailer_plate_country')->nullable();
-            $table->string('trailer_chute');
+            $table->string('trailer_chute')->nullable();
             $table->integer('empty_weight_lbs')->nullable();
             $table->string('drivers_name');
             $table->string('drivers_cellphone');
             $table->string('drivers_email')->nullable();
-            $table->string('drivers_license_number');
+            // Stored encrypted at rest (App\Casts\Encrypted); ciphertext needs text width.
+            $table->text('drivers_license_number');
             $table->date('drivers_license_expiration_date')->nullable();
             $table->string('drivers_license_state')->nullable();
             $table->string('drivers_license_country')->nullable();

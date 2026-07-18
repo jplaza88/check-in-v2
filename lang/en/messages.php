@@ -169,6 +169,26 @@ return [
         'signIn' => 'Sign In',
     ],
 
+    'checkInConfirmation' => [
+        'pageTitle' => 'Check-In Complete',
+        'newCheckIn' => 'New Check-In',
+        'confirmed' => 'Your check-in is complete!',
+        'subheading' => 'Please wait for further instructions.',
+        'reference' => 'Reference',
+        'summary' => 'Check-In Summary',
+        'locationLabel' => 'Location',
+        'customerLabel' => 'Customer',
+        'destinationLabel' => 'Destination',
+        'poLabel' => 'PO Number(s)',
+        'driverLabel' => 'Driver',
+        'nextSteps' => 'Keep this reference number handy while you are on site.',
+        'needHelp' => 'Need help?',
+        'registerHeading' => 'Speed up your next check-in',
+        'registerBody' => 'Create a free account to save your information and check in faster next time.',
+        'createAccount' => 'Create Account',
+        'signIn' => 'Sign In',
+    ],
+
     'appointmentForm' => [
         'pageTitle' => 'Book an Appointment',
         'newAppointment' => 'New Appointment',

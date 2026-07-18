@@ -134,6 +134,27 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Database Encryption Key
+    |--------------------------------------------------------------------------
+    |
+    | A dedicated key used only for encrypting sensitive data at rest (via the
+    | App\Casts\Encrypted cast). Keeping this separate from APP_KEY lets us
+    | rotate APP_KEY (cookies, sessions, signed URLs) without re-encrypting
+    | stored columns. Rotate this key on its own schedule, moving the old key
+    | into DB_ENCRYPTION_PREVIOUS_KEYS until every row is re-encrypted.
+    |
+    */
+
+    'db_encryption_key' => env('DB_ENCRYPTION_KEY'),
+
+    'db_encryption_previous_keys' => [
+        ...array_filter(
+            explode(',', (string) env('DB_ENCRYPTION_PREVIOUS_KEYS', '')),
+        ),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Maintenance Mode Driver
     |--------------------------------------------------------------------------
     |

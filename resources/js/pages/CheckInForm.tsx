@@ -28,7 +28,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import PublicLayout from '@/layouts/PublicLayout';
-import { countryFlag, countryName } from '@/lib/countryFlag';
+import { countryName } from '@/lib/countryFlag';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -258,6 +258,15 @@ function ReviewSummary({
         'side-chute': t.trailerChuteSide,
     };
 
+    // Combines a state and country into one line, e.g. "Arizona, United States".
+    const stateCountry = (
+        state?: string | null,
+        country?: string | null,
+    ): string =>
+        [state, country ? countryName(country) : null]
+            .filter(Boolean)
+            .join(', ');
+
     return (
         <div className="space-y-5 px-5 pt-5 pb-6">
             <SectionHeader step={1} label={t.reviewTitle} />
@@ -280,7 +289,7 @@ function ReviewSummary({
                         label={t.destinationLabel}
                         value={`${values.destination_city}, ${values.destination_state}${
                             values.destination_country
-                                ? ` ${countryFlag(values.destination_country)} ${countryName(values.destination_country)}`
+                                ? ` ${countryName(values.destination_country)}`
                                 : ''
                         }`}
                     />
@@ -315,32 +324,28 @@ function ReviewSummary({
                         label={t.truckPlateLabel}
                         value={values.truck_plate}
                     />
-                    {fields.showTruckPlateState && (
+                    {(fields.showTruckPlateState ||
+                        fields.showTruckPlateCountry) && (
                         <ReviewRow
                             label={t.truckPlateStateLabel}
-                            value={values.truck_plate_state ?? ''}
-                        />
-                    )}
-                    {fields.showTruckPlateCountry && (
-                        <ReviewRow
-                            label={t.truckPlateCountryLabel}
-                            value={values.truck_plate_country ?? ''}
+                            value={stateCountry(
+                                values.truck_plate_state,
+                                values.truck_plate_country,
+                            )}
                         />
                     )}
                     <ReviewRow
                         label={t.trailerPlateLabel}
                         value={values.trailer_plate}
                     />
-                    {fields.showTrailerPlateState && (
+                    {(fields.showTrailerPlateState ||
+                        fields.showTrailerPlateCountry) && (
                         <ReviewRow
                             label={t.trailerPlateStateLabel}
-                            value={values.trailer_plate_state ?? ''}
-                        />
-                    )}
-                    {fields.showTrailerPlateCountry && (
-                        <ReviewRow
-                            label={t.trailerPlateCountryLabel}
-                            value={values.trailer_plate_country ?? ''}
+                            value={stateCountry(
+                                values.trailer_plate_state,
+                                values.trailer_plate_country,
+                            )}
                         />
                     )}
                     <ReviewRow
@@ -368,16 +373,14 @@ function ReviewSummary({
                         label={t.licenseNumberLabel}
                         value={values.drivers_license_number}
                     />
-                    {fields.showDriversLicenseState && (
+                    {(fields.showDriversLicenseState ||
+                        fields.showDriversLicenseCountry) && (
                         <ReviewRow
                             label={t.licenseStateLabel}
-                            value={values.drivers_license_state ?? ''}
-                        />
-                    )}
-                    {fields.showDriversLicenseCountry && (
-                        <ReviewRow
-                            label={t.licenseCountryLabel}
-                            value={values.drivers_license_country ?? ''}
+                            value={stateCountry(
+                                values.drivers_license_state,
+                                values.drivers_license_country,
+                            )}
                         />
                     )}
                     {fields.showDriversLicenseExpirationDate && (
@@ -1230,64 +1233,6 @@ export default function CheckInForm({
                                             )}
                                         />
 
-                                        {/* Cellphone */}
-                                        <Controller
-                                            name="drivers_cellphone"
-                                            control={control}
-                                            render={({ field, fieldState }) => (
-                                                <Field
-                                                    data-invalid={
-                                                        fieldState.invalid
-                                                    }
-                                                >
-                                                    <FieldLabel htmlFor="drivers_cellphone">
-                                                        {t.cellphoneLabel}
-                                                    </FieldLabel>
-                                                    <div className="flex rounded-4xl shadow-xs">
-                                                        <span className="inline-flex items-center rounded-l-4xl border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground dark:bg-input/30">
-                                                            +1
-                                                        </span>
-                                                        <Input
-                                                            id="drivers_cellphone"
-                                                            type="tel"
-                                                            value={field.value}
-                                                            onChange={(e) =>
-                                                                field.onChange(
-                                                                    formatPhone(
-                                                                        e.target
-                                                                            .value,
-                                                                    ),
-                                                                )
-                                                            }
-                                                            onBlur={
-                                                                field.onBlur
-                                                            }
-                                                            name={field.name}
-                                                            ref={field.ref}
-                                                            aria-invalid={
-                                                                fieldState.invalid
-                                                            }
-                                                            placeholder={
-                                                                t.cellphonePlaceholder
-                                                            }
-                                                            maxLength={14}
-                                                            className="rounded-l-none"
-                                                        />
-                                                    </div>
-                                                    <FieldDescription>
-                                                        {t.cellphoneConsent}
-                                                    </FieldDescription>
-                                                    {fieldState.invalid && (
-                                                        <FieldError
-                                                            errors={[
-                                                                fieldState.error,
-                                                            ]}
-                                                        />
-                                                    )}
-                                                </Field>
-                                            )}
-                                        />
-
                                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:[&>:last-child:nth-child(odd)]:col-span-2">
                                             {renderTextField(
                                                 'drivers_license_number',
@@ -1365,6 +1310,64 @@ export default function CheckInForm({
                                                 )}
                                             />
                                         )}
+
+                                        {/* Cellphone */}
+                                        <Controller
+                                            name="drivers_cellphone"
+                                            control={control}
+                                            render={({ field, fieldState }) => (
+                                                <Field
+                                                    data-invalid={
+                                                        fieldState.invalid
+                                                    }
+                                                >
+                                                    <FieldLabel htmlFor="drivers_cellphone">
+                                                        {t.cellphoneLabel}
+                                                    </FieldLabel>
+                                                    <div className="flex rounded-4xl shadow-xs">
+                                                        <span className="inline-flex items-center rounded-l-4xl border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground dark:bg-input/30">
+                                                            +1
+                                                        </span>
+                                                        <Input
+                                                            id="drivers_cellphone"
+                                                            type="tel"
+                                                            value={field.value}
+                                                            onChange={(e) =>
+                                                                field.onChange(
+                                                                    formatPhone(
+                                                                        e.target
+                                                                            .value,
+                                                                    ),
+                                                                )
+                                                            }
+                                                            onBlur={
+                                                                field.onBlur
+                                                            }
+                                                            name={field.name}
+                                                            ref={field.ref}
+                                                            aria-invalid={
+                                                                fieldState.invalid
+                                                            }
+                                                            placeholder={
+                                                                t.cellphonePlaceholder
+                                                            }
+                                                            maxLength={14}
+                                                            className="rounded-l-none"
+                                                        />
+                                                    </div>
+                                                    <FieldDescription>
+                                                        {t.cellphoneConsent}
+                                                    </FieldDescription>
+                                                    {fieldState.invalid && (
+                                                        <FieldError
+                                                            errors={[
+                                                                fieldState.error,
+                                                            ]}
+                                                        />
+                                                    )}
+                                                </Field>
+                                            )}
+                                        />
                                     </FieldGroup>
                                 </div>
 

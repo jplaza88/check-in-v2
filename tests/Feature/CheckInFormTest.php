@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 use App\CheckIn\CheckInScheduleResolver;
 use App\DTOs\CheckInLocationDTO;
+use App\Enums\CheckInErpStatus;
+use App\Enums\CheckInStatus;
+use App\Models\CheckIn;
 use App\Models\Location;
 
 /**
- * @return array{checkInGatePass: array{uuid: string, location: CheckInLocationDTO, fields: array<string, bool>, storedAt: int}}
+ * @return array{checkInGatePass: array{uuid: string, location: CheckInLocationDTO, fields: array<string, bool>, storedAt: int}, userCoordinates: array{latitude: float, longitude: float, storedAt: int}}
  */
 function freshGatePass(Location $location): array
 {
@@ -16,6 +19,11 @@ function freshGatePass(Location $location): array
             'uuid' => $location->uuid,
             'location' => resolve(CheckInScheduleResolver::class)->buildDTO($location, now()),
             'fields' => $location->checkInFormFields(),
+            'storedAt' => now()->timestamp,
+        ],
+        'userCoordinates' => [
+            'latitude' => $location->address->latitude,
+            'longitude' => $location->address->longitude,
             'storedAt' => now()->timestamp,
         ],
     ];
@@ -120,11 +128,12 @@ it('validates the required check-in fields', function (): void {
 it('accepts a valid submission when optional fields are hidden', function (): void {
     $location = Location::factory()->create();
 
-    $this->withSession(freshGatePass($location))
+    $response = $this->withSession(freshGatePass($location))
         ->from(route('checkIn.form', $location))
-        ->post(route('checkIn.store', $location), validCheckInPayload())
-        ->assertSessionHasNoErrors()
-        ->assertRedirect(route('checkIn.selectLocation'));
+        ->post(route('checkIn.store', $location), validCheckInPayload());
+
+    $response->assertSessionHasNoErrors()
+        ->assertRedirect(route('checkIn.confirmed', CheckIn::query()->sole()));
 });
 
 it('accepts a submission that omits the optional trailer chute', function (): void {
@@ -133,11 +142,12 @@ it('accepts a submission that omits the optional trailer chute', function (): vo
     $payload = validCheckInPayload();
     unset($payload['trailer_chute']);
 
-    $this->withSession(freshGatePass($location))
+    $response = $this->withSession(freshGatePass($location))
         ->from(route('checkIn.form', $location))
-        ->post(route('checkIn.store', $location), $payload)
-        ->assertSessionHasNoErrors()
-        ->assertRedirect(route('checkIn.selectLocation'));
+        ->post(route('checkIn.store', $location), $payload);
+
+    $response->assertSessionHasNoErrors()
+        ->assertRedirect(route('checkIn.confirmed', CheckIn::query()->sole()));
 });
 
 it('rejects a trailer chute value outside the allowed set', function (): void {
@@ -188,11 +198,26 @@ it('accepts a valid submission including the config-driven fields', function ():
         'drivers_license_expiration_date' => now()->addYear()->format('Y-m-d'),
     ];
 
-    $this->withSession(freshGatePass($location))
+    $response = $this->withSession(freshGatePass($location))
         ->from(route('checkIn.form', $location))
-        ->post(route('checkIn.store', $location), $payload)
-        ->assertSessionHasNoErrors()
-        ->assertRedirect(route('checkIn.selectLocation'));
+        ->post(route('checkIn.store', $location), $payload);
+
+    $checkIn = CheckIn::query()->sole();
+
+    $response->assertSessionHasNoErrors()
+        ->assertSessionMissing('checkInGatePass')
+        ->assertRedirect(route('checkIn.confirmed', $checkIn));
+
+    expect($checkIn)
+        ->location_id->toBe($location->id)
+        ->customer->toBe('Acme Produce')
+        ->truck_color->toBe('white')
+        ->empty_weight_lbs->toEqual(15000)
+        ->status->toBe(CheckInStatus::Pending)
+        ->erp_status->toBe(CheckInErpStatus::Pending)
+        ->reference_number->toHaveLength(8);
+
+    expect($checkIn->purchaseOrders()->pluck('number')->all())->toBe(['PO-12345']);
 });
 
 it('rejects an expired drivers license', function (): void {
@@ -231,4 +256,30 @@ it('rejects the submission when the gate pass has expired', function (): void {
         ->post(route('checkIn.store', $location), validCheckInPayload())
         ->assertRedirect(route('checkIn.selectLocation'))
         ->assertSessionHasErrors('uuid');
+});
+
+it('redirects the submission to location select when the coordinates have expired', function (): void {
+    $location = Location::factory()->create();
+
+    $session = freshGatePass($location);
+    $session['userCoordinates']['storedAt'] = now()
+        ->subSeconds((int) config('app.user_coordinates_session_ttl') + 1)
+        ->timestamp;
+
+    $this->withSession($session)
+        ->post(route('checkIn.store', $location), validCheckInPayload())
+        ->assertRedirect(route('checkIn.selectLocation'))
+        ->assertSessionHasErrors('userCoords');
+});
+
+it('redirects the form to location select when the coordinates are missing', function (): void {
+    $location = Location::factory()->create();
+
+    $session = freshGatePass($location);
+    unset($session['userCoordinates']);
+
+    $this->withSession($session)
+        ->get(route('checkIn.form', $location))
+        ->assertRedirect(route('checkIn.selectLocation'))
+        ->assertSessionHasErrors('userCoords');
 });

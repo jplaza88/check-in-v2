@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\CompleteCheckInAction;
+use App\CheckIn\CheckInConfirmationResolver;
 use App\CheckIn\CheckInScheduleResolver;
 use App\DTOs\CheckInLocationDTO;
 use App\Http\Requests\CheckInFormRequest;
@@ -12,6 +14,7 @@ use App\Models\Location;
 use App\Session\CheckInSession;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
+use Throwable;
 
 final class CheckInController extends Controller
 {
@@ -58,13 +61,25 @@ final class CheckInController extends Controller
         ]);
     }
 
-    public function store(CheckInFormRequest $request): RedirectResponse
+    /**
+     * @throws Throwable
+     */
+    public function store(CheckInFormRequest $request, CompleteCheckInAction $action): RedirectResponse
     {
-        $request->validated();
+        $locationDTO = $this->session->getLocation();
+        if (! $locationDTO instanceof CheckInLocationDTO) {
+            return to_route('checkIn.selectLocation');
+        }
+
+        $checkIn = $action->handle($request->validated(), $locationDTO);
 
         $this->session->forgetGatePass();
 
-        // TODO: Persist the check-in (CreateCheckInAction) and redirect to a confirmation page.
-        return to_route('checkIn.selectLocation');
+        return to_route('checkIn.confirmed', $checkIn->uuid);
+    }
+
+    public function confirmed(string $uuid, CheckInConfirmationResolver $resolver): Response
+    {
+        return inertia('CheckInConfirmation', $resolver->resolve($uuid));
     }
 }

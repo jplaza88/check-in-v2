@@ -239,4 +239,4 @@
   body {
     @apply bg-background text-foreground;}
   html {
-    @apply font-sans;}}
+    @apply bg-white font-sans dark:bg-gray-900;}}

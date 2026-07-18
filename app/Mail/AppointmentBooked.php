@@ -41,16 +41,22 @@ final class AppointmentBooked extends Mailable implements ShouldQueue
         $scheduledFor = $this->appointment->scheduled_for->setTimezone($location->timezone);
 
         return new Content(
-            view: 'mail.appointment-booked',
+            view: 'mail.notification',
             with: [
+                'preheader' => sprintf('Appointment %s at %s', $this->appointment->reference_number, $location->name),
+                'eyebrow' => 'New Appointment',
+                'title' => 'A new appointment has been booked',
+                'intro' => 'A driver has booked an appointment at your location. The details are below.',
+                'referenceLabel' => 'Reference',
                 'referenceNumber' => $this->appointment->reference_number,
-                'locationName' => $location->name,
-                'locationAddress' => resolve(AddressManager::class)->buildAddress($location->address->toArray()),
-                'scheduledDate' => $scheduledFor->format('F j, Y'),
-                'scheduledTime' => $scheduledFor->format('g:i A T'),
-                'purchaseOrders' => $this->appointment->purchaseOrders->pluck('number')->all(),
-                'driversName' => $this->appointment->drivers_name,
-                'driversPhone' => $this->formatPhone($this->appointment->drivers_cellphone),
+                'rows' => [
+                    ['label' => 'Location', 'value' => $location->name, 'sub' => resolve(AddressManager::class)->buildAddress($location->address->toArray())],
+                    ['label' => 'Date', 'value' => $scheduledFor->format('F j, Y')],
+                    ['label' => 'Time', 'value' => $scheduledFor->format('g:i A T')],
+                    ['label' => 'PO Number(s)', 'value' => implode(', ', $this->appointment->purchaseOrders->pluck('number')->all())],
+                    ['label' => 'Driver', 'value' => $this->appointment->drivers_name],
+                    ['label' => "Driver's Phone Number", 'value' => $this->formatPhone($this->appointment->drivers_cellphone)],
+                ],
             ],
         );
     }

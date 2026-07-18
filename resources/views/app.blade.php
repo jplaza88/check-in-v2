@@ -3,6 +3,8 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        {{-- Default (light) tint for the iOS status bar / safe area; ThemeContext keeps it in sync with the active theme. --}}
+        <meta name="theme-color" content="#ffffff">
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
