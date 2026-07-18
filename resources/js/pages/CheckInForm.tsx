@@ -28,7 +28,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import PublicLayout from '@/layouts/PublicLayout';
-import { countryFlag, countryName } from '@/lib/countryFlag';
+import { countryName } from '@/lib/countryFlag';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -280,7 +280,7 @@ function ReviewSummary({
                         label={t.destinationLabel}
                         value={`${values.destination_city}, ${values.destination_state}${
                             values.destination_country
-                                ? ` ${countryFlag(values.destination_country)} ${countryName(values.destination_country)}`
+                                ? ` ${countryName(values.destination_country)}`
                                 : ''
                         }`}
                     />
@@ -1230,64 +1230,6 @@ export default function CheckInForm({
                                             )}
                                         />
 
-                                        {/* Cellphone */}
-                                        <Controller
-                                            name="drivers_cellphone"
-                                            control={control}
-                                            render={({ field, fieldState }) => (
-                                                <Field
-                                                    data-invalid={
-                                                        fieldState.invalid
-                                                    }
-                                                >
-                                                    <FieldLabel htmlFor="drivers_cellphone">
-                                                        {t.cellphoneLabel}
-                                                    </FieldLabel>
-                                                    <div className="flex rounded-4xl shadow-xs">
-                                                        <span className="inline-flex items-center rounded-l-4xl border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground dark:bg-input/30">
-                                                            +1
-                                                        </span>
-                                                        <Input
-                                                            id="drivers_cellphone"
-                                                            type="tel"
-                                                            value={field.value}
-                                                            onChange={(e) =>
-                                                                field.onChange(
-                                                                    formatPhone(
-                                                                        e.target
-                                                                            .value,
-                                                                    ),
-                                                                )
-                                                            }
-                                                            onBlur={
-                                                                field.onBlur
-                                                            }
-                                                            name={field.name}
-                                                            ref={field.ref}
-                                                            aria-invalid={
-                                                                fieldState.invalid
-                                                            }
-                                                            placeholder={
-                                                                t.cellphonePlaceholder
-                                                            }
-                                                            maxLength={14}
-                                                            className="rounded-l-none"
-                                                        />
-                                                    </div>
-                                                    <FieldDescription>
-                                                        {t.cellphoneConsent}
-                                                    </FieldDescription>
-                                                    {fieldState.invalid && (
-                                                        <FieldError
-                                                            errors={[
-                                                                fieldState.error,
-                                                            ]}
-                                                        />
-                                                    )}
-                                                </Field>
-                                            )}
-                                        />
-
                                         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:[&>:last-child:nth-child(odd)]:col-span-2">
                                             {renderTextField(
                                                 'drivers_license_number',
@@ -1365,6 +1307,64 @@ export default function CheckInForm({
                                                 )}
                                             />
                                         )}
+
+                                        {/* Cellphone */}
+                                        <Controller
+                                            name="drivers_cellphone"
+                                            control={control}
+                                            render={({ field, fieldState }) => (
+                                                <Field
+                                                    data-invalid={
+                                                        fieldState.invalid
+                                                    }
+                                                >
+                                                    <FieldLabel htmlFor="drivers_cellphone">
+                                                        {t.cellphoneLabel}
+                                                    </FieldLabel>
+                                                    <div className="flex rounded-4xl shadow-xs">
+                                                        <span className="inline-flex items-center rounded-l-4xl border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground dark:bg-input/30">
+                                                            +1
+                                                        </span>
+                                                        <Input
+                                                            id="drivers_cellphone"
+                                                            type="tel"
+                                                            value={field.value}
+                                                            onChange={(e) =>
+                                                                field.onChange(
+                                                                    formatPhone(
+                                                                        e.target
+                                                                            .value,
+                                                                    ),
+                                                                )
+                                                            }
+                                                            onBlur={
+                                                                field.onBlur
+                                                            }
+                                                            name={field.name}
+                                                            ref={field.ref}
+                                                            aria-invalid={
+                                                                fieldState.invalid
+                                                            }
+                                                            placeholder={
+                                                                t.cellphonePlaceholder
+                                                            }
+                                                            maxLength={14}
+                                                            className="rounded-l-none"
+                                                        />
+                                                    </div>
+                                                    <FieldDescription>
+                                                        {t.cellphoneConsent}
+                                                    </FieldDescription>
+                                                    {fieldState.invalid && (
+                                                        <FieldError
+                                                            errors={[
+                                                                fieldState.error,
+                                                            ]}
+                                                        />
+                                                    )}
+                                                </Field>
+                                            )}
+                                        />
                                     </FieldGroup>
                                 </div>
 

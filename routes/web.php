@@ -55,7 +55,7 @@ Route::middleware('setLocale')->group(function (): void {
         ->whereUuid('uuid')
         ->name('checkIn.gate');
 
-    Route::middleware('checkInGatePass')->group(function (): void {
+    Route::middleware(['checkInGatePass', 'userCoordinates'])->group(function (): void {
 
         Route::get('/check-in/{uuid}/form', [CheckInController::class, 'form'])
             ->whereUuid('uuid')

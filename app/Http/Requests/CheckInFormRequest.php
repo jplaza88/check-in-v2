@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use App\CheckIn\CheckInAvailabilityResolver;
+use App\CheckIn\CheckInScheduleResolver;
+use App\DTOs\CheckInLocationDTO;
 use App\Enums\TrailerChute;
 use App\Models\Location;
 use App\Queries\CheckInLocation;
+use App\Session\CheckInSession;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -154,12 +158,36 @@ final class CheckInFormRequest extends FormRequest
      *
      * @return array<int, callable>
      */
-    public function after(): array
+    public function after(
+        CheckInAvailabilityResolver $availabilityResolver,
+        CheckInSession $session,
+    ): array
     {
         return [
-            function (Validator $validator): void {
-                if (! $this->location instanceof Location) {
-                    $validator->errors()->add('location', __('messages.checkInSelectLocation.invalidLocation'));
+            function (Validator $validator) use ($availabilityResolver, $session): void {
+                $context = $session->getLocation();
+
+                $location = $context instanceof CheckInLocationDTO
+                    ? resolve(CheckInLocation::class)->execute($context->id)
+                    : null;
+
+                if (! $location instanceof Location) {
+                    $validator->errors()->add('uuid', __('messages.checkInSelectLocation.invalidLocation'));
+
+                    return;
+                }
+
+                $userCoords = $session->getUserCoords();
+                if ($userCoords === null) {
+                    $validator->errors()->add('uuid', __('messages.checkInSelectLocation.invalidLocation'));
+
+                    return;
+                }
+
+                $availability = $availabilityResolver->isAvailableForCheckIn($location, $userCoords);
+
+                if (! $availability->allowed) {
+                    $validator->errors()->add('uuid', $availability->reason ?? __('messages.checkInSelectLocation.invalidLocation'));
                 }
             },
         ];

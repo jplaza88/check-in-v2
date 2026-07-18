@@ -7,7 +7,7 @@ use App\DTOs\CheckInLocationDTO;
 use App\Models\Location;
 
 /**
- * @return array{checkInGatePass: array{uuid: string, location: CheckInLocationDTO, fields: array<string, bool>, storedAt: int}}
+ * @return array{checkInGatePass: array{uuid: string, location: CheckInLocationDTO, fields: array<string, bool>, storedAt: int}, userCoordinates: array{latitude: float, longitude: float, storedAt: int}}
  */
 function freshGatePass(Location $location): array
 {
@@ -16,6 +16,11 @@ function freshGatePass(Location $location): array
             'uuid' => $location->uuid,
             'location' => resolve(CheckInScheduleResolver::class)->buildDTO($location, now()),
             'fields' => $location->checkInFormFields(),
+            'storedAt' => now()->timestamp,
+        ],
+        'userCoordinates' => [
+            'latitude' => $location->address->latitude,
+            'longitude' => $location->address->longitude,
             'storedAt' => now()->timestamp,
         ],
     ];
@@ -231,4 +236,30 @@ it('rejects the submission when the gate pass has expired', function (): void {
         ->post(route('checkIn.store', $location), validCheckInPayload())
         ->assertRedirect(route('checkIn.selectLocation'))
         ->assertSessionHasErrors('uuid');
+});
+
+it('redirects the submission to location select when the coordinates have expired', function (): void {
+    $location = Location::factory()->create();
+
+    $session = freshGatePass($location);
+    $session['userCoordinates']['storedAt'] = now()
+        ->subSeconds((int) config('app.user_coordinates_session_ttl') + 1)
+        ->timestamp;
+
+    $this->withSession($session)
+        ->post(route('checkIn.store', $location), validCheckInPayload())
+        ->assertRedirect(route('checkIn.selectLocation'))
+        ->assertSessionHasErrors('userCoords');
+});
+
+it('redirects the form to location select when the coordinates are missing', function (): void {
+    $location = Location::factory()->create();
+
+    $session = freshGatePass($location);
+    unset($session['userCoordinates']);
+
+    $this->withSession($session)
+        ->get(route('checkIn.form', $location))
+        ->assertRedirect(route('checkIn.selectLocation'))
+        ->assertSessionHasErrors('userCoords');
 });
