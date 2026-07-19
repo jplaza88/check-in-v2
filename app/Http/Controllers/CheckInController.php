@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\CompleteCheckInAction;
+use App\Auth\RegistrationGate;
 use App\CheckIn\CheckInConfirmationResolver;
 use App\CheckIn\CheckInScheduleResolver;
 use App\DTOs\CheckInLocationDTO;
@@ -64,7 +65,7 @@ final class CheckInController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(CheckInFormRequest $request, CompleteCheckInAction $action): RedirectResponse
+    public function store(CheckInFormRequest $request, CompleteCheckInAction $action, RegistrationGate $registrationGate): RedirectResponse
     {
         $locationDTO = $this->session->getLocation();
         if (! $locationDTO instanceof CheckInLocationDTO) {
@@ -74,6 +75,9 @@ final class CheckInController extends Controller
         $checkIn = $action->handle($request->validated(), $locationDTO);
 
         $this->session->forgetGatePass();
+
+        // Open the short registration window so the driver can create an account.
+        $registrationGate->allow();
 
         return to_route('checkIn.confirmed', $checkIn->uuid);
     }

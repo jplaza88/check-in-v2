@@ -60,16 +60,23 @@ export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
                         <NavbarLink
                             href={checkIn.selectLocation().url}
                             name={nav.checkIn}
-                            activeRoute={['checkIn.selectLocation', 'checkIn.form']}
+                            activeRoute={[
+                                'checkIn.selectLocation',
+                                'checkIn.form',
+                            ]}
                         />
                         <NavbarLink
                             href={appointment.selectLocation().url}
                             name={nav.appointment}
-                            activeRoute={['appointment.selectLocation', 'appointment.form', 'appointment.confirmed']}
+                            activeRoute={[
+                                'appointment.selectLocation',
+                                'appointment.form',
+                                'appointment.confirmed',
+                            ]}
                         />
                         {!hideLogin && (
                             <NavbarLink
-                                href="#"
+                                href="/login"
                                 name={nav.login}
                                 activeRoute="login"
                             />
@@ -142,7 +149,11 @@ export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
                     <NavbarLink
                         href={appointment.selectLocation().url}
                         name={nav.appointment}
-                        activeRoute={['appointment.selectLocation', 'appointment.form', 'appointment.confirmed']}
+                        activeRoute={[
+                            'appointment.selectLocation',
+                            'appointment.form',
+                            'appointment.confirmed',
+                        ]}
                         variant="mobile"
                     />
                     {!hideLogin && (

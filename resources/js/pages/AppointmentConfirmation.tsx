@@ -1,8 +1,8 @@
 
 import { Head, usePage } from '@inertiajs/react';
-import { CheckCircle2, Clock, Mail, Phone, UserPlus } from 'lucide-react';
+import { CheckCircle2, Clock, Mail, Phone } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import RegisterCta from '@/components/RegisterCta';
 import PublicLayout from '@/layouts/PublicLayout';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -37,10 +37,6 @@ interface AppointmentConfirmationTranslations {
     driverLabel: string;
     arrivalReminder: string;
     needHelp: string;
-    registerHeading: string;
-    registerBody: string;
-    createAccount: string;
-    signIn: string;
 }
 
 interface Translations {
@@ -181,39 +177,7 @@ export default function AppointmentConfirmation() {
                         </div>
                     </div>
 
-                    {/* Register CTA card */}
-                    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-gray-700/60 dark:bg-gray-800">
-                        <div className="px-5 py-5">
-                            <div className="flex items-start gap-3">
-                                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-green/10">
-                                    <UserPlus className="h-5 w-5 text-brand-green" />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                        {t.registerHeading}
-                                    </p>
-                                    <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                        {t.registerBody}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="mt-4 flex gap-3">
-                                <Button
-                                    asChild
-                                    variant="outline"
-                                    className="flex-1"
-                                >
-                                    <a href="#">{t.signIn}</a>
-                                </Button>
-                                <Button
-                                    asChild
-                                    className="flex-1 bg-brand-green text-white hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
-                                >
-                                    <a href="#">{t.createAccount}</a>
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
+                    <RegisterCta />
                 </div>
             </div>
         </PublicLayout>

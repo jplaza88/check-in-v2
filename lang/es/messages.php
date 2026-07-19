@@ -4,6 +4,48 @@ declare(strict_types=1);
 
 return [
 
+    'login' => [
+        'eyebrow' => 'Acceso a la cuenta',
+        'title' => 'Bienvenido de nuevo',
+        'subtitle' => 'Inicie sesión para continuar a su cuenta.',
+        'emailLabel' => 'Correo electrónico',
+        'emailPlaceholder' => 'usted@martorifarms.com',
+        'passwordLabel' => 'Contraseña',
+        'passwordPlaceholder' => 'Ingrese su contraseña',
+        'rememberMe' => 'Recuérdame',
+        'forgotPassword' => '¿Olvidó su contraseña?',
+        'signIn' => 'Iniciar sesión',
+        'tagline' => 'Frescura de nuestros campos a su muelle.',
+        'taglineSub' => 'La plataforma de registro y programación de nuestros centros de distribución.',
+    ],
+
+    'register' => [
+        'eyebrow' => 'Crear cuenta',
+        'title' => 'Cree su cuenta',
+        'subtitle' => 'Guarde sus datos y regístrese más rápido la próxima vez.',
+        'nameLabel' => 'Nombre completo',
+        'namePlaceholder' => 'Juan Conductor',
+        'emailLabel' => 'Correo electrónico',
+        'emailPlaceholder' => 'usted@ejemplo.com',
+        'passwordLabel' => 'Contraseña',
+        'passwordPlaceholder' => 'Cree una contraseña',
+        'passwordConfirmationLabel' => 'Confirmar contraseña',
+        'passwordConfirmationPlaceholder' => 'Vuelva a ingresar su contraseña',
+        'createAccount' => 'Crear cuenta',
+        'haveAccount' => '¿Ya tiene una cuenta?',
+        'signIn' => 'Iniciar sesión',
+        'tagline' => 'Frescura de nuestros campos a su muelle.',
+        'taglineSub' => 'Cree una cuenta para guardar su información y agilizar su próximo registro.',
+        'notAllowed' => 'El registro solo está disponible justo después de completar un registro o reservar una cita.',
+    ],
+
+    'registerCta' => [
+        'heading' => 'Acelere su próximo registro',
+        'body' => 'Cree una cuenta gratuita para guardar su información y registrarse más rápido la próxima vez.',
+        'createAccount' => 'Crear cuenta',
+        'signIn' => 'Iniciar sesión',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | App Language Lines
@@ -154,10 +196,6 @@ return [
         'driverLabel' => 'Conductor',
         'arrivalReminder' => 'Por favor llegue 5-10 minutos antes de la hora de su cita.',
         'needHelp' => '¿Necesita ayuda?',
-        'registerHeading' => 'Acelere su próximo registro',
-        'registerBody' => 'Cree una cuenta gratuita para guardar su información y registrarse más rápido la próxima vez.',
-        'createAccount' => 'Crear cuenta',
-        'signIn' => 'Iniciar sesión',
     ],
 
     'checkInConfirmation' => [
@@ -174,10 +212,6 @@ return [
         'driverLabel' => 'Conductor',
         'nextSteps' => 'Tenga este número de referencia a mano mientras esté en las instalaciones.',
         'needHelp' => '¿Necesita ayuda?',
-        'registerHeading' => 'Acelere su próximo registro',
-        'registerBody' => 'Cree una cuenta gratuita para guardar su información y registrarse más rápido la próxima vez.',
-        'createAccount' => 'Crear cuenta',
-        'signIn' => 'Iniciar sesión',
     ],
 
     'appointmentForm' => [

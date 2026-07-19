@@ -4,6 +4,48 @@ declare(strict_types=1);
 
 return [
 
+    'login' => [
+        'eyebrow' => 'Accès au compte',
+        'title' => 'Bon retour',
+        'subtitle' => 'Connectez-vous pour continuer vers votre compte.',
+        'emailLabel' => 'E-mail',
+        'emailPlaceholder' => 'vous@martorifarms.com',
+        'passwordLabel' => 'Mot de passe',
+        'passwordPlaceholder' => 'Entrez votre mot de passe',
+        'rememberMe' => 'Se souvenir de moi',
+        'forgotPassword' => 'Mot de passe oublié ?',
+        'signIn' => 'Se connecter',
+        'tagline' => 'La fraîcheur de nos champs à votre quai.',
+        'taglineSub' => "La plateforme d'enregistrement et de planification de nos centres de distribution.",
+    ],
+
+    'register' => [
+        'eyebrow' => 'Créer un compte',
+        'title' => 'Créez votre compte',
+        'subtitle' => 'Enregistrez vos informations et gagnez du temps la prochaine fois.',
+        'nameLabel' => 'Nom complet',
+        'namePlaceholder' => 'Jean Conducteur',
+        'emailLabel' => 'E-mail',
+        'emailPlaceholder' => 'vous@exemple.com',
+        'passwordLabel' => 'Mot de passe',
+        'passwordPlaceholder' => 'Créez un mot de passe',
+        'passwordConfirmationLabel' => 'Confirmer le mot de passe',
+        'passwordConfirmationPlaceholder' => 'Saisissez à nouveau votre mot de passe',
+        'createAccount' => 'Créer un compte',
+        'haveAccount' => 'Vous avez déjà un compte ?',
+        'signIn' => 'Se connecter',
+        'tagline' => 'La fraîcheur de nos champs à votre quai.',
+        'taglineSub' => 'Créez un compte pour enregistrer vos informations et accélérer votre prochain enregistrement.',
+        'notAllowed' => "L'inscription n'est possible qu'immédiatement après un enregistrement ou la réservation d'un rendez-vous.",
+    ],
+
+    'registerCta' => [
+        'heading' => 'Accélérez votre prochain enregistrement',
+        'body' => 'Créez un compte gratuit pour enregistrer vos informations et vous enregistrer plus rapidement la prochaine fois.',
+        'createAccount' => 'Créer un compte',
+        'signIn' => 'Se connecter',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | App Language Lines
@@ -154,10 +196,6 @@ return [
         'driverLabel' => 'Conducteur',
         'arrivalReminder' => "Veuillez arriver 5 à 10 minutes avant l'heure de votre rendez-vous.",
         'needHelp' => 'Besoin d\'aide ?',
-        'registerHeading' => 'Accélérez votre prochain enregistrement',
-        'registerBody' => 'Créez un compte gratuit pour enregistrer vos informations et vous enregistrer plus rapidement la prochaine fois.',
-        'createAccount' => 'Créer un compte',
-        'signIn' => 'Se connecter',
     ],
 
     'checkInConfirmation' => [
@@ -174,10 +212,6 @@ return [
         'driverLabel' => 'Conducteur',
         'nextSteps' => 'Gardez ce numéro de référence à portée de main pendant votre présence sur le site.',
         'needHelp' => 'Besoin d\'aide ?',
-        'registerHeading' => 'Accélérez votre prochain enregistrement',
-        'registerBody' => 'Créez un compte gratuit pour enregistrer vos informations et vous enregistrer plus rapidement la prochaine fois.',
-        'createAccount' => 'Créer un compte',
-        'signIn' => 'Se connecter',
     ],
 
     'appointmentForm' => [

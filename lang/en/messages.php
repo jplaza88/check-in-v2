@@ -4,6 +4,48 @@ declare(strict_types=1);
 
 return [
 
+    'login' => [
+        'eyebrow' => 'Account Access',
+        'title' => 'Welcome back',
+        'subtitle' => 'Sign in to continue to your account.',
+        'emailLabel' => 'Email',
+        'emailPlaceholder' => 'you@martorifarms.com',
+        'passwordLabel' => 'Password',
+        'passwordPlaceholder' => 'Enter your password',
+        'rememberMe' => 'Remember me',
+        'forgotPassword' => 'Forgot password?',
+        'signIn' => 'Sign In',
+        'tagline' => 'Fresh from our fields to your dock.',
+        'taglineSub' => 'The check-in and scheduling platform for our distribution centers.',
+    ],
+
+    'register' => [
+        'eyebrow' => 'Create Account',
+        'title' => 'Create your account',
+        'subtitle' => 'Save your details and check in faster next time.',
+        'nameLabel' => 'Full Name',
+        'namePlaceholder' => 'John Driver',
+        'emailLabel' => 'Email',
+        'emailPlaceholder' => 'you@example.com',
+        'passwordLabel' => 'Password',
+        'passwordPlaceholder' => 'Create a password',
+        'passwordConfirmationLabel' => 'Confirm Password',
+        'passwordConfirmationPlaceholder' => 'Re-enter your password',
+        'createAccount' => 'Create Account',
+        'haveAccount' => 'Already have an account?',
+        'signIn' => 'Sign in',
+        'tagline' => 'Fresh from our fields to your dock.',
+        'taglineSub' => 'Create an account to save your information and breeze through your next check-in.',
+        'notAllowed' => 'Registration is only available right after completing a check-in or booking an appointment.',
+    ],
+
+    'registerCta' => [
+        'heading' => 'Speed up your next check-in',
+        'body' => 'Create a free account to save your information and check in faster next time.',
+        'createAccount' => 'Create Account',
+        'signIn' => 'Sign In',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | App Language Lines
@@ -163,10 +205,6 @@ return [
         'driverLabel' => 'Driver',
         'arrivalReminder' => 'Please arrive 5-10 minutes before your scheduled appointment time.',
         'needHelp' => 'Need help?',
-        'registerHeading' => 'Speed up your next check-in',
-        'registerBody' => 'Create a free account to save your information and check in faster next time.',
-        'createAccount' => 'Create Account',
-        'signIn' => 'Sign In',
     ],
 
     'checkInConfirmation' => [
@@ -183,10 +221,6 @@ return [
         'driverLabel' => 'Driver',
         'nextSteps' => 'Keep this reference number handy while you are on site.',
         'needHelp' => 'Need help?',
-        'registerHeading' => 'Speed up your next check-in',
-        'registerBody' => 'Create a free account to save your information and check in faster next time.',
-        'createAccount' => 'Create Account',
-        'signIn' => 'Sign In',
     ],
 
     'appointmentForm' => [

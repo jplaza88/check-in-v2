@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Actions\BookAppointmentAction;
 use App\Appointment\AppointmentConfirmationResolver;
 use App\Appointment\AppointmentScheduleResolver;
+use App\Auth\RegistrationGate;
 use App\DTOs\AppointmentLocationDTO;
 use App\Http\Requests\AppointmentFormRequest;
 use App\Http\Requests\AppointmentLocationSelectRequest;
@@ -49,7 +50,7 @@ final class AppointmentController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(AppointmentFormRequest $request, BookAppointmentAction $action): RedirectResponse
+    public function store(AppointmentFormRequest $request, BookAppointmentAction $action, RegistrationGate $registrationGate): RedirectResponse
     {
         $locationDTO = $this->session->getLocation();
         if (! $locationDTO instanceof AppointmentLocationDTO) {
@@ -59,6 +60,9 @@ final class AppointmentController extends Controller
         $appointment = $action->handle($request->validated(), $locationDTO);
 
         $this->session->forgetLocation();
+
+        // Open the short registration window so the driver can create an account.
+        $registrationGate->allow();
 
         return to_route('appointment.confirmed', $appointment->uuid);
     }

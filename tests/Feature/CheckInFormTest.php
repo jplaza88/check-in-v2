@@ -220,6 +220,15 @@ it('accepts a valid submission including the config-driven fields', function ():
     expect($checkIn->purchaseOrders()->pluck('number')->all())->toBe(['PO-12345']);
 });
 
+it('opens the registration window after a successful check-in', function (): void {
+    $location = Location::factory()->create();
+
+    $this->withSession(freshGatePass($location))
+        ->from(route('checkIn.form', $location))
+        ->post(route('checkIn.store', $location), validCheckInPayload())
+        ->assertSessionHas(App\Auth\RegistrationGate::SESSION_KEY);
+});
+
 it('rejects an expired drivers license', function (): void {
     $location = Location::factory()->checkinAllOptionalFields()->create();
 
