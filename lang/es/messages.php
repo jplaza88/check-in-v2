@@ -394,4 +394,18 @@ return [
         'editButton' => 'Editar',
         'submitButton' => 'Confirmar y registrarse',
     ],
+
+    'verifyEmail' => [
+        'subject' => 'Verifica tu correo electrónico',
+        'preheader' => 'Confirma tu correo electrónico para activar tu cuenta.',
+        'eyebrow' => 'Verifica tu correo',
+        'title' => 'Confirma tu correo electrónico',
+        'greeting' => 'Hola :name:',
+        'intro' => 'Gracias por crear una cuenta. Confirma que este es tu correo electrónico haciendo clic en el botón de abajo.',
+        'button' => 'Verificar correo electrónico',
+        'expiry' => 'Este enlace vence en :minutes minutos. Si vence, puedes solicitar uno nuevo desde tu cuenta.',
+        'fallbackLabel' => 'Si el botón de arriba no funciona, copia y pega este enlace en tu navegador:',
+        'security' => 'Si no creaste una cuenta, no es necesario hacer nada y puedes ignorar este correo con seguridad.',
+        'footer' => 'Este es un mensaje automático de :app. Por favor, no respondas.',
+    ],
 ];

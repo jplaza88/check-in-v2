@@ -20,11 +20,12 @@ final class User extends Authenticatable implements MustVerifyEmail
     use Notifiable;
 
     /**
-     * Send the (queued) email verification notification.
+     * Send the (queued) email verification notification in the driver's
+     * current locale, captured now so the worker renders the right language.
      */
     public function sendEmailVerificationNotification(): void
     {
-        $this->notify(new VerifyEmail);
+        $this->notify((new VerifyEmail)->locale(app()->getLocale()));
     }
 
     /**

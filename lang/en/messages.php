@@ -403,4 +403,18 @@ return [
         'editButton' => 'Edit',
         'submitButton' => 'Confirm & Check In',
     ],
+
+    'verifyEmail' => [
+        'subject' => 'Verify your email address',
+        'preheader' => 'Confirm your email address to activate your account.',
+        'eyebrow' => 'Verify your email',
+        'title' => 'Confirm your email address',
+        'greeting' => 'Hi :name,',
+        'intro' => 'Thanks for creating an account. Please confirm this is your email address by clicking the button below.',
+        'button' => 'Verify email address',
+        'expiry' => 'This link expires in :minutes minutes. If it does, you can request a new one from your account.',
+        'fallbackLabel' => 'If the button above does not work, copy and paste this link into your browser:',
+        'security' => 'If you did not create an account, no action is needed and you can safely ignore this email.',
+        'footer' => 'This is an automated message from :app. Please do not reply.',
+    ],
 ];

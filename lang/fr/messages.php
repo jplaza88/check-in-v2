@@ -394,4 +394,18 @@ return [
         'editButton' => 'Modifier',
         'submitButton' => "Confirmer et s'enregistrer",
     ],
+
+    'verifyEmail' => [
+        'subject' => 'Vérifiez votre adresse e-mail',
+        'preheader' => 'Confirmez votre adresse e-mail pour activer votre compte.',
+        'eyebrow' => 'Vérifiez votre e-mail',
+        'title' => 'Confirmez votre adresse e-mail',
+        'greeting' => 'Bonjour :name,',
+        'intro' => "Merci d'avoir créé un compte. Veuillez confirmer qu'il s'agit bien de votre adresse e-mail en cliquant sur le bouton ci-dessous.",
+        'button' => 'Vérifier mon adresse e-mail',
+        'expiry' => 'Ce lien expire dans :minutes minutes. S\'il expire, vous pouvez en demander un nouveau depuis votre compte.',
+        'fallbackLabel' => 'Si le bouton ci-dessus ne fonctionne pas, copiez et collez ce lien dans votre navigateur :',
+        'security' => "Si vous n'avez pas créé de compte, aucune action n'est requise et vous pouvez ignorer cet e-mail en toute sécurité.",
+        'footer' => 'Ceci est un message automatique de :app. Merci de ne pas y répondre.',
+    ],
 ];
