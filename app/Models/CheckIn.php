@@ -50,6 +50,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read string|null $drivers_license_country
  * @property-read string|null $loading_instructions
  * @property-read string $locale
+ * @property-read CarbonImmutable|null $claimed_at
+ * @property-read string|null $claimed_via
  * @property-read CarbonImmutable $created_at
  * @property-read CarbonImmutable $updated_at
  * @property-read CarbonImmutable|null $deleted_at
@@ -62,7 +64,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
     'truck_plate_state', 'truck_plate_country', 'trailer_plate', 'trailer_plate_state', 'trailer_plate_country',
     'trailer_chute', 'empty_weight_lbs', 'drivers_name', 'drivers_cellphone', 'drivers_email', 'drivers_license_number',
     'drivers_license_expiration_date', 'drivers_license_state', 'drivers_license_country', 'loading_instructions',
-    'locale'])
+    'locale', 'claimed_at', 'claimed_via'])
 ]
 #[Hidden(['id'])]
 final class CheckIn extends Model
@@ -117,6 +119,7 @@ final class CheckIn extends Model
             'erp_status' => CheckInErpStatus::class,
             'trailer_chute' => TrailerChute::class,
             'drivers_license_number' => Encrypted::class,
+            'claimed_at' => 'datetime',
         ];
     }
 }

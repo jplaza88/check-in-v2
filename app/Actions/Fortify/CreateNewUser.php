@@ -45,10 +45,18 @@ final class CreateNewUser implements CreatesNewUsers
             'password' => $this->passwordRules(),
         ])->validate();
 
+        $claimType = $this->registrationGate->claimType();
+        $claimId = $this->registrationGate->claimId();
+
+        // Stash the guest check-in / appointment as pending; it is attached to
+        // this user only once the email address is verified.
         $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
+            'cellphone' => $this->registrationGate->cellphone(),
+            'pending_check_in_id' => $claimType === 'check_in' ? $claimId : null,
+            'pending_appointment_id' => $claimType === 'appointment' ? $claimId : null,
         ]);
 
         $this->registrationGate->consume();

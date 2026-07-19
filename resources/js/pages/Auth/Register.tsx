@@ -30,15 +30,16 @@ interface RegisterTranslations {
 
 interface PageProps {
     translations: { register: RegisterTranslations };
+    defaultName: string | null;
     [key: string]: unknown;
 }
 
 export default function Register() {
-    const { translations } = usePage<PageProps>().props;
+    const { translations, defaultName } = usePage<PageProps>().props;
     const t = translations.register;
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
+        name: defaultName ?? '',
         email: '',
         password: '',
         password_confirmation: '',

@@ -22,6 +22,8 @@ final class UpdateUserProfileInformation implements UpdatesUserProfileInformatio
      */
     public function update(User $user, array $input): void
     {
+        $input['cellphone'] = $this->normalizeCellphone($input['cellphone'] ?? null);
+
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
 
@@ -32,6 +34,10 @@ final class UpdateUserProfileInformation implements UpdatesUserProfileInformatio
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
+
+            'cellphone' => ['nullable', 'string', 'regex:/^\+1\d{10}$/'],
+        ], [
+            'cellphone.regex' => __('messages.accountProfile.cellphoneInvalid'),
         ])->validateWithBag('updateProfileInformation');
 
         if ($input['email'] !== $user->email &&
@@ -41,8 +47,20 @@ final class UpdateUserProfileInformation implements UpdatesUserProfileInformatio
             $user->forceFill([
                 'name' => $input['name'],
                 'email' => $input['email'],
+                'cellphone' => $input['cellphone'],
             ])->save();
         }
+    }
+
+    /**
+     * Normalize a US cellphone to the "+1XXXXXXXXXX" shape used across the app,
+     * or null when empty. Matches the check-in form so the number can prefill.
+     */
+    private function normalizeCellphone(?string $value): ?string
+    {
+        $digits = preg_replace('/\D/', '', (string) $value);
+
+        return $digits === '' ? null : '+1'.$digits;
     }
 
     /**
@@ -55,6 +73,7 @@ final class UpdateUserProfileInformation implements UpdatesUserProfileInformatio
         $user->forceFill([
             'name' => $input['name'],
             'email' => $input['email'],
+            'cellphone' => $input['cellphone'],
             'email_verified_at' => null,
         ])->save();
 

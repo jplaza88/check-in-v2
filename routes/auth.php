@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Auth\RegistrationGate;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,7 +19,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['guest', 'setLocale'])->group(function (): void {
     Route::inertia('/login', 'Auth/Login')->name('login');
-    Route::inertia('/register', 'Auth/Register')
+    Route::get('/register', fn (RegistrationGate $gate) => inertia('Auth/Register', [
+        'defaultName' => $gate->name(),
+    ]))
         ->middleware('registrationAllowed')
         ->name('register');
 });

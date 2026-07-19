@@ -10,6 +10,8 @@ return [
     'terms' => ['publicNavigation'],
     'login' => ['login'],
     'register' => ['register'],
+    'account' => ['publicNavigation', 'account'],
+    'account.profile' => ['publicNavigation', 'accountProfile'],
     'checkIn.selectLocation' => ['publicNavigation', 'checkInSelectLocation', 'locationRequiredModal'],
     'checkIn.form' => ['publicNavigation', 'checkInForm', 'purchaseOrders'],
     'checkIn.confirmed' => ['publicNavigation', 'checkInConfirmation', 'registerCta'],

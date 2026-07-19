@@ -72,12 +72,19 @@ final class CheckInController extends Controller
             return to_route('checkIn.selectLocation');
         }
 
-        $checkIn = $action->handle($request->validated(), $locationDTO);
+        $validated = $request->validated();
+
+        $checkIn = $action->handle($validated, $locationDTO);
 
         $this->session->forgetGatePass();
 
-        // Open the short registration window so the driver can create an account.
-        $registrationGate->allow();
+        // Open the short registration window, carrying the driver's cellphone so
+        // a follow-up account is prefilled with it.
+        $registrationGate->allow(
+            $validated['drivers_cellphone'] ?? null,
+            $validated['drivers_name'] ?? null,
+        );
+        $registrationGate->claim('check_in', $checkIn->id);
 
         return to_route('checkIn.confirmed', $checkIn->uuid);
     }
