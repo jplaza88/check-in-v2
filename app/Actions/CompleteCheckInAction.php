@@ -7,7 +7,6 @@ namespace App\Actions;
 use App\DTOs\CheckInLocationDTO;
 use App\Models\CheckIn;
 use App\Models\User;
-use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -24,7 +23,7 @@ final readonly class CompleteCheckInAction
      *
      * @throws Throwable
      */
-    public function handle(array $validated, CheckInLocationDTO $locationDTO, #[CurrentUser] ?User $user = null): CheckIn
+    public function handle(array $validated, CheckInLocationDTO $locationDTO, ?User $user = null): CheckIn
     {
         $checkIn = DB::transaction(function () use ($validated, $locationDTO, $user): CheckIn {
 

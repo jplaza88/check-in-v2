@@ -12,7 +12,9 @@ use App\DTOs\CheckInLocationDTO;
 use App\Http\Requests\CheckInFormRequest;
 use App\Http\Requests\CheckInLocationSelectRequest;
 use App\Models\Location;
+use App\Models\User;
 use App\Session\CheckInSession;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 use Throwable;
@@ -65,8 +67,12 @@ final class CheckInController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(CheckInFormRequest $request, CompleteCheckInAction $action, RegistrationGate $registrationGate): RedirectResponse
-    {
+    public function store(
+        CheckInFormRequest $request,
+        CompleteCheckInAction $action,
+        RegistrationGate $registrationGate,
+        #[CurrentUser] ?User $user = null
+    ): RedirectResponse {
         $locationDTO = $this->session->getLocation();
         if (! $locationDTO instanceof CheckInLocationDTO) {
             return to_route('checkIn.selectLocation');
@@ -74,7 +80,7 @@ final class CheckInController extends Controller
 
         $validated = $request->validated();
 
-        $checkIn = $action->handle($validated, $locationDTO);
+        $checkIn = $action->handle($validated, $locationDTO, $user);
 
         $this->session->forgetGatePass();
 

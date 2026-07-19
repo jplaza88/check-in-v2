@@ -156,6 +156,23 @@ it('accepts a valid submission when optional fields are hidden', function (): vo
         ->assertRedirect(route('checkIn.confirmed', CheckIn::query()->sole()));
 });
 
+it('captures the signed-in driver on the check-in', function (): void {
+    $location = Location::factory()->create();
+    $user = User::create([
+        'name' => 'John Driver',
+        'email' => 'john@example.com',
+        'password' => 'secret-password',
+    ]);
+
+    $this->actingAs($user)
+        ->withSession(freshGatePass($location))
+        ->from(route('checkIn.form', $location))
+        ->post(route('checkIn.store', $location), validCheckInPayload())
+        ->assertSessionHasNoErrors();
+
+    expect(CheckIn::query()->sole()->user_id)->toBe($user->id);
+});
+
 it('accepts a submission that omits the optional trailer chute', function (): void {
     $location = Location::factory()->create();
 

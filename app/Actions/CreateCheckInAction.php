@@ -12,7 +12,6 @@ use App\Models\CheckIn;
 use App\Models\Location;
 use App\Models\User;
 use App\Queries\CheckInLocation;
-use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Random\RandomException;
@@ -28,7 +27,7 @@ final readonly class CreateCheckInAction
     public function handle(
         array $validated,
         CheckInLocationDTO $locationDTO,
-        #[CurrentUser] ?User $user = null,
+        ?User $user = null,
     ): CheckIn {
         $location = resolve(CheckInLocation::class)->execute($locationDTO->id);
 

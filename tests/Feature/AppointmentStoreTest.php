@@ -5,9 +5,11 @@ declare(strict_types=1);
 use App\Models\Appointment;
 use App\Models\Location;
 use App\Models\PurchaseOrder;
+use App\Models\User;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 
+use function Pest\Laravel\actingAs;
 use function Pest\Laravel\post;
 
 function passGate(Location $location): void
@@ -102,6 +104,23 @@ it('rejects duplicate PO numbers in the same request', function (): void {
 it('redirects when location does not exist', function (): void {
     post(route('appointment.store', Str::uuid()->toString()), validPayload())
         ->assertRedirect(route('appointment.selectLocation'));
+});
+
+it('captures the signed-in driver on the appointment', function (): void {
+    $location = Location::factory()->appointmentsOnly()->create();
+    $user = User::create([
+        'name' => 'John Driver',
+        'email' => 'john@example.com',
+        'password' => 'secret-password',
+    ]);
+
+    actingAs($user);
+    passGate($location);
+
+    post(route('appointment.store', $location->uuid), validPayload())
+        ->assertSessionHasNoErrors();
+
+    expect(Appointment::query()->first()->user_id)->toBe($user->id);
 });
 
 it('persists the locale on appointment creation', function (): void {

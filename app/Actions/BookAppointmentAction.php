@@ -7,7 +7,6 @@ namespace App\Actions;
 use App\DTOs\AppointmentLocationDTO;
 use App\Models\Appointment;
 use App\Models\User;
-use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -24,7 +23,7 @@ final readonly class BookAppointmentAction
      *
      * @throws Throwable
      */
-    public function handle(array $validated, AppointmentLocationDTO $locationDTO, #[CurrentUser] ?User $user = null): Appointment
+    public function handle(array $validated, AppointmentLocationDTO $locationDTO, ?User $user = null): Appointment
     {
         $appointment = DB::transaction(function () use ($validated, $locationDTO, $user): Appointment {
 

@@ -12,7 +12,9 @@ use App\DTOs\AppointmentLocationDTO;
 use App\Http\Requests\AppointmentFormRequest;
 use App\Http\Requests\AppointmentLocationSelectRequest;
 use App\Models\Location;
+use App\Models\User;
 use App\Session\AppointmentSession;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 use Throwable;
@@ -50,7 +52,7 @@ final class AppointmentController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(AppointmentFormRequest $request, BookAppointmentAction $action, RegistrationGate $registrationGate): RedirectResponse
+    public function store(AppointmentFormRequest $request, BookAppointmentAction $action, RegistrationGate $registrationGate, #[CurrentUser] ?User $user = null): RedirectResponse
     {
         $locationDTO = $this->session->getLocation();
         if (! $locationDTO instanceof AppointmentLocationDTO) {
@@ -59,7 +61,7 @@ final class AppointmentController extends Controller
 
         $validated = $request->validated();
 
-        $appointment = $action->handle($validated, $locationDTO);
+        $appointment = $action->handle($validated, $locationDTO, $user);
 
         $this->session->forgetLocation();
 
