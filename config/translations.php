@@ -10,6 +10,8 @@ return [
     'terms' => ['publicNavigation'],
     'login' => ['login'],
     'register' => ['register'],
+    'password.request' => ['forgotPassword'],
+    'password.reset' => ['resetPassword'],
     'account' => ['publicNavigation', 'account'],
     'account.profile' => ['publicNavigation', 'accountProfile'],
     'checkIn.selectLocation' => ['publicNavigation', 'checkInSelectLocation', 'locationRequiredModal'],

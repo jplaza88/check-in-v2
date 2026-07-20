@@ -156,6 +156,37 @@ it('accepts a valid submission when optional fields are hidden', function (): vo
         ->assertRedirect(route('checkIn.confirmed', CheckIn::query()->sole()));
 });
 
+it('prefills the check-in with the signed-in driver saved license', function (): void {
+    $location = Location::factory()->create();
+    $user = User::create([
+        'name' => 'John Driver',
+        'email' => 'john@example.com',
+        'password' => 'secret-password',
+        'drivers_license_number' => 'D1234567',
+        'drivers_license_state' => 'Arizona',
+        'drivers_license_expiration_date' => '2030-05-01',
+    ]);
+
+    $this->actingAs($user)
+        ->withSession(freshGatePass($location))
+        ->get(route('checkIn.form', $location))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->component('CheckInForm')
+            ->where('driverLicense.number', 'D1234567')
+            ->where('driverLicense.state', 'Arizona')
+            ->where('driverLicense.expirationDate', '2030-05-01'));
+});
+
+it('sends a null driver license for guests on the check-in form', function (): void {
+    $location = Location::factory()->create();
+
+    $this->withSession(freshGatePass($location))
+        ->get(route('checkIn.form', $location))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->component('CheckInForm')
+            ->where('driverLicense', null));
+});
+
 it('captures the signed-in driver on the check-in', function (): void {
     $location = Location::factory()->create();
     $user = User::create([

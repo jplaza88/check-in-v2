@@ -1,13 +1,15 @@
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { Check, ChevronLeft, Lock, User } from 'lucide-react';
+import { Check, ChevronLeft, IdCard, Lock, User } from 'lucide-react';
 import type { FormEvent, ReactNode } from 'react';
 
+import LicenseCard from '@/components/LicenseCard';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { PhoneInput, formatUsPhone } from '@/components/PhoneInput';
 import AppLayout from '@/layouts/AppLayout';
+import { US_STATES } from '@/lib/usStates';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -23,6 +25,15 @@ interface AccountProfileTranslations {
     cellphonePlaceholder: string;
     cellphoneHelp: string;
     emailChangeNote: string;
+    licenseHeading: string;
+    licenseSubheading: string;
+    licenseNumberLabel: string;
+    licenseNumberPlaceholder: string;
+    licenseStateLabel: string;
+    licenseStatePlaceholder: string;
+    licenseExpirationLabel: string;
+    licenseSecure: string;
+    licenseEmpty: string;
     save: string;
     saved: string;
     passwordHeading: string;
@@ -35,6 +46,11 @@ interface AccountProfileTranslations {
 
 interface PageProps {
     auth: { user: { name: string; email: string; cellphone: string | null } };
+    license: {
+        number: string | null;
+        state: string | null;
+        expirationDate: string | null;
+    };
     translations: { accountProfile: AccountProfileTranslations };
     [key: string]: unknown;
 }
@@ -99,13 +115,16 @@ function SectionCard({
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function EditProfile() {
-    const { auth, translations } = usePage<PageProps>().props;
+    const { auth, license, translations } = usePage<PageProps>().props;
     const t = translations.accountProfile;
 
     const profile = useForm({
         name: auth.user.name,
         email: auth.user.email,
         cellphone: formatUsPhone((auth.user.cellphone ?? '').replace(/^\+1/, '')),
+        drivers_license_number: license.number ?? '',
+        drivers_license_state: license.state ?? '',
+        drivers_license_expiration_date: license.expirationDate ?? '',
     });
 
     const password = useForm({
@@ -244,6 +263,161 @@ export default function EditProfile() {
                                     {t.cellphoneHelp}
                                 </p>
                             )}
+                        </Field>
+                    </div>
+
+                    <div className="mt-6 flex items-center gap-4">
+                        <Button
+                            type="submit"
+                            disabled={profile.processing}
+                            className="h-10 rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
+                        >
+                            {t.save}
+                        </Button>
+                        {profile.recentlySuccessful && (
+                            <SavedPill label={t.saved} />
+                        )}
+                    </div>
+                </SectionCard>
+
+                {/* Driver's license */}
+                <SectionCard
+                    icon={<IdCard className="h-5 w-5" />}
+                    heading={t.licenseHeading}
+                    subheading={t.licenseSubheading}
+                    onSubmit={submitProfile}
+                >
+                    <div className="mt-5 space-y-5">
+                        {/* Live, state-themed card preview */}
+                        <LicenseCard
+                            name={profile.data.name}
+                            number={profile.data.drivers_license_number || null}
+                            state={profile.data.drivers_license_state || null}
+                            expirationDate={
+                                profile.data.drivers_license_expiration_date ||
+                                null
+                            }
+                            secureLabel={t.licenseSecure}
+                            emptyLabel={t.licenseEmpty}
+                            className="mx-auto max-w-sm"
+                        />
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <Field
+                                data-invalid={
+                                    !!profile.errors.drivers_license_number ||
+                                    undefined
+                                }
+                            >
+                                <FieldLabel htmlFor="drivers_license_number">
+                                    {t.licenseNumberLabel}
+                                </FieldLabel>
+                                <Input
+                                    id="drivers_license_number"
+                                    name="drivers_license_number"
+                                    type="text"
+                                    maxLength={20}
+                                    autoComplete="off"
+                                    autoCapitalize="characters"
+                                    value={
+                                        profile.data.drivers_license_number
+                                    }
+                                    aria-invalid={
+                                        !!profile.errors
+                                            .drivers_license_number || undefined
+                                    }
+                                    placeholder={t.licenseNumberPlaceholder}
+                                    onChange={(e) =>
+                                        profile.setData(
+                                            'drivers_license_number',
+                                            e.target.value,
+                                        )
+                                    }
+                                />
+                                <FieldError>
+                                    {profile.errors.drivers_license_number}
+                                </FieldError>
+                            </Field>
+
+                            <Field
+                                data-invalid={
+                                    !!profile.errors.drivers_license_state ||
+                                    undefined
+                                }
+                            >
+                                <FieldLabel htmlFor="drivers_license_state">
+                                    {t.licenseStateLabel}
+                                </FieldLabel>
+                                <select
+                                    id="drivers_license_state"
+                                    name="drivers_license_state"
+                                    value={profile.data.drivers_license_state}
+                                    aria-invalid={
+                                        !!profile.errors
+                                            .drivers_license_state || undefined
+                                    }
+                                    onChange={(e) =>
+                                        profile.setData(
+                                            'drivers_license_state',
+                                            e.target.value,
+                                        )
+                                    }
+                                    className="h-9 w-full min-w-0 rounded-4xl border border-input bg-input/30 px-3 py-1 text-base transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 aria-invalid:border-destructive aria-invalid:ring-[3px] aria-invalid:ring-destructive/20 md:text-sm"
+                                >
+                                    <option value="">
+                                        {t.licenseStatePlaceholder}
+                                    </option>
+                                    {US_STATES.map((state) => (
+                                        <option
+                                            key={state.abbr}
+                                            value={state.name}
+                                        >
+                                            {state.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <FieldError>
+                                    {profile.errors.drivers_license_state}
+                                </FieldError>
+                            </Field>
+                        </div>
+
+                        <Field
+                            data-invalid={
+                                !!profile.errors
+                                    .drivers_license_expiration_date || undefined
+                            }
+                            className="sm:max-w-[calc(50%-0.5rem)]"
+                        >
+                            <FieldLabel htmlFor="drivers_license_expiration_date">
+                                {t.licenseExpirationLabel}
+                            </FieldLabel>
+                            <Input
+                                id="drivers_license_expiration_date"
+                                name="drivers_license_expiration_date"
+                                type="date"
+                                value={
+                                    profile.data
+                                        .drivers_license_expiration_date
+                                }
+                                aria-invalid={
+                                    !!profile.errors
+                                        .drivers_license_expiration_date ||
+                                    undefined
+                                }
+                                onChange={(e) =>
+                                    profile.setData(
+                                        'drivers_license_expiration_date',
+                                        e.target.value,
+                                    )
+                                }
+                            />
+                            <FieldError>
+                                {
+                                    profile.errors
+                                        .drivers_license_expiration_date
+                                }
+                            </FieldError>
                         </Field>
                     </div>
 

@@ -79,6 +79,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Redirects
+    |--------------------------------------------------------------------------
+    |
+    | With views disabled, Fortify has no default target for the password reset
+    | response, so it falls back to "home" (/account). A just-reset user is still
+    | a guest, so that bounces through auth and drops the status flash before the
+    | login page can show it. Send them straight to /login instead.
+    |
+    */
+
+    'redirects' => [
+        'password-reset' => '/login',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Fortify Routes Prefix / Subdomain
     |--------------------------------------------------------------------------
     |
@@ -103,7 +119,21 @@ return [
     |
     */
 
-    'middleware' => ['web'],
+    'middleware' => ['web', 'setLocale', 'throttle:fortify', 'auth.timebox'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Auth Timebox
+    |--------------------------------------------------------------------------
+    |
+    | Minimum time (in microseconds) that the sensitive auth endpoints handled
+    | by App\Http\Middleware\AuthTimebox are held to, so success and failure
+    | take the same time and can't be told apart by response timing. Set to 0
+    | (e.g. in the test environment) to disable the floor.
+    |
+    */
+
+    'auth_timebox_microseconds' => (int) env('AUTH_TIMEBOX_MICROSECONDS', 300000),
 
     /*
     |--------------------------------------------------------------------------

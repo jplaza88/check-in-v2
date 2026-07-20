@@ -22,15 +22,17 @@ interface LoginTranslations {
     signIn: string;
     tagline: string;
     taglineSub: string;
+    passwordResetSuccess: string;
 }
 
 interface PageProps {
     translations: { login: LoginTranslations };
+    status?: string | null;
     [key: string]: unknown;
 }
 
 export default function Login() {
-    const { translations } = usePage<PageProps>().props;
+    const { translations, status } = usePage<PageProps>().props;
     const t = translations.login;
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -73,6 +75,12 @@ export default function Login() {
                         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                             {t.subtitle}
                         </p>
+
+                        {status ? (
+                            <div className="mt-6 rounded-2xl border border-brand-green/30 bg-brand-green/10 px-4 py-3 text-sm font-medium text-brand-green">
+                                {t.passwordResetSuccess}
+                            </div>
+                        ) : null}
 
                         <form onSubmit={submit} className="mt-8 space-y-5">
                             <Field data-invalid={!!errors.email || undefined}>

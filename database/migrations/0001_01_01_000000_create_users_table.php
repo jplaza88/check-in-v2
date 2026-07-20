@@ -21,8 +21,9 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('cellphone', 12)->nullable();
-            // A guest check-in / appointment awaiting attachment once this
-            // account's email is verified. Cleared on attachment.
+            $table->text('drivers_license_number')->nullable();
+            $table->string('drivers_license_state')->nullable();
+            $table->date('drivers_license_expiration_date')->nullable();
             $table->unsignedBigInteger('pending_check_in_id')->nullable();
             $table->unsignedBigInteger('pending_appointment_id')->nullable();
             $table->text('two_factor_secret')->nullable();

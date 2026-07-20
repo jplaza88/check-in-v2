@@ -95,6 +95,81 @@ it('rejects an invalid cellphone', function (): void {
     expect($user->refresh()->cellphone)->toBeNull();
 });
 
+it('exposes the saved license to the profile page but hides the number from the shared auth user', function (): void {
+    $user = makeDriver([
+        'drivers_license_number' => 'D1234567',
+        'drivers_license_state' => 'Texas',
+        'drivers_license_expiration_date' => '2031-01-15',
+    ]);
+
+    $this->actingAs($user)
+        ->get(route('account.profile'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('license.number', 'D1234567')
+            ->where('license.state', 'Texas')
+            ->where('license.expirationDate', '2031-01-15')
+            ->missing('auth.user.drivers_license_number'));
+});
+
+it('saves the drivers license to the profile', function (): void {
+    $user = makeDriver();
+
+    $this->actingAs($user)
+        ->put('/user/profile-information', [
+            'name' => 'John Driver',
+            'email' => 'john@example.com',
+            'cellphone' => '',
+            'drivers_license_number' => 'D1234567',
+            'drivers_license_state' => 'Arizona',
+            'drivers_license_expiration_date' => '2030-05-01',
+        ])
+        ->assertSessionHasNoErrors();
+
+    $user->refresh();
+
+    expect($user->drivers_license_number)->toBe('D1234567')
+        ->and($user->drivers_license_state)->toBe('Arizona')
+        ->and($user->drivers_license_expiration_date->format('Y-m-d'))->toBe('2030-05-01');
+});
+
+it('clears the license fields when submitted empty', function (): void {
+    $user = makeDriver([
+        'drivers_license_number' => 'D1234567',
+        'drivers_license_state' => 'Arizona',
+        'drivers_license_expiration_date' => '2030-05-01',
+    ]);
+
+    $this->actingAs($user)
+        ->put('/user/profile-information', [
+            'name' => 'John Driver',
+            'email' => 'john@example.com',
+            'cellphone' => '',
+            'drivers_license_number' => '',
+            'drivers_license_state' => '',
+            'drivers_license_expiration_date' => '',
+        ])
+        ->assertSessionHasNoErrors();
+
+    $user->refresh();
+
+    expect($user->drivers_license_number)->toBeNull()
+        ->and($user->drivers_license_state)->toBeNull()
+        ->and($user->drivers_license_expiration_date)->toBeNull();
+});
+
+it('rejects a too-short license number', function (): void {
+    $user = makeDriver();
+
+    $this->actingAs($user)
+        ->put('/user/profile-information', [
+            'name' => 'John Driver',
+            'email' => 'john@example.com',
+            'cellphone' => '',
+            'drivers_license_number' => 'AB',
+        ])
+        ->assertSessionHasErrors(['drivers_license_number'], null, 'updateProfileInformation');
+});
+
 it('updates the password', function (): void {
     $user = makeDriver();
 

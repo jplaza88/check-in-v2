@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Middleware\AuthTimebox;
 use App\Http\Middleware\EnsureRegistrationAllowed;
 use App\Http\Middleware\EnsureUserHasAppointmentGatePass;
 use App\Http\Middleware\EnsureUserHasCheckInGatePass;
@@ -32,6 +33,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'setLocale' => SetLocale::class,
+            'auth.timebox' => AuthTimebox::class,
             'userCoordinates' => EnsureUserHasCoordinates::class,
             'appointmentGatePass' => EnsureUserHasAppointmentGatePass::class,
             'checkInGatePass' => EnsureUserHasCheckInGatePass::class,

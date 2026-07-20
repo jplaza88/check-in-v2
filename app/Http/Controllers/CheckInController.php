@@ -48,7 +48,7 @@ final class CheckInController extends Controller
         return to_route('checkIn.form', $location->uuid);
     }
 
-    public function form(): RedirectResponse|Response
+    public function form(#[CurrentUser] ?User $user = null): RedirectResponse|Response
     {
         $location = $this->session->getLocation();
 
@@ -61,6 +61,13 @@ final class CheckInController extends Controller
             'location' => $location,
             'fields' => $this->session->getCheckInFormFields() ?? [],
             'truckColors' => config('app.truck_colors'),
+            // Saved license (number is hidden from the global auth.user share) so
+            // a signed-in driver's check-in prefills from their profile.
+            'driverLicense' => $user === null ? null : [
+                'number' => $user->drivers_license_number,
+                'state' => $user->drivers_license_state,
+                'expirationDate' => $user->drivers_license_expiration_date?->format('Y-m-d'),
+            ],
         ]);
     }
 

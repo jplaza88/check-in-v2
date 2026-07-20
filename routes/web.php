@@ -54,7 +54,7 @@ Route::middleware('setLocale')->group(function (): void {
      */
     Route::middleware('auth')->group(function (): void {
         Route::get('/account', [AccountController::class, 'index'])->name('account');
-        Route::inertia('/account/profile', 'Account/EditProfile')->name('account.profile');
+        Route::get('/account/profile', [AccountController::class, 'editProfile'])->name('account.profile');
     });
 
     /**

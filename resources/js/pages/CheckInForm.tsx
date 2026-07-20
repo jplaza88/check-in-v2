@@ -159,6 +159,11 @@ interface PageProps {
     translations: Translations;
     truckColors: string[];
     auth: { user: { name: string; cellphone: string | null } | null };
+    driverLicense: {
+        number: string | null;
+        state: string | null;
+        expirationDate: string | null;
+    } | null;
     [key: string]: unknown;
 }
 
@@ -381,7 +386,7 @@ export default function CheckInForm({
     fields,
     truckColors,
 }: PageProps) {
-    const { translations, auth } = usePage<PageProps>().props;
+    const { translations, auth, driverLicense } = usePage<PageProps>().props;
     const t = translations.checkInForm;
     const poT = translations.purchaseOrders;
 
@@ -391,6 +396,9 @@ export default function CheckInForm({
     const prefillCellphone = auth.user?.cellphone
         ? formatUsPhone(auth.user.cellphone.replace(/^\+1/, ''))
         : '';
+    const prefillLicenseNumber = driverLicense?.number ?? '';
+    const prefillLicenseState = driverLicense?.state ?? '';
+    const prefillLicenseExpiration = driverLicense?.expirationDate ?? '';
 
     const trailerChuteOptions = [
         { value: 'n/a', label: t.trailerChuteNa },
@@ -571,10 +579,10 @@ export default function CheckInForm({
             empty_weight_lbs: '',
             drivers_name: prefillName,
             drivers_cellphone: prefillCellphone,
-            drivers_license_number: '',
-            drivers_license_state: '',
-            drivers_license_country: '',
-            drivers_license_expiration_date: '',
+            drivers_license_number: prefillLicenseNumber,
+            drivers_license_state: prefillLicenseState,
+            drivers_license_country: prefillLicenseState ? 'US' : '',
+            drivers_license_expiration_date: prefillLicenseExpiration,
         },
     });
 
