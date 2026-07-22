@@ -16,6 +16,18 @@ jobs:
       - uses: actions/checkout@v6
       - name: Log in to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      - name: Reclaim Docker disk space
+        # Self-hosted runner: images and build cache accumulate across deploys
+        # and fill the disk. Prune before building so the new image has room.
+        # Runs first, so it never touches the fresh build; volumes are left
+        # alone (staging DB/redis data is safe) and running containers keep
+        # their images.
+        run: |
+          docker system df || true
+          docker container prune -f || true
+          docker image prune -af || true
+          docker builder prune -af || true
+          df -h / || true
       - name: Build image
         run: docker build --target prod --build-arg VITE_APP_NAME="${{ vars.VITE_APP_NAME || 'Martori Farms' }}" --build-arg GIT_COMMIT="${{ github.sha }}" -t ghcr.io/${{ github.repository }}:${{ github.sha }} -t ghcr.io/${{ github.repository }}:latest .
       - name: Push image

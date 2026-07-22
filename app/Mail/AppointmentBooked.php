@@ -63,7 +63,6 @@ final class AppointmentBooked extends Mailable implements ShouldQueue
 
     /**
      * "+15551234567" -> "+1 (555) 123-4567" for readability.
-     *
      */
     private function formatPhone(string $phone): string
     {
