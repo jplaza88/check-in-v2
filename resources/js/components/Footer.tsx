@@ -80,7 +80,7 @@ export default function Footer({ hideLogin = false }: { hideLogin?: boolean }) {
                             </Link>
                             {!hideLogin && (
                                 <Link
-                                    href="#"
+                                    href="/login"
                                     className="text-sm text-gray-500 transition-colors hover:text-brand-green"
                                     prefetch
                                 >

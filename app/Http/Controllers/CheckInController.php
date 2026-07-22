@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Actions\CompleteCheckInAction;
+use App\Auth\RegistrationGate;
 use App\CheckIn\CheckInConfirmationResolver;
 use App\CheckIn\CheckInScheduleResolver;
 use App\DTOs\CheckInLocationDTO;
 use App\Http\Requests\CheckInFormRequest;
 use App\Http\Requests\CheckInLocationSelectRequest;
 use App\Models\Location;
+use App\Models\User;
 use App\Session\CheckInSession;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 use Throwable;
@@ -45,7 +48,7 @@ final class CheckInController extends Controller
         return to_route('checkIn.form', $location->uuid);
     }
 
-    public function form(): RedirectResponse|Response
+    public function form(#[CurrentUser] ?User $user = null): RedirectResponse|Response
     {
         $location = $this->session->getLocation();
 
@@ -58,22 +61,43 @@ final class CheckInController extends Controller
             'location' => $location,
             'fields' => $this->session->getCheckInFormFields() ?? [],
             'truckColors' => config('app.truck_colors'),
+            // Saved license (number is hidden from the global auth.user share) so
+            // a signed-in driver's check-in prefills from their profile.
+            'driverLicense' => $user === null ? null : [
+                'number' => $user->drivers_license_number,
+                'state' => $user->drivers_license_state,
+                'expirationDate' => $user->drivers_license_expiration_date?->format('Y-m-d'),
+            ],
         ]);
     }
 
     /**
      * @throws Throwable
      */
-    public function store(CheckInFormRequest $request, CompleteCheckInAction $action): RedirectResponse
-    {
+    public function store(
+        CheckInFormRequest $request,
+        CompleteCheckInAction $action,
+        RegistrationGate $registrationGate,
+        #[CurrentUser] ?User $user = null
+    ): RedirectResponse {
         $locationDTO = $this->session->getLocation();
         if (! $locationDTO instanceof CheckInLocationDTO) {
             return to_route('checkIn.selectLocation');
         }
 
-        $checkIn = $action->handle($request->validated(), $locationDTO);
+        $validated = $request->validated();
+
+        $checkIn = $action->handle($validated, $locationDTO, $user);
 
         $this->session->forgetGatePass();
+
+        // Open the short registration window, carrying the driver's cellphone so
+        // a follow-up account is prefilled with it.
+        $registrationGate->allow(
+            $validated['drivers_cellphone'] ?? null,
+            $validated['drivers_name'] ?? null,
+        );
+        $registrationGate->claim('check_in', $checkIn->id);
 
         return to_route('checkIn.confirmed', $checkIn->uuid);
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Listeners\AttachPendingRecordsToUser;
 use App\Models\Appointment;
 use App\Models\AppointmentSchedule;
 use App\Models\AppointmentScheduleOverride;
@@ -12,10 +13,12 @@ use App\Models\CheckInScheduleOverride;
 use App\Models\Location;
 use App\Schedule\WeeklyScheduleResolver;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -100,6 +103,17 @@ final class AppServiceProvider extends ServiceProvider
         $this->enforceMorphMaps();
 
         $this->flushScheduleCacheOnDataChanges();
+
+        $this->registerEventListeners();
+    }
+
+    /**
+     * Attach a driver's pending guest check-in / appointment once their email
+     * is verified.
+     */
+    private function registerEventListeners(): void
+    {
+        Event::listen(Verified::class, AttachPendingRecordsToUser::class);
     }
 
     /**

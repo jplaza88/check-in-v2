@@ -21,15 +21,17 @@ A web application that manages truck drivers' check-ins across Martori Farms loc
 
 ## Laravel Packages & Tooling
 
-| Tool | Purpose                                             |
-|---|-----------------------------------------------------|
-| Sail | Docker-based local development environment          |
-| Octane | High-performance application server (FrankenPHP)    |
-| Pint | PHP code style fixer (Wrapper built ontop of PHP-CS-Fixer) |
-| Larastan | Static analysis (PHPStan for Laravel)               |
-| Rector | Automated code refactoring (Driftingly/Laravel Rector) |
-| Horizon | Redis queue monitoring & worker management dashboard |
-| Laravel Phone | Phone number validation (Propaganistas wrapper around Google's libphonenumber) |
+| Tool | Purpose                                                                                                              |
+|---|----------------------------------------------------------------------------------------------------------------------|
+| Sail | Docker-based local development environment                                                                           |
+| Octane | High-performance application server (FrankenPHP)                                                                     |
+| Pint | PHP code style fixer (Wrapper built ontop of PHP-CS-Fixer)                                                           |
+| Larastan | Static analysis (PHPStan for Laravel)                                                                                |
+| Rector | Automated code refactoring (Driftingly/Laravel Rector)                                                               |
+| Horizon | Redis queue monitoring & worker management dashboard                                                                 |
+| Fortify | Headless authentication backend - login, registration, email verification & password reset (custom Inertia/React UI) |
+| Spatie Permission | Roles & permissions with team support - per-location employee scoping (spatie/laravel-permission)                    |
+| Laravel Phone | Phone number validation (Propaganistas wrapper around Google's libphonenumber)                                       |
 
 ## Requirements
 

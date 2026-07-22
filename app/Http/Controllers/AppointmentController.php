@@ -7,11 +7,14 @@ namespace App\Http\Controllers;
 use App\Actions\BookAppointmentAction;
 use App\Appointment\AppointmentConfirmationResolver;
 use App\Appointment\AppointmentScheduleResolver;
+use App\Auth\RegistrationGate;
 use App\DTOs\AppointmentLocationDTO;
 use App\Http\Requests\AppointmentFormRequest;
 use App\Http\Requests\AppointmentLocationSelectRequest;
 use App\Models\Location;
+use App\Models\User;
 use App\Session\AppointmentSession;
+use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 use Throwable;
@@ -49,16 +52,26 @@ final class AppointmentController extends Controller
     /**
      * @throws Throwable
      */
-    public function store(AppointmentFormRequest $request, BookAppointmentAction $action): RedirectResponse
+    public function store(AppointmentFormRequest $request, BookAppointmentAction $action, RegistrationGate $registrationGate, #[CurrentUser] ?User $user = null): RedirectResponse
     {
         $locationDTO = $this->session->getLocation();
         if (! $locationDTO instanceof AppointmentLocationDTO) {
             return to_route('appointment.selectLocation');
         }
 
-        $appointment = $action->handle($request->validated(), $locationDTO);
+        $validated = $request->validated();
+
+        $appointment = $action->handle($validated, $locationDTO, $user);
 
         $this->session->forgetLocation();
+
+        // Open the short registration window, carrying the driver's cellphone so
+        // a follow-up account is prefilled with it.
+        $registrationGate->allow(
+            $validated['drivers_cellphone'] ?? null,
+            $validated['drivers_name'] ?? null,
+        );
+        $registrationGate->claim('appointment', $appointment->id);
 
         return to_route('appointment.confirmed', $appointment->uuid);
     }

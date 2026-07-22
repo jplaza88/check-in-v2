@@ -26,6 +26,7 @@ import {
     FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { PhoneInput, formatUsPhone } from '@/components/PhoneInput';
 import { Textarea } from '@/components/ui/textarea';
 import PublicLayout from '@/layouts/PublicLayout';
 import { countryName } from '@/lib/countryFlag';
@@ -157,31 +158,14 @@ interface PageProps {
     fields: FieldFlags;
     translations: Translations;
     truckColors: string[];
+    auth: { user: { name: string; cellphone: string | null } | null };
+    driverLicense: {
+        number: string | null;
+        state: string | null;
+        expirationDate: string | null;
+    } | null;
     [key: string]: unknown;
 }
-
-// ── Input formatters ─────────────────────────────────────────────────────────
-
-const formatPhone = (raw: string) => {
-    const digits = raw.replace(/\D/g, '').substring(0, 10);
-    const area = digits.substring(0, 3);
-    const mid = digits.substring(3, 6);
-    const last = digits.substring(6, 10);
-
-    if (digits.length > 6) {
-        return `(${area}) ${mid}-${last}`;
-    }
-
-    if (digits.length > 3) {
-        return `(${area}) ${mid}`;
-    }
-
-    if (digits.length > 0) {
-        return `(${area}`;
-    }
-
-    return '';
-};
 
 const formatPlate = (raw: string) =>
     raw
@@ -402,9 +386,19 @@ export default function CheckInForm({
     fields,
     truckColors,
 }: PageProps) {
-    const { translations } = usePage<PageProps>().props;
+    const { translations, auth, driverLicense } = usePage<PageProps>().props;
     const t = translations.checkInForm;
     const poT = translations.purchaseOrders;
+
+    // Prefill the driver's identity for signed-in drivers, from their saved
+    // profile. Guests start with blank fields.
+    const prefillName = auth.user?.name ?? '';
+    const prefillCellphone = auth.user?.cellphone
+        ? formatUsPhone(auth.user.cellphone.replace(/^\+1/, ''))
+        : '';
+    const prefillLicenseNumber = driverLicense?.number ?? '';
+    const prefillLicenseState = driverLicense?.state ?? '';
+    const prefillLicenseExpiration = driverLicense?.expirationDate ?? '';
 
     const trailerChuteOptions = [
         { value: 'n/a', label: t.trailerChuteNa },
@@ -583,12 +577,12 @@ export default function CheckInForm({
             trailer_plate_country: '',
             trailer_chute: 'n/a',
             empty_weight_lbs: '',
-            drivers_name: '',
-            drivers_cellphone: '',
-            drivers_license_number: '',
-            drivers_license_state: '',
-            drivers_license_country: '',
-            drivers_license_expiration_date: '',
+            drivers_name: prefillName,
+            drivers_cellphone: prefillCellphone,
+            drivers_license_number: prefillLicenseNumber,
+            drivers_license_state: prefillLicenseState,
+            drivers_license_country: prefillLicenseState ? 'US' : '',
+            drivers_license_expiration_date: prefillLicenseExpiration,
         },
     });
 
@@ -1324,37 +1318,22 @@ export default function CheckInForm({
                                                     <FieldLabel htmlFor="drivers_cellphone">
                                                         {t.cellphoneLabel}
                                                     </FieldLabel>
-                                                    <div className="flex rounded-4xl shadow-xs">
-                                                        <span className="inline-flex items-center rounded-l-4xl border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground dark:bg-input/30">
-                                                            +1
-                                                        </span>
-                                                        <Input
-                                                            id="drivers_cellphone"
-                                                            type="tel"
-                                                            value={field.value}
-                                                            onChange={(e) =>
-                                                                field.onChange(
-                                                                    formatPhone(
-                                                                        e.target
-                                                                            .value,
-                                                                    ),
-                                                                )
-                                                            }
-                                                            onBlur={
-                                                                field.onBlur
-                                                            }
-                                                            name={field.name}
-                                                            ref={field.ref}
-                                                            aria-invalid={
-                                                                fieldState.invalid
-                                                            }
-                                                            placeholder={
-                                                                t.cellphonePlaceholder
-                                                            }
-                                                            maxLength={14}
-                                                            className="rounded-l-none"
-                                                        />
-                                                    </div>
+                                                    <PhoneInput
+                                                        id="drivers_cellphone"
+                                                        name={field.name}
+                                                        value={field.value}
+                                                        onChange={
+                                                            field.onChange
+                                                        }
+                                                        onBlur={field.onBlur}
+                                                        ref={field.ref}
+                                                        invalid={
+                                                            fieldState.invalid
+                                                        }
+                                                        placeholder={
+                                                            t.cellphonePlaceholder
+                                                        }
+                                                    />
                                                     <FieldDescription>
                                                         {t.cellphoneConsent}
                                                     </FieldDescription>

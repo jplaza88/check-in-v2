@@ -43,6 +43,8 @@ return new class extends Migration
             $table->string('drivers_license_country')->nullable();
             $table->text('loading_instructions')->nullable();
             $table->string('locale', 2)->default('en');
+            $table->timestampTz('claimed_at')->nullable();
+            $table->string('claimed_via')->nullable();
 
             $table->timestampsTz();
             $table->softDeletes();

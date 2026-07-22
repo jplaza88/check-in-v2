@@ -236,6 +236,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Registration Window
+    |--------------------------------------------------------------------------
+    |
+    | How long (in seconds) a driver may register an account after completing a
+    | check-in or booking an appointment. Registration is only permitted inside
+    | this short window; the flag is cleared once used or expired.
+    |
+    | Default: 60 seconds * 15 (15 minutes)
+    |
+    */
+
+    'registration_window_ttl' => 60 * 15,
+
+    /*
+    |--------------------------------------------------------------------------
     | User Location Distances Time-to-Live
     |--------------------------------------------------------------------------
     |

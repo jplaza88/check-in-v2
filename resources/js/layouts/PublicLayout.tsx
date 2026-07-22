@@ -103,7 +103,7 @@ export default function PublicLayout({ children }: PublicLayoutProps) {
                                             onClick={() =>
                                                 setInfoModalOpen(false)
                                             }
-                                            className="btn-sm mt-5 inline-flex cursor-pointer items-center justify-center rounded-lg border border-transparent bg-gray-900 px-4 py-2 text-gray-100 hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
+                                            className="mt-5 inline-flex cursor-pointer items-center justify-center rounded-lg border border-transparent bg-gray-900 px-4 py-2 text-gray-100 hover:bg-gray-800 dark:bg-gray-100 dark:text-gray-800 dark:hover:bg-white"
                                         >
                                             OK
                                         </button>

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\CheckInDistanceController;
@@ -47,6 +48,14 @@ Route::middleware('setLocale')->group(function (): void {
     Route::inertia('/privacy', 'PrivacyPolicy')->name('privacy');
 
     Route::inertia('/terms', 'TermsOfService')->name('terms');
+
+    /**
+     * Authenticated driver account
+     */
+    Route::middleware('auth')->group(function (): void {
+        Route::get('/account', [AccountController::class, 'index'])->name('account');
+        Route::get('/account/profile', [AccountController::class, 'editProfile'])->name('account.profile');
+    });
 
     /**
      * Check-In
