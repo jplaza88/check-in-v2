@@ -9,7 +9,7 @@ use Closure;
 use Illuminate\Http\Request;
 
 /*
- * This class handles the language settings for driver facing pages (check-in, appointment, and dashboard)
+ * This class handles the language settings for driver facing pages (check-in, appointment, and account)
  */
 final readonly class SetLocale
 {

@@ -11,7 +11,6 @@ use App\Models\Appointment;
 use App\Models\Location;
 use App\Models\User;
 use App\Queries\AppointmentLocation;
-use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
 use Random\RandomException;
@@ -30,7 +29,7 @@ final readonly class CreateAppointmentAction
     public function handle(
         array $validated,
         AppointmentLocationDTO $locationDTO,
-        #[CurrentUser] ?User $user = null,
+        ?User $user = null,
     ): Appointment {
         $location = resolve(AppointmentLocation::class)->execute($locationDTO->id, true);
 

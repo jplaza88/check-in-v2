@@ -24,6 +24,7 @@ import {
     FieldDescription,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { PhoneInput, formatUsPhone } from '@/components/PhoneInput';
 import PublicLayout from '@/layouts/PublicLayout';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -84,6 +85,7 @@ interface Translations {
 interface PageProps {
     location: Location;
     translations: Translations;
+    auth: { user: { name: string; cellphone: string | null } | null };
     [key: string]: unknown;
 }
 
@@ -181,9 +183,16 @@ function ReviewSummary({
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ScheduleAppointment({ location }: PageProps) {
-    const { translations } = usePage<PageProps>().props;
+    const { translations, auth } = usePage<PageProps>().props;
     const t = translations.appointmentForm;
     const poT = translations.purchaseOrders;
+
+    // Prefill the driver's identity for signed-in drivers, from their saved
+    // profile. Guests start with blank fields.
+    const prefillName = auth.user?.name ?? '';
+    const prefillCellphone = auth.user?.cellphone
+        ? formatUsPhone(auth.user.cellphone.replace(/^\+1/, ''))
+        : '';
 
     const [processing, setProcessing] = useState(false);
     const [step, setStep] = useState<'form' | 'review'>('form');
@@ -231,8 +240,8 @@ export default function ScheduleAppointment({ location }: PageProps) {
                 date: firstWindow?.date ?? '',
                 time: firstWindow?.firstSlot ?? '10:00:00',
                 po_numbers: [{ value: '' }],
-                drivers_name: '',
-                drivers_cellphone: '',
+                drivers_name: prefillName,
+                drivers_cellphone: prefillCellphone,
             },
         });
 
@@ -245,27 +254,6 @@ export default function ScheduleAppointment({ location }: PageProps) {
     const currentWindow = selectedDate
         ? windowByDate.get(selectedDate)
         : undefined;
-
-    const formatPhone = (raw: string) => {
-        const digits = raw.replace(/\D/g, '').substring(0, 10);
-        const area = digits.substring(0, 3);
-        const mid = digits.substring(3, 6);
-        const last = digits.substring(6, 10);
-
-        if (digits.length > 6) {
-            return `(${area}) ${mid}-${last}`;
-        }
-
-        if (digits.length > 3) {
-            return `(${area}) ${mid}`;
-        }
-
-        if (digits.length > 0) {
-            return `(${area}`;
-        }
-
-        return '';
-    };
 
     const onReview = () => {
         handleSubmit(() => setStep('review'))();
@@ -573,37 +561,22 @@ export default function ScheduleAppointment({ location }: PageProps) {
                                                     <FieldLabel htmlFor="drivers_cellphone">
                                                         {t.cellphoneLabel}
                                                     </FieldLabel>
-                                                    <div className="flex rounded-4xl shadow-xs">
-                                                        <span className="inline-flex items-center rounded-l-4xl border border-r-0 border-input bg-muted px-3 text-sm text-muted-foreground dark:bg-input/30">
-                                                            +1
-                                                        </span>
-                                                        <Input
-                                                            id="drivers_cellphone"
-                                                            type="tel"
-                                                            value={field.value}
-                                                            onChange={(e) =>
-                                                                field.onChange(
-                                                                    formatPhone(
-                                                                        e.target
-                                                                            .value,
-                                                                    ),
-                                                                )
-                                                            }
-                                                            onBlur={
-                                                                field.onBlur
-                                                            }
-                                                            name={field.name}
-                                                            ref={field.ref}
-                                                            aria-invalid={
-                                                                fieldState.invalid
-                                                            }
-                                                            placeholder={
-                                                                t.cellphonePlaceholder
-                                                            }
-                                                            maxLength={14}
-                                                            className="rounded-l-none"
-                                                        />
-                                                    </div>
+                                                    <PhoneInput
+                                                        id="drivers_cellphone"
+                                                        name={field.name}
+                                                        value={field.value}
+                                                        onChange={
+                                                            field.onChange
+                                                        }
+                                                        onBlur={field.onBlur}
+                                                        ref={field.ref}
+                                                        invalid={
+                                                            fieldState.invalid
+                                                        }
+                                                        placeholder={
+                                                            t.cellphonePlaceholder
+                                                        }
+                                                    />
                                                     <FieldDescription>
                                                         {t.cellphoneConsent}
                                                     </FieldDescription>

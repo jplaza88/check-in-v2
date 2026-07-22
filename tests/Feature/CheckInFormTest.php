@@ -8,6 +8,8 @@ use App\Enums\CheckInErpStatus;
 use App\Enums\CheckInStatus;
 use App\Models\CheckIn;
 use App\Models\Location;
+use App\Models\User;
+use Inertia\Testing\AssertableInertia;
 
 /**
  * @return array{checkInGatePass: array{uuid: string, location: CheckInLocationDTO, fields: array<string, bool>, storedAt: int}, userCoordinates: array{latitude: float, longitude: float, storedAt: int}}
@@ -84,6 +86,24 @@ it('renders the check-in form with the location and field flags', function (): v
         ]);
 });
 
+it('exposes a signed-in driver profile so the form can prefill', function (): void {
+    $location = Location::factory()->create();
+    $user = User::create([
+        'name' => 'John Driver',
+        'email' => 'john@example.com',
+        'password' => 'secret-password',
+        'cellphone' => '+12015550123',
+    ]);
+
+    $this->actingAs($user)
+        ->withSession(freshGatePass($location))
+        ->get(route('checkIn.form', $location))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->component('CheckInForm')
+            ->where('auth.user.name', 'John Driver')
+            ->where('auth.user.cellphone', '+12015550123'));
+});
+
 it('hides optional fields when the location config does not enable them', function (): void {
     $location = Location::factory()->create();
 
@@ -134,6 +154,54 @@ it('accepts a valid submission when optional fields are hidden', function (): vo
 
     $response->assertSessionHasNoErrors()
         ->assertRedirect(route('checkIn.confirmed', CheckIn::query()->sole()));
+});
+
+it('prefills the check-in with the signed-in driver saved license', function (): void {
+    $location = Location::factory()->create();
+    $user = User::create([
+        'name' => 'John Driver',
+        'email' => 'john@example.com',
+        'password' => 'secret-password',
+        'drivers_license_number' => 'D1234567',
+        'drivers_license_state' => 'Arizona',
+        'drivers_license_expiration_date' => '2030-05-01',
+    ]);
+
+    $this->actingAs($user)
+        ->withSession(freshGatePass($location))
+        ->get(route('checkIn.form', $location))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->component('CheckInForm')
+            ->where('driverLicense.number', 'D1234567')
+            ->where('driverLicense.state', 'Arizona')
+            ->where('driverLicense.expirationDate', '2030-05-01'));
+});
+
+it('sends a null driver license for guests on the check-in form', function (): void {
+    $location = Location::factory()->create();
+
+    $this->withSession(freshGatePass($location))
+        ->get(route('checkIn.form', $location))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->component('CheckInForm')
+            ->where('driverLicense', null));
+});
+
+it('captures the signed-in driver on the check-in', function (): void {
+    $location = Location::factory()->create();
+    $user = User::create([
+        'name' => 'John Driver',
+        'email' => 'john@example.com',
+        'password' => 'secret-password',
+    ]);
+
+    $this->actingAs($user)
+        ->withSession(freshGatePass($location))
+        ->from(route('checkIn.form', $location))
+        ->post(route('checkIn.store', $location), validCheckInPayload())
+        ->assertSessionHasNoErrors();
+
+    expect(CheckIn::query()->sole()->user_id)->toBe($user->id);
 });
 
 it('accepts a submission that omits the optional trailer chute', function (): void {
@@ -218,6 +286,22 @@ it('accepts a valid submission including the config-driven fields', function ():
         ->reference_number->toHaveLength(8);
 
     expect($checkIn->purchaseOrders()->pluck('number')->all())->toBe(['PO-12345']);
+});
+
+it('opens the registration window after a successful check-in', function (): void {
+    $location = Location::factory()->create();
+
+    $response = $this->withSession(freshGatePass($location))
+        ->from(route('checkIn.form', $location))
+        ->post(route('checkIn.store', $location), validCheckInPayload());
+
+    $checkIn = CheckIn::query()->sole();
+
+    $response->assertSessionHas(App\Auth\RegistrationGate::SESSION_KEY)
+        ->assertSessionHas(App\Auth\RegistrationGate::CELLPHONE_KEY, '+15551234567')
+        ->assertSessionHas(App\Auth\RegistrationGate::NAME_KEY, 'John Driver')
+        ->assertSessionHas(App\Auth\RegistrationGate::CLAIM_TYPE_KEY, 'check_in')
+        ->assertSessionHas(App\Auth\RegistrationGate::CLAIM_ID_KEY, $checkIn->id);
 });
 
 it('rejects an expired drivers license', function (): void {

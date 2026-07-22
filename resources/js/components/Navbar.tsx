@@ -4,12 +4,15 @@ import LocaleController from '@/actions/App/Http/Controllers/LocaleController';
 import Logo from '@/components/Logo';
 import NavbarLink from '@/components/NavbarLink';
 import ThemeToggle from '@/components/ThemeToggle';
+import UserMenu from '@/components/UserMenu';
+import { account } from '@/routes';
 import appointment from '@/routes/appointment';
 import checkIn from "@/routes/checkIn";
 
 interface PublicNavigation {
     checkIn: string;
     appointment: string;
+    account: string;
     login: string;
 }
 
@@ -21,6 +24,7 @@ interface PageProps {
     currentLocale: string;
     localesLabels: Record<string, string>;
     translations: Translations;
+    auth?: { user: { name: string; email: string } | null };
     [key: string]: unknown;
 }
 
@@ -29,11 +33,13 @@ export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
         currentLocale,
         localesLabels = {},
         translations,
+        auth,
     } = usePage<PageProps>().props;
 
     const [isOpen, setIsOpen] = useState(false);
 
     const nav = translations.publicNavigation;
+    const isAuthenticated = Boolean(auth?.user);
 
     function switchLocale(code: string) {
         if (code === currentLocale) {
@@ -60,16 +66,30 @@ export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
                         <NavbarLink
                             href={checkIn.selectLocation().url}
                             name={nav.checkIn}
-                            activeRoute={['checkIn.selectLocation', 'checkIn.form']}
+                            activeRoute={[
+                                'checkIn.selectLocation',
+                                'checkIn.form',
+                            ]}
                         />
                         <NavbarLink
                             href={appointment.selectLocation().url}
                             name={nav.appointment}
-                            activeRoute={['appointment.selectLocation', 'appointment.form', 'appointment.confirmed']}
+                            activeRoute={[
+                                'appointment.selectLocation',
+                                'appointment.form',
+                                'appointment.confirmed',
+                            ]}
                         />
-                        {!hideLogin && (
+                        {isAuthenticated && (
                             <NavbarLink
-                                href="#"
+                                href={account().url}
+                                name={nav.account}
+                                activeRoute={['account', 'account.profile']}
+                            />
+                        )}
+                        {!isAuthenticated && !hideLogin && (
+                            <NavbarLink
+                                href="/login"
                                 name={nav.login}
                                 activeRoute="login"
                             />
@@ -77,7 +97,7 @@ export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
                     </div>
                 </div>
 
-                {/* Right: Theme + Lang + Hamburger */}
+                {/* Right: Lang + Theme + Avatar + Hamburger */}
                 <div className="flex items-center gap-4">
                     {/* Language Switch */}
                     <div className="flex items-center gap-3">
@@ -108,6 +128,17 @@ export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
 
                     {/* Theme toggle — moved to the right of lang */}
                     <ThemeToggle />
+
+                    {/* Signed-in avatar + menu */}
+                    {isAuthenticated && (
+                        <>
+                            <span
+                                aria-hidden
+                                className="hidden h-5 w-px bg-gray-200 sm:block dark:bg-gray-700/60"
+                            />
+                            <UserMenu />
+                        </>
+                    )}
 
                     {/* Animated hamburger */}
                     <button
@@ -142,10 +173,22 @@ export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
                     <NavbarLink
                         href={appointment.selectLocation().url}
                         name={nav.appointment}
-                        activeRoute={['appointment.selectLocation', 'appointment.form', 'appointment.confirmed']}
+                        activeRoute={[
+                            'appointment.selectLocation',
+                            'appointment.form',
+                            'appointment.confirmed',
+                        ]}
                         variant="mobile"
                     />
-                    {!hideLogin && (
+                    {isAuthenticated && (
+                        <NavbarLink
+                            href={account().url}
+                            name={nav.account}
+                            activeRoute={['account', 'account.profile']}
+                            variant="mobile"
+                        />
+                    )}
+                    {!isAuthenticated && !hideLogin && (
                         <NavbarLink
                             href="/login"
                             name={nav.login}
