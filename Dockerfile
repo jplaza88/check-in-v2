@@ -1,24 +1,27 @@
 # syntax=docker/dockerfile:1
 ARG PHP_VERSION=8.5
 
-# Composer Dependencies
-FROM dunglas/frankenphp:php${PHP_VERSION} AS vendor
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Shared base: install the PHP extensions once so the vendor, frontend, and prod
+# stages reuse a single layer instead of compiling ICU/zip/gd three times (which
+# was tripling build-time disk usage).
+FROM dunglas/frankenphp:php${PHP_VERSION} AS base
 RUN install-php-extensions pcntl pdo_pgsql redis intl zip opcache bcmath gd
 WORKDIR /app
+
+# Composer Dependencies
+FROM base AS vendor
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 ENV APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
 COPY . .
 RUN composer dump-autoload --optimize --no-dev   # runs package:discover with full app present
 
-# -Frontend assets (needs PHP for wayfinder:generate)
-FROM dunglas/frankenphp:php${PHP_VERSION} AS frontend
-RUN install-php-extensions pcntl pdo_pgsql redis intl zip bcmath \
-    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+# Frontend assets (needs PHP for wayfinder:generate, plus Node)
+FROM base AS frontend
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
-WORKDIR /app
 ENV APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
 # Vite inlines VITE_* vars into the JS bundle at build time; the runtime .env
 # cannot change them afterwards. Must be present before `npm run build`.
@@ -28,11 +31,8 @@ COPY --from=vendor /app/vendor ./vendor
 COPY . .
 RUN npm ci && npm run build
 
-# Runtime
-FROM dunglas/frankenphp:php${PHP_VERSION} AS prod
-RUN install-php-extensions pcntl pdo_pgsql redis intl zip opcache bcmath gd \
-    && apt-get update && apt-get install -y --no-install-recommends curl \
-    && rm -rf /var/lib/apt/lists/*
+# Runtime — extensions and curl come from the shared base, so no reinstall here.
+FROM base AS prod
 # Opcache tuned for long-running Octane workers
 RUN { \
       echo "opcache.enable=1"; \
@@ -43,7 +43,6 @@ RUN { \
       echo "opcache.memory_consumption=256"; \
       echo "opcache.max_accelerated_files=20000"; \
     } > /usr/local/etc/php/conf.d/zz-opcache.ini
-WORKDIR /app
 # Deployed commit SHA, surfaced in-app via config('app.commit').
 ARG GIT_COMMIT=unknown
 ENV GIT_COMMIT=${GIT_COMMIT}
