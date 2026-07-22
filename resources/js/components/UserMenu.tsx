@@ -8,6 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { profile as accountProfile } from '@/routes/account';
 
 interface PageProps {
     auth: { user: { name: string; email: string } };
@@ -67,7 +68,7 @@ export default function UserMenu() {
                 {/* Actions */}
                 <div className="p-1.5">
                     <DropdownMenuItem asChild>
-                        <Link href="/account/profile">
+                        <Link href={accountProfile().url}>
                             <UserIcon />
                             {nav.editProfile}
                         </Link>

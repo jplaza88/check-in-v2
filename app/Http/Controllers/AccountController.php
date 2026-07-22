@@ -13,7 +13,10 @@ final class AccountController extends Controller
 {
     public function index(#[CurrentUser] User $user, AccountResolver $resolver): Response
     {
-        return inertia('Account', $resolver->resolve($user));
+        return inertia('Account', [
+            ...$resolver->resolve($user),
+            'hasLicense' => $user->drivers_license_number !== null,
+        ]);
     }
 
     public function editProfile(#[CurrentUser] User $user): Response
@@ -21,6 +24,7 @@ final class AccountController extends Controller
         // The license number is hidden from the globally-shared auth.user, so
         // pass the decrypted value explicitly, only on the screen that edits it.
         return inertia('Account/EditProfile', [
+            'hasLicense' => $user->drivers_license_number !== null,
             'license' => [
                 'number' => $user->drivers_license_number,
                 'state' => $user->drivers_license_state,

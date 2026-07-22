@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 
 import Logo from '@/components/Logo';
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 
 const appName = (import.meta.env.VITE_APP_NAME as string) ?? '';
 
-interface LoginTranslations {
+interface ResetPasswordTranslations {
     eyebrow: string;
     title: string;
     subtitle: string;
@@ -17,33 +17,37 @@ interface LoginTranslations {
     emailPlaceholder: string;
     passwordLabel: string;
     passwordPlaceholder: string;
-    rememberMe: string;
-    forgotPassword: string;
-    signIn: string;
+    passwordConfirmationLabel: string;
+    passwordConfirmationPlaceholder: string;
+    resetButton: string;
+    backToLogin: string;
     tagline: string;
     taglineSub: string;
-    passwordResetSuccess: string;
 }
 
 interface PageProps {
-    translations: { login: LoginTranslations };
-    status?: string | null;
+    translations: { resetPassword: ResetPasswordTranslations };
+    token: string;
+    email: string | null;
     [key: string]: unknown;
 }
 
-export default function Login() {
-    const { translations, status } = usePage<PageProps>().props;
-    const t = translations.login;
+export default function ResetPassword() {
+    const { translations, token, email } = usePage<PageProps>().props;
+    const t = translations.resetPassword;
 
     const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
+        token,
+        email: email ?? '',
         password: '',
-        remember: false,
+        password_confirmation: '',
     });
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
-        post('/login', { onFinish: () => reset('password') });
+        post('/reset-password', {
+            onFinish: () => reset('password', 'password_confirmation'),
+        });
     };
 
     return (
@@ -76,12 +80,6 @@ export default function Login() {
                             {t.subtitle}
                         </p>
 
-                        {status ? (
-                            <div className="mt-6 rounded-2xl border border-brand-green/30 bg-brand-green/10 px-4 py-3 text-sm font-medium text-brand-green">
-                                {t.passwordResetSuccess}
-                            </div>
-                        ) : null}
-
                         <form onSubmit={submit} className="mt-8 space-y-5">
                             <Field data-invalid={!!errors.email || undefined}>
                                 <FieldLabel htmlFor="email">
@@ -92,7 +90,6 @@ export default function Login() {
                                     name="email"
                                     type="email"
                                     autoComplete="email"
-                                    autoFocus
                                     value={data.email}
                                     aria-invalid={!!errors.email || undefined}
                                     placeholder={t.emailPlaceholder}
@@ -111,7 +108,8 @@ export default function Login() {
                                     id="password"
                                     name="password"
                                     type="password"
-                                    autoComplete="current-password"
+                                    autoComplete="new-password"
+                                    autoFocus
                                     value={data.password}
                                     aria-invalid={!!errors.password || undefined}
                                     placeholder={t.passwordPlaceholder}
@@ -122,34 +120,56 @@ export default function Login() {
                                 <FieldError>{errors.password}</FieldError>
                             </Field>
 
-                            <div className="flex items-center justify-between">
-                                <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-600 select-none dark:text-gray-300">
-                                    <input
-                                        type="checkbox"
-                                        checked={data.remember}
-                                        onChange={(e) =>
-                                            setData('remember', e.target.checked)
-                                        }
-                                        className="size-4 rounded border-input accent-brand-green"
-                                    />
-                                    {t.rememberMe}
-                                </label>
-                                <a
-                                    href="/forgot-password"
-                                    className="text-sm font-medium text-brand-green transition-opacity hover:opacity-80"
-                                >
-                                    {t.forgotPassword}
-                                </a>
-                            </div>
+                            <Field
+                                data-invalid={
+                                    !!errors.password_confirmation || undefined
+                                }
+                            >
+                                <FieldLabel htmlFor="password_confirmation">
+                                    {t.passwordConfirmationLabel}
+                                </FieldLabel>
+                                <Input
+                                    id="password_confirmation"
+                                    name="password_confirmation"
+                                    type="password"
+                                    autoComplete="new-password"
+                                    value={data.password_confirmation}
+                                    aria-invalid={
+                                        !!errors.password_confirmation ||
+                                        undefined
+                                    }
+                                    placeholder={
+                                        t.passwordConfirmationPlaceholder
+                                    }
+                                    onChange={(e) =>
+                                        setData(
+                                            'password_confirmation',
+                                            e.target.value,
+                                        )
+                                    }
+                                />
+                                <FieldError>
+                                    {errors.password_confirmation}
+                                </FieldError>
+                            </Field>
 
                             <Button
                                 type="submit"
                                 disabled={processing}
                                 className="h-11 w-full rounded-4xl bg-brand-green text-sm font-semibold text-white shadow-sm shadow-brand-green/30 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50 cursor-pointer"
                             >
-                                {t.signIn}
+                                {t.resetButton}
                             </Button>
                         </form>
+
+                        <p className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <Link
+                                href="/login"
+                                className="font-medium text-brand-green transition-opacity hover:opacity-80"
+                            >
+                                {t.backToLogin}
+                            </Link>
+                        </p>
                     </div>
 
                     <div className="relative mx-auto mt-12 w-full max-w-sm">

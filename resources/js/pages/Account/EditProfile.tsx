@@ -1,14 +1,13 @@
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { Check, ChevronLeft, IdCard, Lock, User } from 'lucide-react';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import { Check, IdCard, Lock, User } from 'lucide-react';
 import type { FormEvent, ReactNode } from 'react';
 
 import LicenseCard from '@/components/LicenseCard';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { PhoneInput, formatUsPhone } from '@/components/PhoneInput';
-import AppLayout from '@/layouts/AppLayout';
+import AccountLayout from '@/layouts/AccountLayout';
 import { US_STATES } from '@/lib/usStates';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -56,16 +55,6 @@ interface PageProps {
 }
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
-
-function initialsOf(name: string): string {
-    return name
-        .trim()
-        .split(/\s+/)
-        .map((part) => part[0] ?? '')
-        .slice(0, 2)
-        .join('')
-        .toUpperCase();
-}
 
 function SavedPill({ label }: { label: string }) {
     return (
@@ -153,43 +142,10 @@ export default function EditProfile() {
     const emailChanged = profile.data.email !== auth.user.email;
 
     return (
-        <AppLayout>
+        <AccountLayout>
             <Head title={t.title} />
 
-            {/* Hero */}
-            <div className="relative overflow-hidden">
-                <div
-                    aria-hidden
-                    className="pointer-events-none absolute -top-16 left-1/2 h-56 w-[36rem] max-w-full -translate-x-1/2 rounded-full bg-brand-green/10 blur-3xl dark:bg-brand-green/[0.07]"
-                />
-                <div className="relative mx-auto max-w-2xl px-6 pt-6 pb-2">
-                    <Link
-                        href="/account"
-                        className="inline-flex items-center gap-1 text-sm font-medium text-gray-500 transition-colors hover:text-brand-green dark:text-gray-400"
-                    >
-                        <ChevronLeft className="h-4 w-4" />
-                        {t.back}
-                    </Link>
-
-                    <div className="mt-5 flex items-center gap-4">
-                        <Avatar className="size-14 shadow-sm ring-2 ring-white dark:ring-gray-800">
-                            <AvatarFallback className="bg-gradient-to-br from-brand-green to-green-600 text-lg font-semibold text-white">
-                                {initialsOf(auth.user.name)}
-                            </AvatarFallback>
-                        </Avatar>
-                        <div className="min-w-0">
-                            <h1 className="truncate text-2xl font-bold tracking-tight text-brand-grey dark:text-gray-50">
-                                {auth.user.name}
-                            </h1>
-                            <p className="truncate text-sm text-gray-500 dark:text-gray-400">
-                                {t.subtitle}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="mx-auto max-w-2xl space-y-6 px-6 pt-4 pb-12">
+            <div className="mx-auto max-w-2xl space-y-6 px-6 pt-6 pb-12">
                 {/* Personal information */}
                 <SectionCard
                     icon={<User className="h-5 w-5" />}
@@ -270,7 +226,7 @@ export default function EditProfile() {
                         <Button
                             type="submit"
                             disabled={profile.processing}
-                            className="h-10 rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
+                            className="h-10 rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50 cursor-pointer"
                         >
                             {t.save}
                         </Button>
@@ -425,7 +381,7 @@ export default function EditProfile() {
                         <Button
                             type="submit"
                             disabled={profile.processing}
-                            className="h-10 rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
+                            className="h-10 rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50 cursor-pointer"
                         >
                             {t.save}
                         </Button>
@@ -521,7 +477,7 @@ export default function EditProfile() {
                         <Button
                             type="submit"
                             disabled={password.processing}
-                            className="h-10 rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
+                            className="h-10 rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50 cursor-pointer"
                         >
                             {t.updatePassword}
                         </Button>
@@ -531,6 +487,6 @@ export default function EditProfile() {
                     </div>
                 </SectionCard>
             </div>
-        </AppLayout>
+        </AccountLayout>
     );
 }

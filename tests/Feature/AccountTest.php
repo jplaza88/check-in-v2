@@ -33,6 +33,32 @@ it('renders the driver account for an authenticated user', function (): void {
             ->has('translations.account.checkInNow'));
 });
 
+it('reports whether the driver has a license on file for the hub chips and nudges', function (): void {
+    $without = User::create([
+        'name' => 'No License',
+        'email' => 'nolicense@example.com',
+        'password' => 'secret-password',
+    ]);
+
+    $this->actingAs($without)
+        ->get(route('account'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('hasLicense', false)
+            ->has('translations.accountNav.overview'));
+
+    $with = User::create([
+        'name' => 'Has License',
+        'email' => 'haslicense@example.com',
+        'password' => 'secret-password',
+        'drivers_license_number' => 'D1234567',
+    ]);
+
+    $this->actingAs($with)
+        ->get(route('account'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('hasLicense', true));
+});
+
 it('surfaces the driver\'s next appointment and recent check-ins', function (): void {
     $user = User::create([
         'name' => 'John Driver',

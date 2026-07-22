@@ -1,15 +1,23 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     CalendarDays,
     CalendarPlus,
+    Check,
     ChevronRight,
     Clock,
+    IdCard,
+    Mail,
     MapPin,
     PackageOpen,
     Truck,
 } from 'lucide-react';
+import type { ComponentType, ReactNode } from 'react';
+import { useState } from 'react';
 
-import AppLayout from '@/layouts/AppLayout';
+import AccountLayout from '@/layouts/AccountLayout';
+import { profile as accountProfile } from '@/routes/account';
+import appointment from '@/routes/appointment';
+import checkIn from '@/routes/checkIn';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -46,11 +54,19 @@ interface AccountTranslations {
     statusPending: string;
     statusCompleted: string;
     statusCancelled: string;
+    nudgeAddLicenseTitle: string;
+    nudgeAddLicenseBody: string;
+    nudgeAddLicenseCta: string;
+    nudgeVerifyEmailTitle: string;
+    nudgeVerifyEmailBody: string;
+    nudgeVerifyEmailCta: string;
+    nudgeVerifyEmailSent: string;
 }
 
 interface PageProps {
-    auth: { user: { name: string } };
+    auth: { user: { name: string; email_verified_at?: string | null } };
     currentLocale: string;
+    hasLicense: boolean;
     nextAppointment: NextAppointment | null;
     recentCheckIns: RecentCheckIn[];
     translations: { account: AccountTranslations };
@@ -109,13 +125,46 @@ function SectionHeading({ children }: { children: string }) {
     );
 }
 
+// ── Nudge card ───────────────────────────────────────────────────────────────
+
+function NudgeCard({
+    icon: Icon,
+    title,
+    body,
+    action,
+}: {
+    icon: ComponentType<{ className?: string }>;
+    title: string;
+    body: string;
+    action: ReactNode;
+}) {
+    return (
+        <div className="flex items-start gap-3 rounded-2xl border border-amber-200/70 bg-amber-50/70 p-4 dark:border-amber-500/20 dark:bg-amber-500/[0.07]">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                <Icon className="h-5 w-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-brand-grey dark:text-gray-100">
+                    {title}
+                </p>
+                <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                    {body}
+                </p>
+            </div>
+            <div className="shrink-0 self-center">{action}</div>
+        </div>
+    );
+}
+
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Account() {
-    const { auth, currentLocale, nextAppointment, recentCheckIns, translations } =
+    const { auth, currentLocale, hasLicense, nextAppointment, recentCheckIns, translations } =
         usePage<PageProps>().props;
     const t = translations.account;
-    const firstName = auth.user.name.split(' ')[0];
+    const verified = Boolean(auth.user.email_verified_at);
+
+    const [verifySent, setVerifySent] = useState(false);
 
     const hour = new Date().getHours();
     const greeting =
@@ -131,33 +180,26 @@ export default function Account() {
         day: 'numeric',
     }).format(new Date());
 
+    const resendVerification = () => {
+        router.post(
+            '/email/verification-notification',
+            {},
+            { preserveScroll: true, onSuccess: () => setVerifySent(true) },
+        );
+    };
+
     return (
-        <AppLayout>
+        <AccountLayout>
             <Head title={t.checkInNow} />
 
-            {/* Hero */}
-            <div className="relative overflow-hidden">
-                <div
-                    aria-hidden
-                    className="pointer-events-none absolute -top-16 left-1/2 h-56 w-[36rem] max-w-full -translate-x-1/2 rounded-full bg-brand-green/10 blur-3xl dark:bg-brand-green/[0.07]"
-                />
-                <div className="relative mx-auto max-w-2xl px-6 pt-8 pb-2">
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                        {greeting},
-                    </p>
-                    <h1 className="mt-0.5 text-3xl font-bold tracking-tight text-brand-grey dark:text-gray-50">
-                        {firstName}
-                    </h1>
-                    <p className="mt-1 text-sm text-gray-400 capitalize dark:text-gray-500">
-                        {today}
-                    </p>
-                </div>
-            </div>
+            <div className="mx-auto max-w-2xl space-y-7 px-6 pt-5 pb-12">
+                <p className="-mt-1 px-1 text-sm text-gray-400 capitalize dark:text-gray-500">
+                    {greeting} · {today}
+                </p>
 
-            <div className="mx-auto max-w-2xl space-y-7 px-6 pt-4 pb-12">
                 {/* Primary CTA */}
                 <Link
-                    href="/check-in/select-location"
+                    href={checkIn.selectLocation().url}
                     className="group relative flex items-center gap-4 overflow-hidden rounded-3xl bg-gradient-to-br from-brand-green to-green-600 p-5 text-white shadow-lg shadow-brand-green/25 transition-all active:scale-[0.99]"
                 >
                     <div
@@ -177,6 +219,50 @@ export default function Account() {
                     </span>
                     <ChevronRight className="relative h-5 w-5 shrink-0 text-white/85 transition-transform group-hover:translate-x-0.5" />
                 </Link>
+
+                {/* Smart nudges */}
+                {(!verified || !hasLicense) && (
+                    <div className="space-y-3">
+                        {!verified && (
+                            <NudgeCard
+                                icon={Mail}
+                                title={t.nudgeVerifyEmailTitle}
+                                body={t.nudgeVerifyEmailBody}
+                                action={
+                                    verifySent ? (
+                                        <span className="inline-flex items-center gap-1 text-xs font-medium text-brand-green">
+                                            <Check className="h-3.5 w-3.5" />
+                                            {t.nudgeVerifyEmailSent}
+                                        </span>
+                                    ) : (
+                                        <button
+                                            type="button"
+                                            onClick={resendVerification}
+                                            className="inline-flex cursor-pointer items-center rounded-full border border-amber-300 bg-white/60 px-3 py-1.5 text-xs font-semibold text-amber-700 transition-colors hover:bg-white dark:border-amber-500/30 dark:bg-transparent dark:text-amber-400 dark:hover:bg-amber-500/10"
+                                        >
+                                            {t.nudgeVerifyEmailCta}
+                                        </button>
+                                    )
+                                }
+                            />
+                        )}
+                        {!hasLicense && (
+                            <NudgeCard
+                                icon={IdCard}
+                                title={t.nudgeAddLicenseTitle}
+                                body={t.nudgeAddLicenseBody}
+                                action={
+                                    <Link
+                                        href={accountProfile().url}
+                                        className="inline-flex items-center rounded-full bg-brand-green px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90"
+                                    >
+                                        {t.nudgeAddLicenseCta}
+                                    </Link>
+                                }
+                            />
+                        )}
+                    </div>
+                )}
 
                 {/* Next appointment */}
                 <section>
@@ -227,7 +313,7 @@ export default function Account() {
                                 {t.noAppointmentSubtitle}
                             </p>
                             <Link
-                                href="/appointment/select-location"
+                                href={appointment.selectLocation().url}
                                 className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-brand-green px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-brand-green/30 transition-colors hover:bg-brand-green/90"
                             >
                                 <CalendarPlus className="h-4 w-4" />
@@ -278,6 +364,6 @@ export default function Account() {
                     )}
                 </section>
             </div>
-        </AppLayout>
+        </AccountLayout>
     );
 }

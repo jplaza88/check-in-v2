@@ -94,6 +94,20 @@ return [
         'statusPending' => 'Pending',
         'statusCompleted' => 'Completed',
         'statusCancelled' => 'Cancelled',
+        'nudgeAddLicenseTitle' => 'Add your license',
+        'nudgeAddLicenseBody' => 'Save your license once and we\'ll fill it in for you at check-in.',
+        'nudgeAddLicenseCta' => 'Add license',
+        'nudgeVerifyEmailTitle' => 'Verify your email',
+        'nudgeVerifyEmailBody' => 'Confirm your email address to keep your account secure.',
+        'nudgeVerifyEmailCta' => 'Resend link',
+        'nudgeVerifyEmailSent' => 'Verification link sent',
+    ],
+
+    'accountNav' => [
+        'overview' => 'Overview',
+        'profile' => 'Profile',
+        'emailVerified' => 'Email verified',
+        'licenseOnFile' => 'License on file',
     ],
 
     'accountProfile' => [
@@ -104,7 +118,7 @@ return [
         'infoSubheading' => 'Update your name, email, and phone number.',
         'nameLabel' => 'Full name',
         'emailLabel' => 'Email',
-        'cellphoneLabel' => 'Cell phone',
+        'cellphoneLabel' => 'Phone number',
         'cellphonePlaceholder' => '(555) 123-4567',
         'cellphoneHelp' => 'We use this to speed up your check-ins.',
         'cellphoneInvalid' => 'Please enter a valid 10-digit US phone number.',
@@ -192,6 +206,7 @@ return [
     'publicNavigation' => [
         'checkIn' => 'Check-In',
         'appointment' => 'Appointment',
+        'account' => 'Account',
         'login' => 'Login',
         'logout' => 'Logout',
         'editProfile' => 'Edit profile',

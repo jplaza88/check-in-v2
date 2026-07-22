@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import type { FormEvent } from 'react';
 
 import Logo from '@/components/Logo';
@@ -9,41 +9,36 @@ import { Input } from '@/components/ui/input';
 
 const appName = (import.meta.env.VITE_APP_NAME as string) ?? '';
 
-interface LoginTranslations {
+interface ForgotPasswordTranslations {
     eyebrow: string;
     title: string;
     subtitle: string;
     emailLabel: string;
     emailPlaceholder: string;
-    passwordLabel: string;
-    passwordPlaceholder: string;
-    rememberMe: string;
-    forgotPassword: string;
-    signIn: string;
+    sendLink: string;
+    sent: string;
+    backToLogin: string;
     tagline: string;
     taglineSub: string;
-    passwordResetSuccess: string;
 }
 
 interface PageProps {
-    translations: { login: LoginTranslations };
+    translations: { forgotPassword: ForgotPasswordTranslations };
     status?: string | null;
     [key: string]: unknown;
 }
 
-export default function Login() {
+export default function ForgotPassword() {
     const { translations, status } = usePage<PageProps>().props;
-    const t = translations.login;
+    const t = translations.forgotPassword;
 
-    const { data, setData, post, processing, errors, reset } = useForm({
+    const { data, setData, post, processing, errors } = useForm({
         email: '',
-        password: '',
-        remember: false,
     });
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
-        post('/login', { onFinish: () => reset('password') });
+        post('/forgot-password');
     };
 
     return (
@@ -78,78 +73,48 @@ export default function Login() {
 
                         {status ? (
                             <div className="mt-6 rounded-2xl border border-brand-green/30 bg-brand-green/10 px-4 py-3 text-sm font-medium text-brand-green">
-                                {t.passwordResetSuccess}
+                                {t.sent}
                             </div>
-                        ) : null}
-
-                        <form onSubmit={submit} className="mt-8 space-y-5">
-                            <Field data-invalid={!!errors.email || undefined}>
-                                <FieldLabel htmlFor="email">
-                                    {t.emailLabel}
-                                </FieldLabel>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    autoFocus
-                                    value={data.email}
-                                    aria-invalid={!!errors.email || undefined}
-                                    placeholder={t.emailPlaceholder}
-                                    onChange={(e) =>
-                                        setData('email', e.target.value)
-                                    }
-                                />
-                                <FieldError>{errors.email}</FieldError>
-                            </Field>
-
-                            <Field data-invalid={!!errors.password || undefined}>
-                                <FieldLabel htmlFor="password">
-                                    {t.passwordLabel}
-                                </FieldLabel>
-                                <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    autoComplete="current-password"
-                                    value={data.password}
-                                    aria-invalid={!!errors.password || undefined}
-                                    placeholder={t.passwordPlaceholder}
-                                    onChange={(e) =>
-                                        setData('password', e.target.value)
-                                    }
-                                />
-                                <FieldError>{errors.password}</FieldError>
-                            </Field>
-
-                            <div className="flex items-center justify-between">
-                                <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-600 select-none dark:text-gray-300">
-                                    <input
-                                        type="checkbox"
-                                        checked={data.remember}
+                        ) : (
+                            <form onSubmit={submit} className="mt-8 space-y-5">
+                                <Field data-invalid={!!errors.email || undefined}>
+                                    <FieldLabel htmlFor="email">
+                                        {t.emailLabel}
+                                    </FieldLabel>
+                                    <Input
+                                        id="email"
+                                        name="email"
+                                        type="email"
+                                        autoComplete="email"
+                                        autoFocus
+                                        value={data.email}
+                                        aria-invalid={!!errors.email || undefined}
+                                        placeholder={t.emailPlaceholder}
                                         onChange={(e) =>
-                                            setData('remember', e.target.checked)
+                                            setData('email', e.target.value)
                                         }
-                                        className="size-4 rounded border-input accent-brand-green"
                                     />
-                                    {t.rememberMe}
-                                </label>
-                                <a
-                                    href="/forgot-password"
-                                    className="text-sm font-medium text-brand-green transition-opacity hover:opacity-80"
-                                >
-                                    {t.forgotPassword}
-                                </a>
-                            </div>
+                                    <FieldError>{errors.email}</FieldError>
+                                </Field>
 
-                            <Button
-                                type="submit"
-                                disabled={processing}
-                                className="h-11 w-full rounded-4xl bg-brand-green text-sm font-semibold text-white shadow-sm shadow-brand-green/30 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50 cursor-pointer"
+                                <Button
+                                    type="submit"
+                                    disabled={processing}
+                                    className="h-11 w-full rounded-4xl bg-brand-green text-sm font-semibold text-white shadow-sm shadow-brand-green/30 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50 cursor-pointer"
+                                >
+                                    {t.sendLink}
+                                </Button>
+                            </form>
+                        )}
+
+                        <p className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                            <Link
+                                href="/login"
+                                className="font-medium text-brand-green transition-opacity hover:opacity-80"
                             >
-                                {t.signIn}
-                            </Button>
-                        </form>
+                                {t.backToLogin}
+                            </Link>
+                        </p>
                     </div>
 
                     <div className="relative mx-auto mt-12 w-full max-w-sm">

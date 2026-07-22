@@ -94,6 +94,20 @@ return [
         'statusPending' => 'En attente',
         'statusCompleted' => 'Terminé',
         'statusCancelled' => 'Annulé',
+        'nudgeAddLicenseTitle' => 'Ajoutez votre permis',
+        'nudgeAddLicenseBody' => "Enregistrez votre permis une fois et nous le remplirons pour vous à l'enregistrement.",
+        'nudgeAddLicenseCta' => 'Ajouter le permis',
+        'nudgeVerifyEmailTitle' => 'Vérifiez votre e-mail',
+        'nudgeVerifyEmailBody' => 'Confirmez votre adresse e-mail pour sécuriser votre compte.',
+        'nudgeVerifyEmailCta' => 'Renvoyer le lien',
+        'nudgeVerifyEmailSent' => 'Lien de vérification envoyé',
+    ],
+
+    'accountNav' => [
+        'overview' => 'Aperçu',
+        'profile' => 'Profil',
+        'emailVerified' => 'E-mail vérifié',
+        'licenseOnFile' => 'Permis enregistré',
     ],
 
     'accountProfile' => [
@@ -104,7 +118,7 @@ return [
         'infoSubheading' => 'Mettez à jour votre nom, votre e-mail et votre numéro de téléphone.',
         'nameLabel' => 'Nom complet',
         'emailLabel' => 'E-mail',
-        'cellphoneLabel' => 'Téléphone portable',
+        'cellphoneLabel' => 'Numéro de téléphone',
         'cellphonePlaceholder' => '(555) 123-4567',
         'cellphoneHelp' => "Nous l'utilisons pour accélérer vos enregistrements.",
         'cellphoneInvalid' => 'Veuillez saisir un numéro de téléphone américain valide à 10 chiffres.',
@@ -191,6 +205,7 @@ return [
     'publicNavigation' => [
         'checkIn' => 'Enregistrement',
         'appointment' => 'Rendez-vous',
+        'account' => 'Compte',
         'login' => 'Connexion',
         'logout' => 'Déconnexion',
         'editProfile' => 'Modifier le profil',

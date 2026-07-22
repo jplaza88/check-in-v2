@@ -94,6 +94,20 @@ return [
         'statusPending' => 'Pendiente',
         'statusCompleted' => 'Completado',
         'statusCancelled' => 'Cancelado',
+        'nudgeAddLicenseTitle' => 'Agrega tu licencia',
+        'nudgeAddLicenseBody' => 'Guarda tu licencia una vez y la completaremos por ti en el registro.',
+        'nudgeAddLicenseCta' => 'Agregar licencia',
+        'nudgeVerifyEmailTitle' => 'Verifica tu correo',
+        'nudgeVerifyEmailBody' => 'Confirma tu correo electrónico para mantener tu cuenta segura.',
+        'nudgeVerifyEmailCta' => 'Reenviar enlace',
+        'nudgeVerifyEmailSent' => 'Enlace de verificación enviado',
+    ],
+
+    'accountNav' => [
+        'overview' => 'Resumen',
+        'profile' => 'Perfil',
+        'emailVerified' => 'Correo verificado',
+        'licenseOnFile' => 'Licencia guardada',
     ],
 
     'accountProfile' => [
@@ -104,7 +118,7 @@ return [
         'infoSubheading' => 'Actualice su nombre, correo electrónico y número de teléfono.',
         'nameLabel' => 'Nombre completo',
         'emailLabel' => 'Correo electrónico',
-        'cellphoneLabel' => 'Teléfono celular',
+        'cellphoneLabel' => 'Número de teléfono',
         'cellphonePlaceholder' => '(555) 123-4567',
         'cellphoneHelp' => 'Lo usamos para agilizar sus registros.',
         'cellphoneInvalid' => 'Ingrese un número de teléfono de EE. UU. válido de 10 dígitos.',
@@ -191,6 +205,7 @@ return [
     'publicNavigation' => [
         'checkIn' => 'Registro',
         'appointment' => 'Cita',
+        'account' => 'Cuenta',
         'login' => 'Iniciar sesión',
         'logout' => 'Cerrar sesión',
         'editProfile' => 'Editar perfil',

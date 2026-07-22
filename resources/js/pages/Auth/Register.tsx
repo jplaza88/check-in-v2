@@ -177,7 +177,7 @@ export default function Register() {
                             <Button
                                 type="submit"
                                 disabled={processing}
-                                className="h-11 w-full rounded-4xl bg-brand-green text-sm font-semibold text-white shadow-sm shadow-brand-green/30 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
+                                className="h-11 w-full rounded-4xl bg-brand-green text-sm font-semibold text-white shadow-sm shadow-brand-green/30 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50 cursor-pointer"
                             >
                                 {t.createAccount}
                             </Button>

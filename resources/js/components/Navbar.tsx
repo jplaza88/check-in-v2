@@ -5,12 +5,14 @@ import Logo from '@/components/Logo';
 import NavbarLink from '@/components/NavbarLink';
 import ThemeToggle from '@/components/ThemeToggle';
 import UserMenu from '@/components/UserMenu';
+import { account } from '@/routes';
 import appointment from '@/routes/appointment';
 import checkIn from "@/routes/checkIn";
 
 interface PublicNavigation {
     checkIn: string;
     appointment: string;
+    account: string;
     login: string;
 }
 
@@ -78,6 +80,13 @@ export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
                                 'appointment.confirmed',
                             ]}
                         />
+                        {isAuthenticated && (
+                            <NavbarLink
+                                href={account().url}
+                                name={nav.account}
+                                activeRoute={['account', 'account.profile']}
+                            />
+                        )}
                         {!isAuthenticated && !hideLogin && (
                             <NavbarLink
                                 href="/login"
@@ -171,6 +180,14 @@ export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
                         ]}
                         variant="mobile"
                     />
+                    {isAuthenticated && (
+                        <NavbarLink
+                            href={account().url}
+                            name={nav.account}
+                            activeRoute={['account', 'account.profile']}
+                            variant="mobile"
+                        />
+                    )}
                     {!isAuthenticated && !hideLogin && (
                         <NavbarLink
                             href="/login"

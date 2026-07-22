@@ -15,6 +15,8 @@ final class HandleInertiaRequests extends Middleware
         'appointment.confirmed',
         'checkIn.selectLocation',
         'checkIn.form',
+        'account',
+        'account.profile',
         // 'checkIn.*',
         // 'appointment.*',
     ];

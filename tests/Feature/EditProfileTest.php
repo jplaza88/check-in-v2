@@ -30,7 +30,9 @@ it('renders the profile page for an authenticated user', function (): void {
         ->assertSuccessful()
         ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
             ->component('Account/EditProfile')
-            ->has('translations.accountProfile.title'));
+            ->where('hasLicense', false)
+            ->has('translations.accountProfile.title')
+            ->has('translations.accountNav.profile'));
 });
 
 it('updates the profile and normalizes the cellphone', function (): void {
@@ -105,6 +107,7 @@ it('exposes the saved license to the profile page but hides the number from the 
     $this->actingAs($user)
         ->get(route('account.profile'))
         ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('hasLicense', true)
             ->where('license.number', 'D1234567')
             ->where('license.state', 'Texas')
             ->where('license.expirationDate', '2031-01-15')
