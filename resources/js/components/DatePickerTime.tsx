@@ -48,12 +48,14 @@ export function DatePicker({
     onDateChange,
     availableDates,
     minDate,
+    maxDate,
     endMonth,
 }: {
     date: Date | undefined;
     onDateChange: (d: Date | undefined) => void;
     availableDates?: Set<string>;
     minDate?: Date;
+    maxDate?: Date;
     endMonth?: Date;
 }) {
     const [open, setOpen] = React.useState(false);
@@ -63,8 +65,12 @@ export function DatePicker({
             return !availableDates.has(format(day, 'yyyy-MM-dd'));
         }
 
-        if (minDate) {
-            return day < minDate;
+        if (minDate && day < minDate) {
+            return true;
+        }
+
+        if (maxDate && day > maxDate) {
+            return true;
         }
 
         return false;

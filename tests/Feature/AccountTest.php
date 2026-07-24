@@ -59,6 +59,36 @@ it('reports whether the driver has a license on file for the hub chips and nudge
             ->where('hasLicense', true));
 });
 
+it('flags an expired license so the overview can nudge the driver', function (): void {
+    $expired = User::create([
+        'name' => 'Expired License',
+        'email' => 'expired@example.com',
+        'password' => 'secret-password',
+        'drivers_license_number' => 'D1234567',
+        'drivers_license_expiration_date' => now()->subDay()->format('Y-m-d'),
+    ]);
+
+    $this->actingAs($expired)
+        ->get(route('account'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('hasLicense', true)
+            ->where('licenseExpired', true));
+
+    $valid = User::create([
+        'name' => 'Valid License',
+        'email' => 'valid@example.com',
+        'password' => 'secret-password',
+        'drivers_license_number' => 'D7654321',
+        'drivers_license_expiration_date' => now()->addYear()->format('Y-m-d'),
+    ]);
+
+    $this->actingAs($valid)
+        ->get(route('account'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('hasLicense', true)
+            ->where('licenseExpired', false));
+});
+
 it('surfaces the driver\'s next appointment and recent check-ins', function (): void {
     $user = User::create([
         'name' => 'John Driver',

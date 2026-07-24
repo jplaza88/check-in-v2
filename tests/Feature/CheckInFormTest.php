@@ -328,6 +328,30 @@ it('rejects an expired drivers license', function (): void {
         ]);
 });
 
+it('rejects a drivers license expiring more than 60 years out', function (): void {
+    $location = Location::factory()->checkinAllOptionalFields()->create();
+
+    $payload = [
+        ...validCheckInPayload(),
+        'truck_color' => 'white',
+        'truck_plate_state' => 'Arizona',
+        'truck_plate_country' => 'US',
+        'trailer_plate_state' => 'Sonora',
+        'trailer_plate_country' => 'MX',
+        'empty_weight_lbs' => 15000,
+        'drivers_license_state' => 'Arizona',
+        'drivers_license_country' => 'US',
+        'drivers_license_expiration_date' => now()->addYears(61)->format('Y-m-d'),
+    ];
+
+    $this->withSession(freshGatePass($location))
+        ->from(route('checkIn.form', $location))
+        ->post(route('checkIn.store', $location), $payload)
+        ->assertSessionHasErrors([
+            'drivers_license_expiration_date' => __('messages.checkInForm.licenseExpirationTooFar'),
+        ]);
+});
+
 it('rejects the submission when the gate pass has expired', function (): void {
     $location = Location::factory()->create();
 

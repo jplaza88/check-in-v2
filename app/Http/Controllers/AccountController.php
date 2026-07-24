@@ -13,9 +13,12 @@ final class AccountController extends Controller
 {
     public function index(#[CurrentUser] User $user, AccountResolver $resolver): Response
     {
+        $expirationDate = $user->drivers_license_expiration_date;
+
         return inertia('Account', [
             ...$resolver->resolve($user),
             'hasLicense' => $user->drivers_license_number !== null,
+            'licenseExpired' => $expirationDate !== null && $expirationDate->lt(today()),
         ]);
     }
 

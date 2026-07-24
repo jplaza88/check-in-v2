@@ -135,6 +135,51 @@ it('saves the drivers license to the profile', function (): void {
         ->and($user->drivers_license_expiration_date->format('Y-m-d'))->toBe('2030-05-01');
 });
 
+it('rejects a license expiration date in the past', function (): void {
+    $user = makeDriver();
+
+    $this->actingAs($user)
+        ->put('/user/profile-information', [
+            'name' => 'John Driver',
+            'email' => 'john@example.com',
+            'cellphone' => '',
+            'drivers_license_number' => 'D1234567',
+            'drivers_license_state' => 'Arizona',
+            'drivers_license_expiration_date' => now()->subDay()->format('Y-m-d'),
+        ])
+        ->assertSessionHasErrors(['drivers_license_expiration_date'], null, 'updateProfileInformation');
+});
+
+it('rejects a license expiration date more than 60 years out', function (): void {
+    $user = makeDriver();
+
+    $this->actingAs($user)
+        ->put('/user/profile-information', [
+            'name' => 'John Driver',
+            'email' => 'john@example.com',
+            'cellphone' => '',
+            'drivers_license_number' => 'D1234567',
+            'drivers_license_state' => 'Arizona',
+            'drivers_license_expiration_date' => now()->addYears(61)->format('Y-m-d'),
+        ])
+        ->assertSessionHasErrors(['drivers_license_expiration_date'], null, 'updateProfileInformation');
+});
+
+it('accepts a far-future Arizona license within the 60 year window', function (): void {
+    $user = makeDriver();
+
+    $this->actingAs($user)
+        ->put('/user/profile-information', [
+            'name' => 'John Driver',
+            'email' => 'john@example.com',
+            'cellphone' => '',
+            'drivers_license_number' => 'D1234567',
+            'drivers_license_state' => 'Arizona',
+            'drivers_license_expiration_date' => now()->addYears(45)->format('Y-m-d'),
+        ])
+        ->assertSessionHasNoErrors();
+});
+
 it('clears the license fields when submitted empty', function (): void {
     $user = makeDriver([
         'drivers_license_number' => 'D1234567',

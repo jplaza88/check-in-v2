@@ -78,7 +78,7 @@ final class CheckInFormRequest extends FormRequest
                 : ['exclude'],
             'loading_instructions' => ['nullable', 'string', 'max:500'],
             'drivers_license_expiration_date' => ($fields['showDriversLicenseExpirationDate'] ?? false)
-                ? ['required', 'date', 'date_format:Y-m-d', 'after:today']
+                ? ['required', 'date', 'date_format:Y-m-d', 'after:today', 'before:+60 years']
                 : ['exclude'],
         ];
     }
@@ -147,6 +147,7 @@ final class CheckInFormRequest extends FormRequest
             'drivers_license_expiration_date.date' => __('messages.checkInForm.licenseExpirationInvalid'),
             'drivers_license_expiration_date.date_format' => __('messages.checkInForm.licenseExpirationInvalid'),
             'drivers_license_expiration_date.after' => __('messages.checkInForm.licenseExpired'),
+            'drivers_license_expiration_date.before' => __('messages.checkInForm.licenseExpirationTooFar'),
             'loading_instructions.max' => __('messages.checkInForm.loadingInstructionsMax'),
         ];
     }

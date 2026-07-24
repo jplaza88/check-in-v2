@@ -139,6 +139,7 @@ interface CheckInFormTranslations {
     licenseExpirationRequired: string;
     licenseExpirationInvalid: string;
     licenseExpired: string;
+    licenseExpirationTooFar: string;
     locationLabel: string;
     reviewButton: string;
     submitting: string;
@@ -415,7 +416,8 @@ export default function CheckInForm({
     const [step, setStep] = useState<'form' | 'review'>('form');
     const [serverError, setServerError] = useState<string | null>(null);
 
-    // License must still be valid beyond today; allow picking up to 20 years out.
+    // License must still be valid beyond today; allow picking up to 60 years out
+    // (the widest real-world US window is Arizona's "valid until age 65").
     const licenseMinDate = useMemo(() => {
         const tomorrow = new Date();
         tomorrow.setHours(0, 0, 0, 0);
@@ -424,10 +426,13 @@ export default function CheckInForm({
         return tomorrow;
     }, []);
 
-    const licenseMaxMonth = useMemo(
-        () => new Date(new Date().getFullYear() + 20, 11, 31),
-        [],
-    );
+    const licenseMaxDate = useMemo(() => {
+        const max = new Date();
+        max.setHours(0, 0, 0, 0);
+        max.setFullYear(max.getFullYear() + 60);
+
+        return max;
+    }, []);
 
     const schema = useMemo(() => {
         const optionalUnless = (
@@ -550,7 +555,13 @@ export default function CheckInForm({
                     .refine(
                         (d) => new Date(d + 'T00:00:00') > new Date(),
                         t.licenseExpired,
-                    ) as unknown as z.ZodString,
+                    )
+                    .refine((d) => {
+                        const max = new Date();
+                        max.setFullYear(max.getFullYear() + 60);
+
+                        return new Date(d + 'T00:00:00') <= max;
+                    }, t.licenseExpirationTooFar) as unknown as z.ZodString,
             ),
         });
     }, [fields, t, poT]);
@@ -559,32 +570,32 @@ export default function CheckInForm({
 
     const { control, handleSubmit, setError, getValues, setValue } =
         useForm<FormValues>({
-        resolver: zodResolver(schema),
-        defaultValues: {
-            customer: '',
-            destination_city: '',
-            destination_state: '',
-            destination_country: '',
-            loading_instructions: '',
-            po_numbers: [{ value: '' }],
-            truck_name: '',
-            truck_plate: '',
-            truck_plate_state: '',
-            truck_plate_country: '',
-            truck_color: '',
-            trailer_plate: '',
-            trailer_plate_state: '',
-            trailer_plate_country: '',
-            trailer_chute: 'n/a',
-            empty_weight_lbs: '',
-            drivers_name: prefillName,
-            drivers_cellphone: prefillCellphone,
-            drivers_license_number: prefillLicenseNumber,
-            drivers_license_state: prefillLicenseState,
-            drivers_license_country: prefillLicenseState ? 'US' : '',
-            drivers_license_expiration_date: prefillLicenseExpiration,
-        },
-    });
+            resolver: zodResolver(schema),
+            defaultValues: {
+                customer: '',
+                destination_city: '',
+                destination_state: '',
+                destination_country: '',
+                loading_instructions: '',
+                po_numbers: [{ value: '' }],
+                truck_name: '',
+                truck_plate: '',
+                truck_plate_state: '',
+                truck_plate_country: '',
+                truck_color: '',
+                trailer_plate: '',
+                trailer_plate_state: '',
+                trailer_plate_country: '',
+                trailer_chute: 'n/a',
+                empty_weight_lbs: '',
+                drivers_name: prefillName,
+                drivers_cellphone: prefillCellphone,
+                drivers_license_number: prefillLicenseNumber,
+                drivers_license_state: prefillLicenseState,
+                drivers_license_country: prefillLicenseState ? 'US' : '',
+                drivers_license_expiration_date: prefillLicenseExpiration,
+            },
+        });
 
     const {
         fields: poFields,
@@ -1289,8 +1300,11 @@ export default function CheckInForm({
                                                             minDate={
                                                                 licenseMinDate
                                                             }
+                                                            maxDate={
+                                                                licenseMaxDate
+                                                            }
                                                             endMonth={
-                                                                licenseMaxMonth
+                                                                licenseMaxDate
                                                             }
                                                         />
                                                         {fieldState.invalid && (
