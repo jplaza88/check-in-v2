@@ -39,11 +39,13 @@ final class UpdateUserProfileInformation implements UpdatesUserProfileInformatio
 
             'drivers_license_number' => ['nullable', 'string', 'min:4', 'max:20'],
             'drivers_license_state' => ['nullable', 'string', 'max:255'],
-            'drivers_license_expiration_date' => ['nullable', 'date_format:Y-m-d'],
+            'drivers_license_expiration_date' => ['nullable', 'date_format:Y-m-d', 'after:today', 'before:+60 years'],
         ], [
             'cellphone.regex' => __('messages.accountProfile.cellphoneInvalid'),
             'drivers_license_number.min' => __('messages.accountProfile.licenseNumberInvalid'),
             'drivers_license_number.max' => __('messages.accountProfile.licenseNumberInvalid'),
+            'drivers_license_expiration_date.after' => __('messages.accountProfile.licenseExpirationPast'),
+            'drivers_license_expiration_date.before' => __('messages.accountProfile.licenseExpirationTooFar'),
         ])->validateWithBag('updateProfileInformation');
 
         $license = $this->normalizeLicense($input);

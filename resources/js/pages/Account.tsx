@@ -57,6 +57,9 @@ interface AccountTranslations {
     nudgeAddLicenseTitle: string;
     nudgeAddLicenseBody: string;
     nudgeAddLicenseCta: string;
+    nudgeLicenseExpiredTitle: string;
+    nudgeLicenseExpiredBody: string;
+    nudgeLicenseExpiredCta: string;
     nudgeVerifyEmailTitle: string;
     nudgeVerifyEmailBody: string;
     nudgeVerifyEmailCta: string;
@@ -67,6 +70,7 @@ interface PageProps {
     auth: { user: { name: string; email_verified_at?: string | null } };
     currentLocale: string;
     hasLicense: boolean;
+    licenseExpired: boolean;
     nextAppointment: NextAppointment | null;
     recentCheckIns: RecentCheckIn[];
     translations: { account: AccountTranslations };
@@ -159,8 +163,15 @@ function NudgeCard({
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Account() {
-    const { auth, currentLocale, hasLicense, nextAppointment, recentCheckIns, translations } =
-        usePage<PageProps>().props;
+    const {
+        auth,
+        currentLocale,
+        hasLicense,
+        licenseExpired,
+        nextAppointment,
+        recentCheckIns,
+        translations,
+    } = usePage<PageProps>().props;
     const t = translations.account;
     const verified = Boolean(auth.user.email_verified_at);
 
@@ -221,7 +232,7 @@ export default function Account() {
                 </Link>
 
                 {/* Smart nudges */}
-                {(!verified || !hasLicense) && (
+                {(!verified || !hasLicense || licenseExpired) && (
                     <div className="space-y-3">
                         {!verified && (
                             <NudgeCard
@@ -257,6 +268,21 @@ export default function Account() {
                                         className="inline-flex items-center rounded-full bg-brand-green px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90"
                                     >
                                         {t.nudgeAddLicenseCta}
+                                    </Link>
+                                }
+                            />
+                        )}
+                        {hasLicense && licenseExpired && (
+                            <NudgeCard
+                                icon={IdCard}
+                                title={t.nudgeLicenseExpiredTitle}
+                                body={t.nudgeLicenseExpiredBody}
+                                action={
+                                    <Link
+                                        href={accountProfile().url}
+                                        className="inline-flex items-center rounded-full bg-brand-green px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90"
+                                    >
+                                        {t.nudgeLicenseExpiredCta}
                                     </Link>
                                 }
                             />
@@ -345,7 +371,10 @@ export default function Account() {
                                             {checkIn.referenceNumber}
                                         </p>
                                     </div>
-                                    <StatusBadge status={checkIn.status} t={t} />
+                                    <StatusBadge
+                                        status={checkIn.status}
+                                        t={t}
+                                    />
                                 </li>
                             ))}
                         </ul>

@@ -1,7 +1,10 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
+import { format } from 'date-fns';
 import { Check, IdCard, Lock, User } from 'lucide-react';
 import type { FormEvent, ReactNode } from 'react';
+import { useMemo } from 'react';
 
+import { DatePicker } from '@/components/DatePickerTime';
 import LicenseCard from '@/components/LicenseCard';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
@@ -107,10 +110,30 @@ export default function EditProfile() {
     const { auth, license, translations } = usePage<PageProps>().props;
     const t = translations.accountProfile;
 
+    // A license must still be valid (future dated) and, at most, 60 years out;
+    // the widest real-world US window is Arizona's "valid until age 65".
+    const licenseMinDate = useMemo(() => {
+        const tomorrow = new Date();
+        tomorrow.setHours(0, 0, 0, 0);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        return tomorrow;
+    }, []);
+
+    const licenseMaxDate = useMemo(() => {
+        const max = new Date();
+        max.setHours(0, 0, 0, 0);
+        max.setFullYear(max.getFullYear() + 60);
+
+        return max;
+    }, []);
+
     const profile = useForm({
         name: auth.user.name,
         email: auth.user.email,
-        cellphone: formatUsPhone((auth.user.cellphone ?? '').replace(/^\+1/, '')),
+        cellphone: formatUsPhone(
+            (auth.user.cellphone ?? '').replace(/^\+1/, ''),
+        ),
         drivers_license_number: license.number ?? '',
         drivers_license_state: license.state ?? '',
         drivers_license_expiration_date: license.expirationDate ?? '',
@@ -154,7 +177,9 @@ export default function EditProfile() {
                     onSubmit={submitProfile}
                 >
                     <div className="mt-5 space-y-4">
-                        <Field data-invalid={!!profile.errors.name || undefined}>
+                        <Field
+                            data-invalid={!!profile.errors.name || undefined}
+                        >
                             <FieldLabel htmlFor="name">
                                 {t.nameLabel}
                             </FieldLabel>
@@ -164,7 +189,9 @@ export default function EditProfile() {
                                 type="text"
                                 autoComplete="name"
                                 value={profile.data.name}
-                                aria-invalid={!!profile.errors.name || undefined}
+                                aria-invalid={
+                                    !!profile.errors.name || undefined
+                                }
                                 onChange={(e) =>
                                     profile.setData('name', e.target.value)
                                 }
@@ -172,7 +199,9 @@ export default function EditProfile() {
                             <FieldError>{profile.errors.name}</FieldError>
                         </Field>
 
-                        <Field data-invalid={!!profile.errors.email || undefined}>
+                        <Field
+                            data-invalid={!!profile.errors.email || undefined}
+                        >
                             <FieldLabel htmlFor="email">
                                 {t.emailLabel}
                             </FieldLabel>
@@ -198,7 +227,9 @@ export default function EditProfile() {
                         </Field>
 
                         <Field
-                            data-invalid={!!profile.errors.cellphone || undefined}
+                            data-invalid={
+                                !!profile.errors.cellphone || undefined
+                            }
                         >
                             <FieldLabel htmlFor="cellphone">
                                 {t.cellphoneLabel}
@@ -226,7 +257,7 @@ export default function EditProfile() {
                         <Button
                             type="submit"
                             disabled={profile.processing}
-                            className="h-10 rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50 cursor-pointer"
+                            className="h-10 cursor-pointer rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
                         >
                             {t.save}
                         </Button>
@@ -275,9 +306,7 @@ export default function EditProfile() {
                                     maxLength={20}
                                     autoComplete="off"
                                     autoCapitalize="characters"
-                                    value={
-                                        profile.data.drivers_license_number
-                                    }
+                                    value={profile.data.drivers_license_number}
                                     aria-invalid={
                                         !!profile.errors
                                             .drivers_license_number || undefined
@@ -341,38 +370,36 @@ export default function EditProfile() {
                         <Field
                             data-invalid={
                                 !!profile.errors
-                                    .drivers_license_expiration_date || undefined
+                                    .drivers_license_expiration_date ||
+                                undefined
                             }
                             className="sm:max-w-[calc(50%-0.5rem)]"
                         >
                             <FieldLabel htmlFor="drivers_license_expiration_date">
                                 {t.licenseExpirationLabel}
                             </FieldLabel>
-                            <Input
-                                id="drivers_license_expiration_date"
-                                name="drivers_license_expiration_date"
-                                type="date"
-                                value={
-                                    profile.data
-                                        .drivers_license_expiration_date
+                            <DatePicker
+                                date={
+                                    profile.data.drivers_license_expiration_date
+                                        ? new Date(
+                                              profile.data
+                                                  .drivers_license_expiration_date +
+                                                  'T00:00:00',
+                                          )
+                                        : undefined
                                 }
-                                aria-invalid={
-                                    !!profile.errors
-                                        .drivers_license_expiration_date ||
-                                    undefined
-                                }
-                                onChange={(e) =>
+                                onDateChange={(d) =>
                                     profile.setData(
                                         'drivers_license_expiration_date',
-                                        e.target.value,
+                                        d ? format(d, 'yyyy-MM-dd') : '',
                                     )
                                 }
+                                minDate={licenseMinDate}
+                                maxDate={licenseMaxDate}
+                                endMonth={licenseMaxDate}
                             />
                             <FieldError>
-                                {
-                                    profile.errors
-                                        .drivers_license_expiration_date
-                                }
+                                {profile.errors.drivers_license_expiration_date}
                             </FieldError>
                         </Field>
                     </div>
@@ -381,7 +408,7 @@ export default function EditProfile() {
                         <Button
                             type="submit"
                             disabled={profile.processing}
-                            className="h-10 rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50 cursor-pointer"
+                            className="h-10 cursor-pointer rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
                         >
                             {t.save}
                         </Button>
@@ -477,7 +504,7 @@ export default function EditProfile() {
                         <Button
                             type="submit"
                             disabled={password.processing}
-                            className="h-10 rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50 cursor-pointer"
+                            className="h-10 cursor-pointer rounded-4xl bg-brand-green px-5 text-sm font-semibold text-white shadow-sm shadow-brand-green/25 transition-colors hover:bg-brand-green/90 focus-visible:ring-brand-green/50"
                         >
                             {t.updatePassword}
                         </Button>
