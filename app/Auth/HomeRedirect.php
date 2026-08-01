@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Auth;
 
-use App\Models\User;
-
 /**
  * Resolves where a user lands after authenticating. Centralized so login and
  * registration stay in sync.
@@ -17,7 +15,7 @@ use App\Models\User;
  */
 final class HomeRedirect
 {
-    public static function for(User $user): string
+    public static function for(): string
     {
         return route('account');
     }

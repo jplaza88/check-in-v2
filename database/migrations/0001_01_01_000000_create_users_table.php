@@ -39,7 +39,7 @@ return new class extends Migration
             $table->timestamp('created_at')->nullable();
         });
 
-        Schema::create('passkeys', function (Blueprint $table) {
+        Schema::create('passkeys', function (Blueprint $table): void {
             $table->id();
             $table->foreignIdFor(Passkeys::userModel(), 'user_id')->constrained()->cascadeOnDelete();
             $table->string('name');

@@ -10,7 +10,7 @@ use Illuminate\Auth\Events\Verified;
 
 function driverWithPending(array $attributes): User
 {
-    return User::create([
+    return User::query()->create([
         'name' => 'John Driver',
         'email' => 'john@example.com',
         'password' => 'secret-password',
@@ -64,7 +64,7 @@ it('does not claim a check-in that already has a user', function (): void {
         'user_id' => $owner->id,
     ]);
 
-    $other = User::create([
+    $other = User::query()->create([
         'name' => 'Other Driver',
         'email' => 'other@example.com',
         'password' => 'secret-password',

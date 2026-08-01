@@ -12,7 +12,7 @@ use function Pest\Laravel\get;
 
 function makeDriver(array $attributes = []): User
 {
-    return User::create([
+    return User::query()->create([
         'name' => 'John Driver',
         'email' => 'john@example.com',
         'password' => 'secret-password',

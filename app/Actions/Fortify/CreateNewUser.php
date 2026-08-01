@@ -12,11 +12,11 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
-final class CreateNewUser implements CreatesNewUsers
+final readonly class CreateNewUser implements CreatesNewUsers
 {
     use PasswordValidationRules;
 
-    public function __construct(private readonly RegistrationGate $registrationGate) {}
+    public function __construct(private RegistrationGate $registrationGate) {}
 
     /**
      * Validate and create a newly registered user.
@@ -50,7 +50,7 @@ final class CreateNewUser implements CreatesNewUsers
 
         // Stash the guest check-in / appointment as pending; it is attached to
         // this user only once the email address is verified.
-        $user = User::create([
+        $user = User::query()->create([
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => Hash::make($input['password']),

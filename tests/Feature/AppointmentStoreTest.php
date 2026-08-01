@@ -108,7 +108,7 @@ it('redirects when location does not exist', function (): void {
 
 it('captures the signed-in driver on the appointment', function (): void {
     $location = Location::factory()->appointmentsOnly()->create();
-    $user = User::create([
+    $user = User::query()->create([
         'name' => 'John Driver',
         'email' => 'john@example.com',
         'password' => 'secret-password',

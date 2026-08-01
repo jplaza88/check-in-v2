@@ -15,7 +15,7 @@ use function Pest\Laravel\post;
 
 function resetUser(): User
 {
-    return User::create([
+    return User::query()->create([
         'name' => 'John Driver',
         'email' => 'john@example.com',
         'password' => 'old-password-123',

@@ -63,11 +63,11 @@ final class CheckInController extends Controller
             'truckColors' => config('app.truck_colors'),
             // Saved license (number is hidden from the global auth.user share) so
             // a signed-in driver's check-in prefills from their profile.
-            'driverLicense' => $user === null ? null : [
+            'driverLicense' => $user instanceof User ? [
                 'number' => $user->drivers_license_number,
                 'state' => $user->drivers_license_state,
                 'expirationDate' => $user->drivers_license_expiration_date?->format('Y-m-d'),
-            ],
+            ] : null,
         ]);
     }
 

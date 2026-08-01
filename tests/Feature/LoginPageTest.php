@@ -24,7 +24,7 @@ it('redirects authenticated users away from the login page', function (): void {
 });
 
 it('sends a driver to their account after logging in', function (): void {
-    User::create([
+    User::query()->create([
         'name' => 'John Driver',
         'email' => 'john@example.com',
         'password' => 'Password123!',

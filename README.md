@@ -17,7 +17,7 @@ A web application that manages truck drivers' check-ins across Martori Farms loc
 | Frontend | React · TypeScript · Inertia.js · Tailwind CSS |
 | Cache / Queue | Redis                                         |
 | Queue Dashboard | Laravel Horizon                             |
-| Mail | Mailpit                                       |
+| Mail | Mailpit (local) · Mailgun HTTP API (staging)   |
 
 ## Laravel Packages & Tooling
 

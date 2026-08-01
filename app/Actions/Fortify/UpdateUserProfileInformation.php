@@ -7,12 +7,12 @@ namespace App\Actions\Fortify;
 use App\Actions\RecordUserHistoryAction;
 use App\Enums\UserHistoryEvent;
 use App\Models\User;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
+use Throwable;
 
 final readonly class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 {
@@ -21,10 +21,10 @@ final readonly class UpdateUserProfileInformation implements UpdatesUserProfileI
     /**
      * Validate and update the given user's profile information.
      *
-     * @param array<string, string> $input
+     * @param  array<string, string|null>  $input
      *
      * @throws ValidationException
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function update(User $user, array $input): void
     {
@@ -58,8 +58,7 @@ final readonly class UpdateUserProfileInformation implements UpdatesUserProfileI
 
         $before = $this->snapshot($user);
 
-        $requiresReverification = $input['email'] !== $user->email
-            && $user instanceof MustVerifyEmail;
+        $requiresReverification = $input['email'] !== $user->email;
 
         DB::transaction(function () use ($user, $input, $license, $before, $requiresReverification): void {
             $user->forceFill([
@@ -142,7 +141,7 @@ final readonly class UpdateUserProfileInformation implements UpdatesUserProfileI
      * Coerce the optional license fields to their stored shape: trimmed values
      * or null when blank, so clearing a field wipes it.
      *
-     * @param  array<string, string>  $input
+     * @param  array<string, string|null>  $input
      * @return array{drivers_license_number: string|null, drivers_license_state: string|null, drivers_license_expiration_date: string|null}
      */
     private function normalizeLicense(array $input): array

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Auth\RegistrationGate;
 use App\CheckIn\CheckInScheduleResolver;
 use App\DTOs\CheckInLocationDTO;
 use App\Enums\CheckInErpStatus;
@@ -88,7 +89,7 @@ it('renders the check-in form with the location and field flags', function (): v
 
 it('exposes a signed-in driver profile so the form can prefill', function (): void {
     $location = Location::factory()->create();
-    $user = User::create([
+    $user = User::query()->create([
         'name' => 'John Driver',
         'email' => 'john@example.com',
         'password' => 'secret-password',
@@ -158,7 +159,7 @@ it('accepts a valid submission when optional fields are hidden', function (): vo
 
 it('prefills the check-in with the signed-in driver saved license', function (): void {
     $location = Location::factory()->create();
-    $user = User::create([
+    $user = User::query()->create([
         'name' => 'John Driver',
         'email' => 'john@example.com',
         'password' => 'secret-password',
@@ -189,7 +190,7 @@ it('sends a null driver license for guests on the check-in form', function (): v
 
 it('captures the signed-in driver on the check-in', function (): void {
     $location = Location::factory()->create();
-    $user = User::create([
+    $user = User::query()->create([
         'name' => 'John Driver',
         'email' => 'john@example.com',
         'password' => 'secret-password',
@@ -297,11 +298,11 @@ it('opens the registration window after a successful check-in', function (): voi
 
     $checkIn = CheckIn::query()->sole();
 
-    $response->assertSessionHas(App\Auth\RegistrationGate::SESSION_KEY)
-        ->assertSessionHas(App\Auth\RegistrationGate::CELLPHONE_KEY, '+15551234567')
-        ->assertSessionHas(App\Auth\RegistrationGate::NAME_KEY, 'John Driver')
-        ->assertSessionHas(App\Auth\RegistrationGate::CLAIM_TYPE_KEY, 'check_in')
-        ->assertSessionHas(App\Auth\RegistrationGate::CLAIM_ID_KEY, $checkIn->id);
+    $response->assertSessionHas(RegistrationGate::SESSION_KEY)
+        ->assertSessionHas(RegistrationGate::CELLPHONE_KEY, '+15551234567')
+        ->assertSessionHas(RegistrationGate::NAME_KEY, 'John Driver')
+        ->assertSessionHas(RegistrationGate::CLAIM_TYPE_KEY, 'check_in')
+        ->assertSessionHas(RegistrationGate::CLAIM_ID_KEY, $checkIn->id);
 });
 
 it('rejects an expired drivers license', function (): void {
