@@ -74,11 +74,11 @@ cp .env.example .env
 
 ## Accessing the Application
 
-| Service | URL                       |
-|---|---------------------------|
-| Web application | https://martori.localhost |
+| Service | URL                               |
+|---|-----------------------------------|
+| Web application | https://martori.localhost         |
 | Horizon dashboard | https://martori.localhost/horizon |
-| Mailpit inbox | http://localhost:8025     |
+| Mailpit inbox | http://martori.localhost:8025     |
 
 ## Development
 
