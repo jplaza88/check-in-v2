@@ -4,21 +4,27 @@ declare(strict_types=1);
 
 namespace App\Actions\Fortify;
 
+use App\Actions\RecordUserHistoryAction;
+use App\Enums\UserHistoryEvent;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
-final class UpdateUserProfileInformation implements UpdatesUserProfileInformation
+final readonly class UpdateUserProfileInformation implements UpdatesUserProfileInformation
 {
+    public function __construct(private RecordUserHistoryAction $history) {}
+
     /**
      * Validate and update the given user's profile information.
      *
-     * @param  array<string, string>  $input
+     * @param array<string, string> $input
      *
      * @throws ValidationException
+     * @throws \Throwable
      */
     public function update(User $user, array $input): void
     {
@@ -50,17 +56,75 @@ final class UpdateUserProfileInformation implements UpdatesUserProfileInformatio
 
         $license = $this->normalizeLicense($input);
 
-        if ($input['email'] !== $user->email &&
-            $user instanceof MustVerifyEmail) {
-            $this->updateVerifiedUser($user, $input, $license);
-        } else {
+        $before = $this->snapshot($user);
+
+        $requiresReverification = $input['email'] !== $user->email
+            && $user instanceof MustVerifyEmail;
+
+        DB::transaction(function () use ($user, $input, $license, $before, $requiresReverification): void {
             $user->forceFill([
                 'name' => $input['name'],
                 'email' => $input['email'],
                 'cellphone' => $input['cellphone'],
                 ...$license,
+                ...($requiresReverification ? ['email_verified_at' => null] : []),
             ])->save();
+
+            $changes = $this->diff($before, $this->snapshot($user));
+
+            if ($changes !== []) {
+                $this->history->handle($user, UserHistoryEvent::ProfileUpdated, $changes);
+            }
+        });
+
+        // Dispatched after the commit on purpose: VerifyEmail is queued on Redis,
+        // so a worker could pick the job up and mail a link for an email address
+        // whose row never landed.
+        if ($requiresReverification) {
+            $user->sendEmailVerificationNotification();
         }
+    }
+
+    /**
+     * Capture the trackable profile attributes as plain, comparable scalars.
+     *
+     * This reads through the accessors on purpose — getDirty()/getChanges()
+     * can't be used here. Encrypted::set() produces different ciphertext on
+     * every write and Eloquent only decrypts-to-compare for its own built-in
+     * `encrypted` cast, so drivers_license_number would report dirty on every
+     * single save. The expiration date is normalized to its stored Y-m-d shape
+     * because the cast hands back a CarbonImmutable.
+     *
+     * @return array<string, string|null>
+     */
+    private function snapshot(User $user): array
+    {
+        return [
+            'name' => $user->name,
+            'email' => $user->email,
+            'cellphone' => $user->cellphone,
+            'drivers_license_number' => $user->drivers_license_number,
+            'drivers_license_state' => $user->drivers_license_state,
+            'drivers_license_expiration_date' => $user->drivers_license_expiration_date?->format('Y-m-d'),
+        ];
+    }
+
+    /**
+     * @param  array<string, string|null>  $before
+     * @param  array<string, string|null>  $after
+     * @return array<string, array{from: string|null, to: string|null}>
+     */
+    private function diff(array $before, array $after): array
+    {
+        $changes = [];
+
+        foreach ($after as $attribute => $value) {
+            if ($before[$attribute] !== $value) {
+                $changes[$attribute] = ['from' => $before[$attribute], 'to' => $value];
+            }
+        }
+
+        return $changes;
     }
 
     /**
@@ -94,24 +158,5 @@ final class UpdateUserProfileInformation implements UpdatesUserProfileInformatio
             'drivers_license_state' => $blankToNull($input['drivers_license_state'] ?? null),
             'drivers_license_expiration_date' => $blankToNull($input['drivers_license_expiration_date'] ?? null),
         ];
-    }
-
-    /**
-     * Update the given verified user's profile information.
-     *
-     * @param  array<string, string>  $input
-     * @param  array{drivers_license_number: string|null, drivers_license_state: string|null, drivers_license_expiration_date: string|null}  $license
-     */
-    private function updateVerifiedUser(User $user, array $input, array $license): void
-    {
-        $user->forceFill([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'cellphone' => $input['cellphone'],
-            ...$license,
-            'email_verified_at' => null,
-        ])->save();
-
-        $user->sendEmailVerificationNotification();
     }
 }

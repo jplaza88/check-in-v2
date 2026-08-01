@@ -4,22 +4,29 @@ declare(strict_types=1);
 
 namespace App\Actions\Fortify;
 
+use App\Actions\RecordUserHistoryAction;
+use App\Enums\UserHistoryEvent;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Fortify\Contracts\UpdatesUserPasswords;
+use Throwable;
 
-final class UpdateUserPassword implements UpdatesUserPasswords
+final readonly class UpdateUserPassword implements UpdatesUserPasswords
 {
     use PasswordValidationRules;
+
+    public function __construct(private RecordUserHistoryAction $history) {}
 
     /**
      * Validate and update the user's password.
      *
-     * @param  array<string, string>  $input
+     * @param array<string, string> $input
      *
      * @throws ValidationException
+     * @throws Throwable
      */
     public function update(User $user, array $input): void
     {
@@ -30,8 +37,12 @@ final class UpdateUserPassword implements UpdatesUserPasswords
             'current_password.current_password' => __('The provided password does not match your current password.'),
         ])->validateWithBag('updatePassword');
 
-        $user->forceFill([
-            'password' => Hash::make($input['password']),
-        ])->save();
+        $password = Hash::make($input['password']);
+
+        DB::transaction(function () use ($user, $password): void {
+            $user->forceFill(['password' => $password])->save();
+
+            $this->history->handle($user, UserHistoryEvent::PasswordUpdated);
+        });
     }
 }
