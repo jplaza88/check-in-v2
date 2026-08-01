@@ -14,9 +14,9 @@ final class AccountResolver
 {
     /**
      * @return array{
-     *     nextAppointment: array{referenceNumber: string, locationName: string, date: string, time: string}|null,
-     *     recentCheckIns: list<array{referenceNumber: string, locationName: string, date: string, status: string}>,
-     * }
+     *     nextAppointment: array{referenceNumber: string, locationName: string, monthShort: string, day: string, time: string}|null,
+     *     recentCheckIns: list<array{referenceNumber: string, locationName: string, date: string, status: string}>
+     *         }
      */
     public function resolve(User $user): array
     {
@@ -47,7 +47,7 @@ final class AccountResolver
         return [
             'referenceNumber' => $appointment->reference_number,
             'locationName' => $appointment->location->name,
-            'monthShort' => $scheduledFor->locale(app()->getLocale())->isoFormat('MMM'),
+            'monthShort' => $scheduledFor->settings(['locale' => app()->getLocale()])->isoFormat('MMM'),
             'day' => $scheduledFor->format('j'),
             'time' => $scheduledFor->format('g:i A'),
         ];
@@ -58,17 +58,19 @@ final class AccountResolver
      */
     private function recentCheckIns(User $user): array
     {
-        return CheckIn::with('location')
-            ->where('user_id', $user->id)
-            ->latest()
-            ->limit(5)
-            ->get()
-            ->map(fn (CheckIn $checkIn): array => [
-                'referenceNumber' => $checkIn->reference_number,
-                'locationName' => $checkIn->location->name,
-                'date' => $checkIn->created_at->setTimezone($checkIn->location->timezone)->format('M j, Y'),
-                'status' => $checkIn->status->value,
-            ])
-            ->all();
+        return array_values(
+            CheckIn::with('location')
+                ->where('user_id', $user->id)
+                ->latest()
+                ->limit(5)
+                ->get()
+                ->map(fn (CheckIn $checkIn): array => [
+                    'referenceNumber' => $checkIn->reference_number,
+                    'locationName' => $checkIn->location->name,
+                    'date' => $checkIn->created_at->setTimezone($checkIn->location->timezone)->format('M j, Y'),
+                    'status' => $checkIn->status->value,
+                ])
+                ->all()
+        );
     }
 }

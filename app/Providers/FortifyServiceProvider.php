@@ -57,9 +57,7 @@ final class FortifyServiceProvider extends ServiceProvider
         // Applied to Fortify's whole POST group (config/fortify.php middleware).
         // Each endpoint gets its own per-IP budget so probing register, the
         // forgot-password form, etc. is capped without starving legitimate use.
-        RateLimiter::for('fortify', function (Request $request) {
-            return Limit::perMinute(20)->by(($request->route()?->getName() ?? 'fortify').'|'.$request->ip());
-        });
+        RateLimiter::for('fortify', fn (Request $request) => Limit::perMinute(20)->by(($request->route()?->getName() ?? 'fortify').'|'.$request->ip()));
 
         // Uncomment when enabling two-factor or passkeys
         /*RateLimiter::for('two-factor', function (Request $request) {
