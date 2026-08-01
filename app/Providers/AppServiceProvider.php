@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -95,6 +96,8 @@ final class AppServiceProvider extends ServiceProvider
         $this->autoEagerLoadRelationships();
 
         $this->forceHttps();
+
+        $this->redirectMailOutsideProduction();
 
         $this->strictModels();
 
@@ -174,6 +177,27 @@ final class AppServiceProvider extends ServiceProvider
         if (app()->isProduction()) {
             URL::forceHttps();
         }
+    }
+
+    /**
+     * Funnel every outgoing message to a single inbox outside production.
+     *
+     * This sits at the transport rather than in the seeder on purpose. The
+     * location seeder carries the real @martorifarms.com shipping addresses
+     * because production needs them, so scrubbing the data there would be both
+     * wrong and incomplete: it would still leave registrations, password
+     * resets, and verification mail free to reach whatever address a tester
+     * typed in. Rewriting the recipient catches all of it in one place.
+     */
+    private function redirectMailOutsideProduction(): void
+    {
+        $address = config('mail.always_to');
+
+        if (! is_string($address) || $address === '' || app()->isProduction()) {
+            return;
+        }
+
+        Mail::alwaysTo($address);
     }
 
     private function strictModels(): void

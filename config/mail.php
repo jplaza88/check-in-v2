@@ -121,4 +121,21 @@ return [
         'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Global "To" Address
+    |--------------------------------------------------------------------------
+    |
+    | When set, every outgoing message is redirected to this single inbox and
+    | its real recipients are discarded. Staging sets this so the live
+    | @martorifarms.com addresses carried by the location seeder, and anyone
+    | who registers to poke at the site, can never be mailed for real.
+    |
+    | Ignored in production, so a stray value in a production environment file
+    | cannot silently divert customer mail.
+    |
+    */
+
+    'always_to' => env('MAIL_ALWAYS_TO'),
+
 ];
