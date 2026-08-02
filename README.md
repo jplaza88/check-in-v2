@@ -103,16 +103,7 @@ Worker supervisors, queues, and balancing strategies are configured in `config/h
 
 #### Horizon on staging
 
-The staging dashboard is **not reachable from the public internet**. The public FQDN returns 404 for `/horizon`, and Caddy never forwards those requests to PHP.
-
-Access requires two things:
-
-1. Membership in the tailnet, with your device granted access to `tag:checkin-horizon`. A `tailscale` sidecar in `compose.staging.yaml` joins the tailnet and serves the app at `https://checkin-horizon.<tailnet>.ts.net` (see `deploy/tailscale/serve.json`).
-2. Signing in as a user permitted by the `viewHorizon` gate.
-
-`HORIZON_DOMAIN` in the server-side `.env` scopes the Horizon route group to the tailnet hostname, so its routes are not registered on the public host at all. `HORIZON_PATH` may also be set there to move it off the default path. Neither is set locally, so local development is unchanged.
-
-`deploy/Caddyfile.staging` is a **reference fragment** of the shared multi-app VPS Caddyfile, not a deployable file. Do not copy it over `/etc/caddy/Caddyfile`.
+Not reachable from the public internet: `HORIZON_DOMAIN` in the server-side `.env` scopes Horizon's routes to the tailnet hostname, so they are never registered on the public FQDN. The `handle /horizon*` block in `deploy/Caddyfile.staging` is optional defense in depth.
 
 ### Code Style (Pint)
 

@@ -1,0 +1,21 @@
+# Reference copy of the check-in site block from the shared VPS Caddyfile.
+#
+# NOT deployed by CI, and NOT a complete Caddyfile - the VPS proxy serves several
+# apps from one config. Copying this file over /etc/caddy/Caddyfile would take the
+# other sites down. Edit the real file on the VPS by hand and keep this in sync.
+#
+# The hostname below is a placeholder. The real staging FQDN is deliberately kept
+# out of this repo; substitute it when applying this block on the VPS.
+#
+# Horizon is not reachable through this block. HORIZON_DOMAIN (set in the server-side
+# .env) scopes the Horizon route group to the Tailscale hostname, so its routes are
+# not registered on this host at all. The handle below just stops scanner traffic
+# before it reaches PHP.
+
+staging.example.com {
+	handle /horizon* {
+		respond 404
+	}
+
+	reverse_proxy check-in-checkin-1:80
+}
