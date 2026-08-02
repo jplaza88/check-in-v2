@@ -101,6 +101,19 @@ Background jobs are processed by [Laravel Horizon](https://laravel.com/docs/hori
 
 Worker supervisors, queues, and balancing strategies are configured in `config/horizon.php`. Dashboard access is authorized via the `viewHorizon` gate.
 
+#### Horizon on staging
+
+The staging dashboard is **not reachable from the public internet**. The public FQDN returns 404 for `/horizon`, and Caddy never forwards those requests to PHP.
+
+Access requires two things:
+
+1. Membership in the tailnet, with your device granted access to `tag:checkin-horizon`. A `tailscale` sidecar in `compose.staging.yaml` joins the tailnet and serves the app at `https://checkin-horizon.<tailnet>.ts.net` (see `deploy/tailscale/serve.json`).
+2. Signing in as a user permitted by the `viewHorizon` gate.
+
+`HORIZON_DOMAIN` in the server-side `.env` scopes the Horizon route group to the tailnet hostname, so its routes are not registered on the public host at all. `HORIZON_PATH` may also be set there to move it off the default path. Neither is set locally, so local development is unchanged.
+
+`deploy/Caddyfile.staging` is a **reference fragment** of the shared multi-app VPS Caddyfile, not a deployable file. Do not copy it over `/etc/caddy/Caddyfile`.
+
 ### Code Style (Pint)
 
 Uses extensive custom rules defined in `pint.json` - including `declare_strict_types`, `final_class`, `strict_comparison`, `ordered_class_elements`, and more. See `pint.json` for the full ruleset.
