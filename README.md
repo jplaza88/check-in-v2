@@ -101,6 +101,10 @@ Background jobs are processed by [Laravel Horizon](https://laravel.com/docs/hori
 
 Worker supervisors, queues, and balancing strategies are configured in `config/horizon.php`. Dashboard access is authorized via the `viewHorizon` gate.
 
+#### Horizon on staging
+
+Not reachable from the public internet: `HORIZON_DOMAIN` in the server-side `.env` scopes Horizon's routes to the tailnet hostname, so they are never registered on the public FQDN. The `handle /horizon*` block in `deploy/Caddyfile.staging` is optional defense in depth.
+
 ### Code Style (Pint)
 
 Uses extensive custom rules defined in `pint.json` - including `declare_strict_types`, `final_class`, `strict_comparison`, `ordered_class_elements`, and more. See `pint.json` for the full ruleset.
