@@ -84,7 +84,7 @@ export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
                             <NavbarLink
                                 href={account().url}
                                 name={nav.account}
-                                activeRoute={['account', 'account.profile']}
+                                activeRoute={['account', 'account.profile', 'account.history']}
                             />
                         )}
                         {!isAuthenticated && !hideLogin && (

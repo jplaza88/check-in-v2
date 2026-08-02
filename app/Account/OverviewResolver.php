@@ -10,7 +10,7 @@ use App\Models\CheckIn;
 use App\Models\User;
 use Illuminate\Support\Facades\Date;
 
-final class AccountResolver
+final class OverviewResolver
 {
     /**
      * @return array{

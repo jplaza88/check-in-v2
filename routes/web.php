@@ -55,6 +55,17 @@ Route::middleware('setLocale')->group(function (): void {
     Route::middleware('auth')->group(function (): void {
         Route::get('/account', [AccountController::class, 'index'])->name('account');
         Route::get('/account/profile', [AccountController::class, 'editProfile'])->name('account.profile');
+
+        Route::get('/account/history', [AccountController::class, 'history'])
+            ->name('account.history');
+
+        Route::get('/account/history/check-in/{uuid}', [AccountController::class, 'showCheckIn'])
+            ->whereUuid('uuid')
+            ->name('account.history.checkIn');
+
+        Route::get('/account/history/appointment/{uuid}', [AccountController::class, 'showAppointment'])
+            ->whereUuid('uuid')
+            ->name('account.history.appointment');
     });
 
     /**

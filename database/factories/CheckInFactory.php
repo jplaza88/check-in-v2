@@ -9,9 +9,14 @@ use App\Enums\CheckInStatus;
 use App\Enums\TrailerChute;
 use App\Models\CheckIn;
 use App\Models\Location;
+use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
 
+/**
+ * @extends Factory<CheckIn>
+ */
 final class CheckInFactory extends Factory
 {
     protected $model = CheckIn::class;
@@ -58,5 +63,73 @@ final class CheckInFactory extends Factory
             'user_id' => null,
             'appointment_id' => null,
         ];
+    }
+
+    /**
+     * Attach the check-in to a driver and mirror their details onto the record,
+     * the way CreateCheckInAction does for an authenticated driver.
+     *
+     * Note this deliberately leaves claimed_at/claimed_via alone: those are only
+     * stamped by the post-registration claim flow. Use claimed() for that case.
+     */
+    public function forUser(User $user): static
+    {
+        return $this->state(fn (array $attributes): array => array_filter([
+            'user_id' => $user->id,
+            'drivers_name' => $user->name,
+            'drivers_email' => $user->email,
+            'drivers_cellphone' => $user->cellphone,
+            'drivers_license_number' => $user->drivers_license_number,
+            'drivers_license_state' => $user->drivers_license_state,
+            'drivers_license_expiration_date' => $user->drivers_license_expiration_date,
+        ], fn (mixed $value): bool => $value !== null));
+    }
+
+    public function atLocation(Location $location): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'location_id' => $location->id,
+        ]);
+    }
+
+    /**
+     * Backdate the record. Sets updated_at alongside created_at so the two never
+     * disagree, which would otherwise break any ordering or cache key built on it.
+     */
+    public function createdAt(CarbonInterface $when): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'created_at' => $when,
+            'updated_at' => $when,
+        ]);
+    }
+
+    public function claimed(string $via = 'email_verification'): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'claimed_at' => Date::now(),
+            'claimed_via' => $via,
+        ]);
+    }
+
+    public function pending(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => CheckInStatus::Pending,
+        ]);
+    }
+
+    public function completed(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => CheckInStatus::Completed,
+        ]);
+    }
+
+    public function cancelled(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => CheckInStatus::Cancelled,
+        ]);
     }
 }

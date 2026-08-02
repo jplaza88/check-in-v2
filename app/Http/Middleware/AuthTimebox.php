@@ -8,6 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Timebox;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 /**
  * Forces sensitive auth endpoints (login, password reset link request) to take a
@@ -26,6 +27,9 @@ final class AuthTimebox
      */
     private const array SENSITIVE_ROUTES = ['login', 'password.email'];
 
+    /**
+     * @throws Throwable
+     */
     public function handle(Request $request, Closure $next): Response
     {
         $microseconds = (int) config('fortify.auth_timebox_microseconds', 300000);

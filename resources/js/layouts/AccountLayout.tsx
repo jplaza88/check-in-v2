@@ -1,16 +1,26 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BadgeCheck, IdCard, LayoutGrid, UserRound } from 'lucide-react';
+import {
+    BadgeCheck,
+    History,
+    IdCard,
+    LayoutGrid,
+    UserRound,
+} from 'lucide-react';
 import type { ComponentType, ReactNode } from 'react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import AppLayout from '@/layouts/AppLayout';
 import { account } from '@/routes';
-import { profile as accountProfile } from '@/routes/account';
+import {
+    history as accountHistory,
+    profile as accountProfile,
+} from '@/routes/account';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
 interface AccountNavTranslations {
     overview: string;
+    history: string;
     profile: string;
     emailVerified: string;
     licenseOnFile: string;
@@ -18,7 +28,11 @@ interface AccountNavTranslations {
 
 interface PageProps {
     auth: {
-        user: { name: string; email: string; email_verified_at?: string | null };
+        user: {
+            name: string;
+            email: string;
+            email_verified_at?: string | null;
+        };
     };
     hasLicense?: boolean;
     translations: { accountNav: AccountNavTranslations };
@@ -67,7 +81,14 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
     const t = translations.accountNav;
 
     const path = page.url.split('?')[0];
-    const activeKey = path.startsWith('/account/profile') ? 'profile' : 'overview';
+
+    // Longest prefix first: /account/history must not fall through to overview.
+    const activeKey = path.startsWith('/account/history')
+        ? 'history'
+        : path.startsWith('/account/profile')
+          ? 'profile'
+          : 'overview';
+
     const verified = Boolean(auth.user.email_verified_at);
 
     const tabs: Tab[] = [
@@ -76,6 +97,12 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
             href: account().url,
             label: t.overview,
             icon: LayoutGrid,
+        },
+        {
+            key: 'history',
+            href: accountHistory().url,
+            label: t.history,
+            icon: History,
         },
         {
             key: 'profile',
@@ -113,7 +140,10 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
                     {(verified || hasLicense) && (
                         <div className="mt-4 flex flex-wrap gap-2">
                             {verified && (
-                                <Chip icon={BadgeCheck} label={t.emailVerified} />
+                                <Chip
+                                    icon={BadgeCheck}
+                                    label={t.emailVerified}
+                                />
                             )}
                             {hasLicense && (
                                 <Chip icon={IdCard} label={t.licenseOnFile} />
@@ -136,15 +166,19 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
                                     <Link
                                         key={tab.key}
                                         href={tab.href}
-                                        aria-current={active ? 'page' : undefined}
-                                        className={`flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-colors ${
+                                        aria-current={
+                                            active ? 'page' : undefined
+                                        }
+                                        className={`flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl px-2 py-2 text-[13px] font-semibold transition-colors sm:gap-2 sm:px-4 sm:text-sm ${
                                             active
                                                 ? 'bg-brand-green text-white shadow-sm shadow-brand-green/25'
                                                 : 'text-gray-500 hover:text-brand-grey dark:text-gray-400 dark:hover:text-gray-200'
                                         }`}
                                     >
-                                        <Icon className="h-4 w-4" />
-                                        {tab.label}
+                                        <Icon className="h-4 w-4 shrink-0" />
+                                        <span className="truncate">
+                                            {tab.label}
+                                        </span>
                                     </Link>
                                 );
                             })}
