@@ -27,9 +27,9 @@ it('seeds a verified admin driver with a license on file', function (): void {
 
     $user = User::query()->where('email', UserSeeder::ADMIN_EMAIL)->firstOrFail();
 
-    // Mirrors the seeder's own fallback so a local SEED_ADMIN_PASSWORD does
-    // not break this assertion.
-    $expected = env('SEED_ADMIN_PASSWORD') ?: 'password';
+    // Reads the same config the seeder does, so a local SEED_ADMIN_PASSWORD
+    // does not break this assertion.
+    $expected = config('app.seed_admin_password');
 
     expect($user->email_verified_at)->not->toBeNull()
         ->and($user->drivers_license_number)->not->toBeNull()
