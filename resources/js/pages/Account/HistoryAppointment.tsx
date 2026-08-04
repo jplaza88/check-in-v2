@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ChevronLeft } from 'lucide-react';
 
-import DownloadPdfButton from '@/components/history/DownloadPdfButton';
+import RecordActions from '@/components/history/RecordActions';
 import {
     DetailRow,
     DetailSection,
@@ -9,6 +9,10 @@ import {
 import StatusBadge from '@/components/StatusBadge';
 import AccountLayout from '@/layouts/AccountLayout';
 import { history as accountHistory } from '@/routes/account';
+import {
+    email as appointmentEmail,
+    pdf as appointmentPdf,
+} from '@/routes/account/history/appointment';
 
 import type { RecordTranslations } from './recordTranslations';
 import { recordStatusLabel } from './recordTranslations';
@@ -121,7 +125,15 @@ export default function HistoryAppointment() {
                     </DetailSection>
                 )}
 
-                <DownloadPdfButton label={t.downloadPdf} badge={t.comingSoon} />
+                <RecordActions
+                    pdfUrl={appointmentPdf(appointment.uuid).url}
+                    emailUrl={appointmentEmail(appointment.uuid).url}
+                    labels={{
+                        viewPdf: t.viewPdf,
+                        emailCopy: t.emailCopy,
+                        emailSent: t.emailSent,
+                    }}
+                />
             </div>
         </AccountLayout>
     );

@@ -14,6 +14,7 @@ return [
     'password.reset' => ['resetPassword'],
     'account' => ['publicNavigation', 'account', 'accountNav'],
     'account.profile' => ['publicNavigation', 'accountProfile', 'accountNav'],
+    'account.settings' => ['publicNavigation', 'accountSettings', 'accountNav'],
     'account.history' => ['publicNavigation', 'accountHistory', 'accountNav'],
     'account.history.checkIn' => ['publicNavigation', 'accountHistoryRecord', 'accountNav'],
     'account.history.appointment' => ['publicNavigation', 'accountHistoryRecord', 'accountNav'],

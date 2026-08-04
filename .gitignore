@@ -1,4 +1,5 @@
 /.phpunit.cache
+/.puppeteer
 /bootstrap/ssr
 /config/composer/.htaccess
 /config/psysh/*

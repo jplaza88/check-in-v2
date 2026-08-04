@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { ChevronLeft } from 'lucide-react';
 
-import DownloadPdfButton from '@/components/history/DownloadPdfButton';
+import RecordActions from '@/components/history/RecordActions';
 import {
     DetailRow,
     DetailSection,
@@ -9,6 +9,10 @@ import {
 import StatusBadge from '@/components/StatusBadge';
 import AccountLayout from '@/layouts/AccountLayout';
 import { history as accountHistory } from '@/routes/account';
+import {
+    email as checkInEmail,
+    pdf as checkInPdf,
+} from '@/routes/account/history/checkIn';
 
 import type { RecordTranslations } from './recordTranslations';
 import { recordStatusLabel } from './recordTranslations';
@@ -169,7 +173,15 @@ export default function HistoryCheckIn() {
                     />
                 </DetailSection>
 
-                <DownloadPdfButton label={t.downloadPdf} badge={t.comingSoon} />
+                <RecordActions
+                    pdfUrl={checkInPdf(checkIn.uuid).url}
+                    emailUrl={checkInEmail(checkIn.uuid).url}
+                    labels={{
+                        viewPdf: t.viewPdf,
+                        emailCopy: t.emailCopy,
+                        emailSent: t.emailSent,
+                    }}
+                />
             </div>
         </AccountLayout>
     );

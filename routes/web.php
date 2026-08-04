@@ -55,6 +55,7 @@ Route::middleware('setLocale')->group(function (): void {
     Route::middleware('auth')->group(function (): void {
         Route::get('/account', [AccountController::class, 'index'])->name('account');
         Route::get('/account/profile', [AccountController::class, 'editProfile'])->name('account.profile');
+        Route::get('/account/settings', [AccountController::class, 'settings'])->name('account.settings');
 
         Route::get('/account/history', [AccountController::class, 'history'])
             ->name('account.history');
@@ -66,6 +67,28 @@ Route::middleware('setLocale')->group(function (): void {
         Route::get('/account/history/appointment/{uuid}', [AccountController::class, 'showAppointment'])
             ->whereUuid('uuid')
             ->name('account.history.appointment');
+
+        // Rendering is bounded work behind a cache, but still worth throttling.
+        Route::middleware('throttle:10,1')->group(function (): void {
+            Route::get('/account/history/check-in/{uuid}/pdf', [AccountController::class, 'checkInPdf'])
+                ->whereUuid('uuid')
+                ->name('account.history.checkIn.pdf');
+
+            Route::get('/account/history/appointment/{uuid}/pdf', [AccountController::class, 'appointmentPdf'])
+                ->whereUuid('uuid')
+                ->name('account.history.appointment.pdf');
+        });
+
+        // Tighter: each one queues a render and sends mail.
+        Route::middleware('throttle:5,1')->group(function (): void {
+            Route::post('/account/history/check-in/{uuid}/email', [AccountController::class, 'emailCheckInPdf'])
+                ->whereUuid('uuid')
+                ->name('account.history.checkIn.email');
+
+            Route::post('/account/history/appointment/{uuid}/email', [AccountController::class, 'emailAppointmentPdf'])
+                ->whereUuid('uuid')
+                ->name('account.history.appointment.email');
+        });
     });
 
     /**

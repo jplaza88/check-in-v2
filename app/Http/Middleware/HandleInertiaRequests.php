@@ -17,6 +17,7 @@ final class HandleInertiaRequests extends Middleware
         'checkIn.form',
         'account',
         'account.profile',
+        'account.settings',
         'account.history',
         'account.history.checkIn',
         'account.history.appointment',
@@ -60,6 +61,7 @@ final class HandleInertiaRequests extends Middleware
                 'user' => $request->user(...),
             ],
             'currentRoute' => $this->getCurrentRouteName(...),
+            'hasLicense' => $this->getHasLicense(...),
             'userCoordsBrowserTtl' => $this->getUserCoordsBrowserTtl(...),
             'currentLocale' => fn () => app()->getLocale(),
             'localesAvailable' => fn () => config('app.locales'),
@@ -88,6 +90,22 @@ final class HandleInertiaRequests extends Middleware
             self::PUBLIC_NAV_ROUTES,
             strict: true
         ) ? request()->route()->getName() : null;
+    }
+
+    /**
+     * Drives the "License on file" chip in the account identity header, which
+     * AccountLayout renders on every account page. Shared rather than passed
+     * per-controller-method so a new account page cannot silently lose it.
+     */
+    private function getHasLicense(): ?bool
+    {
+        $routeName = request()->route()?->getName();
+
+        if ($routeName === null || ! str_starts_with($routeName, 'account')) {
+            return null;
+        }
+
+        return request()->user()?->drivers_license_number !== null;
     }
 
     private function getUserCoordsBrowserTtl(): ?int

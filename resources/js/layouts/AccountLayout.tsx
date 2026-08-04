@@ -4,6 +4,7 @@ import {
     History,
     IdCard,
     LayoutGrid,
+    Settings,
     UserRound,
 } from 'lucide-react';
 import type { ComponentType, ReactNode } from 'react';
@@ -14,6 +15,7 @@ import { account } from '@/routes';
 import {
     history as accountHistory,
     profile as accountProfile,
+    settings as accountSettings,
 } from '@/routes/account';
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -22,6 +24,7 @@ interface AccountNavTranslations {
     overview: string;
     history: string;
     profile: string;
+    settings: string;
     emailVerified: string;
     licenseOnFile: string;
 }
@@ -83,12 +86,17 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
     const path = page.url.split('?')[0];
 
     // Longest prefix first: /account/history must not fall through to overview.
+    // Settings is not a tab, so it deliberately matches none of them rather
+    // than leaving Overview lit while you are on another page.
     const activeKey = path.startsWith('/account/history')
         ? 'history'
         : path.startsWith('/account/profile')
           ? 'profile'
-          : 'overview';
+          : path.startsWith('/account/settings')
+            ? 'settings'
+            : 'overview';
 
+    const settingsActive = activeKey === 'settings';
     const verified = Boolean(auth.user.email_verified_at);
 
     const tabs: Tab[] = [
@@ -127,7 +135,7 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
                                 {initialsOf(auth.user.name)}
                             </AvatarFallback>
                         </Avatar>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                             <h1 className="truncate text-2xl font-bold tracking-tight text-brand-grey dark:text-gray-50">
                                 {auth.user.name}
                             </h1>
@@ -135,6 +143,22 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
                                 {auth.user.email}
                             </p>
                         </div>
+
+                        {/* Settings lives here rather than as a 4th tab: a
+                            fourth segment drops each tab to ~78px at 375px,
+                            which clips the label. */}
+                        <Link
+                            href={accountSettings().url}
+                            aria-label={t.settings}
+                            aria-current={settingsActive ? 'page' : undefined}
+                            className={`flex size-11 shrink-0 items-center justify-center rounded-full transition-colors ${
+                                settingsActive
+                                    ? 'bg-brand-green/10 text-brand-green'
+                                    : 'text-gray-500 hover:bg-gray-100 hover:text-brand-grey dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'
+                            }`}
+                        >
+                            <Settings className="h-5 w-5" />
+                        </Link>
                     </div>
 
                     {(verified || hasLicense) && (

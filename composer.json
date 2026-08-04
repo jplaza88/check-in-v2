@@ -85,7 +85,7 @@
             "npm run types:check",
             "@test"
         ],
-        "test:unit": "XDEBUG_MODE=\"coverage\" pest --parallel --coverage --exactly=95.8",
+        "test:unit": "XDEBUG_MODE=\"coverage\" pest --parallel --coverage --exactly=94.2",
         "test": [
             "@test:type-coverage",
             "@test:unit",

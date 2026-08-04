@@ -5,13 +5,19 @@ declare(strict_types=1);
 namespace App\Account;
 
 use App\Address\AddressManager;
+use App\Enums\TrailerChute;
 use App\Models\Appointment;
 use App\Models\CheckIn;
+use App\Models\Location;
+use App\Phone\PhoneFormatter;
 use Illuminate\Support\Facades\Date;
 
 final readonly class HistoryRecordResolver
 {
-    public function __construct(private AddressManager $address) {}
+    public function __construct(
+        private AddressManager $address,
+        private PhoneFormatter $phone,
+    ) {}
 
     /**
      * @return array<string, mixed>
@@ -30,18 +36,19 @@ final readonly class HistoryRecordResolver
             'status' => $checkIn->status->value,
             'date' => $when->format('M j, Y'),
             'time' => $when->format('g:i A T'),
-            'locationName' => $location->name,
-            'locationAddress' => $this->address->buildAddress($location->address->toArray()),
+            ...$this->locationContact($location),
             'customer' => $checkIn->customer,
             'destination' => $this->destination($checkIn),
             'truckName' => $checkIn->truck_name,
             'truckPlate' => $this->plate($checkIn->truck_plate, $checkIn->truck_plate_state, $checkIn->truck_plate_country),
             'truckColor' => $checkIn->truck_color,
             'trailerPlate' => $this->plate($checkIn->trailer_plate, $checkIn->trailer_plate_state, $checkIn->trailer_plate_country),
-            'trailerChute' => $checkIn->trailer_chute?->value,
+            'trailerChute' => $checkIn->trailer_chute instanceof TrailerChute
+                ? $this->chuteLabel($checkIn->trailer_chute)
+                : null,
             'emptyWeightLbs' => $checkIn->empty_weight_lbs,
             'driversName' => $checkIn->drivers_name,
-            'driversCellphone' => $checkIn->drivers_cellphone,
+            'driversCellphone' => $this->phone->format($checkIn->drivers_cellphone),
             'driversEmail' => $checkIn->drivers_email,
             'licenseMasked' => $this->maskLicense($checkIn->drivers_license_number),
             'licenseState' => $checkIn->drivers_license_state,
@@ -70,14 +77,49 @@ final readonly class HistoryRecordResolver
             'date' => $when->format('M j, Y'),
             'time' => $when->format('g:i A T'),
             'isUpcoming' => $appointment->scheduled_for->isFuture(),
-            'locationName' => $location->name,
-            'locationAddress' => $this->address->buildAddress($location->address->toArray()),
+            ...$this->locationContact($location),
+            'bookedOn' => $appointment->created_at->setTimezone($location->timezone)->format('M j, Y'),
             'driversName' => $appointment->drivers_name,
-            'driversCellphone' => $appointment->drivers_cellphone,
+            'driversCellphone' => $this->phone->format($appointment->drivers_cellphone),
             'cancelledAt' => $cancelledAt?->format('M j, Y'),
             'cancelledReason' => $appointment->cancelled_reason,
             'purchaseOrders' => $purchaseOrders,
         ];
+    }
+
+    /**
+     * Name, address and the contact block. Phone and email live on Location and
+     * are already eager-loaded, but had never reached the payload.
+     *
+     * @return array<string, mixed>
+     */
+    private function locationContact(Location $location): array
+    {
+        return [
+            'locationName' => $location->name,
+            'locationAbbreviation' => $location->abbreviation,
+            'locationAddress' => $this->address->buildAddress($location->address->toArray()),
+            'locationPhone' => $this->phone->format($location->phone),
+            'locationPhoneExt' => $location->phone_ext,
+            'locationEmail' => $location->email,
+        ];
+    }
+
+    /**
+     * The enum's raw value ("center-chute") leaks straight to the screen today.
+     */
+    /**
+     * Reuses the labels the check-in form already ships in all three locales,
+     * rather than leaking the raw enum value ("center-chute") the way the
+     * detail page did.
+     */
+    private function chuteLabel(TrailerChute $chute): string
+    {
+        return match ($chute) {
+            TrailerChute::NotApplicable => __('messages.checkInForm.trailerChuteNa'),
+            TrailerChute::CenterChute => __('messages.checkInForm.trailerChuteCenter'),
+            TrailerChute::SideChute => __('messages.checkInForm.trailerChuteSide'),
+        };
     }
 
     private function destination(CheckIn $checkIn): string

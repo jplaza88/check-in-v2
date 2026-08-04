@@ -7,7 +7,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import UserMenu from '@/components/UserMenu';
 import { account } from '@/routes';
 import appointment from '@/routes/appointment';
-import checkIn from "@/routes/checkIn";
+import checkIn from '@/routes/checkIn';
 
 interface PublicNavigation {
     checkIn: string;
@@ -84,7 +84,12 @@ export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
                             <NavbarLink
                                 href={account().url}
                                 name={nav.account}
-                                activeRoute={['account', 'account.profile', 'account.history']}
+                                activeRoute={[
+                                    'account',
+                                    'account.profile',
+                                    'account.history',
+                                    'account.settings',
+                                ]}
                             />
                         )}
                         {!isAuthenticated && !hideLogin && (
@@ -184,7 +189,12 @@ export default function Navbar({ hideLogin = false }: { hideLogin?: boolean }) {
                         <NavbarLink
                             href={account().url}
                             name={nav.account}
-                            activeRoute={['account', 'account.profile']}
+                            activeRoute={[
+                                'account',
+                                'account.profile',
+                                'account.history',
+                                'account.settings',
+                            ]}
                             variant="mobile"
                         />
                     )}

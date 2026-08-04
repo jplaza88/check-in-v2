@@ -2,8 +2,9 @@ export interface RecordTranslations {
     back: string;
     checkInTitle: string;
     appointmentTitle: string;
-    downloadPdf: string;
-    comingSoon: string;
+    viewPdf: string;
+    emailCopy: string;
+    emailSent: string;
     reference: string;
     status: string;
     date: string;

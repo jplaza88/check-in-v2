@@ -70,7 +70,12 @@ return [
             'driver' => 'redis',
             'connection' => env('REDIS_QUEUE_CONNECTION', 'default'),
             'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 90),
+            /*
+             * Must exceed the longest Horizon supervisor timeout, which is the
+             * pdf supervisor's 120s. Below it, a slow PDF render would be
+             * re-reserved and run twice while the first attempt is still going.
+             */
+            'retry_after' => (int) env('REDIS_QUEUE_RETRY_AFTER', 180),
             'block_for' => null,
             'after_commit' => false,
         ],

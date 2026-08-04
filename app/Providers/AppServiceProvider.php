@@ -11,6 +11,8 @@ use App\Models\AppointmentScheduleOverride;
 use App\Models\CheckInSchedule;
 use App\Models\CheckInScheduleOverride;
 use App\Models\Location;
+use App\Pdf\BrowsershotRecordPdfRenderer;
+use App\Pdf\RecordPdfRenderer;
 use App\Schedule\WeeklyScheduleResolver;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Verified;
@@ -34,6 +36,9 @@ final class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->registerDatabaseEncrypter();
+
+        // bind, not singleton: Octane keeps singletons across requests.
+        $this->app->bind(RecordPdfRenderer::class, BrowsershotRecordPdfRenderer::class);
     }
 
     /**
