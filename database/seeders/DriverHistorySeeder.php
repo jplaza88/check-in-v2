@@ -15,6 +15,7 @@ use Database\Factories\CheckInFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Date;
+use Random\RandomException;
 
 final class DriverHistorySeeder extends Seeder
 {
@@ -36,10 +37,6 @@ final class DriverHistorySeeder extends Seeder
 
     public function run(): void
     {
-        if (app()->isProduction()) {
-            return;
-        }
-
         $driver = User::query()->where('email', UserSeeder::ADMIN_EMAIL)->first();
 
         if (! $driver instanceof User) {
@@ -87,7 +84,8 @@ final class DriverHistorySeeder extends Seeder
     }
 
     /**
-     * @param  Collection<int, Location>  $locations
+     * @param Collection<int, Location> $locations
+     * @throws RandomException
      */
     private function seedAppointment(User $driver, Collection $locations, CarbonImmutable $when, int $index): void
     {
