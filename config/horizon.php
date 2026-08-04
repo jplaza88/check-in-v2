@@ -199,6 +199,28 @@ return [
     */
 
     'defaults' => [
+        /*
+         * PDF rendering spawns Chrome and takes seconds. Kept off the default
+         * queue so it cannot delay transactional check-in and appointment mail,
+         * and given more memory, a longer timeout and a retry, since a single
+         * Chrome hiccup would otherwise lose the driver's document for good.
+         *
+         * timeout must stay below config('queue.connections.redis.retry_after').
+         */
+        'supervisor-pdf' => [
+            'connection' => 'redis',
+            'queue' => ['pdf'],
+            'balance' => 'auto',
+            'autoScalingStrategy' => 'time',
+            'maxProcesses' => 1,
+            'maxTime' => 0,
+            'maxJobs' => 0,
+            'memory' => 256,
+            'tries' => 2,
+            'timeout' => 120,
+            'nice' => 5,
+        ],
+
         'supervisor-1' => [
             'connection' => 'redis',
             'queue' => ['default'],
@@ -221,6 +243,11 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
+            // Each process can hold a Chrome instance, so this is deliberately
+            // low relative to supervisor-1.
+            'supervisor-pdf' => [
+                'maxProcesses' => 3,
+            ],
         ],
 
         'staging' => [
@@ -229,11 +256,17 @@ return [
                 'balanceMaxShift' => 1,
                 'balanceCooldown' => 3,
             ],
+            'supervisor-pdf' => [
+                'maxProcesses' => 2,
+            ],
         ],
 
         'local' => [
             'supervisor-1' => [
                 'maxProcesses' => 3,
+            ],
+            'supervisor-pdf' => [
+                'maxProcesses' => 1,
             ],
         ],
     ],

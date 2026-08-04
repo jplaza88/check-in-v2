@@ -1,18 +1,28 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { LogOut, User as UserIcon } from 'lucide-react';
+import { LogOut, Settings, User as UserIcon } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { profile as accountProfile } from '@/routes/account';
+import {
+    profile as accountProfile,
+    settings as accountSettings,
+} from '@/routes/account';
 
 interface PageProps {
     auth: { user: { name: string; email: string } };
-    translations: { publicNavigation: { logout: string; editProfile: string } };
+    translations: {
+        publicNavigation: {
+            logout: string;
+            editProfile: string;
+            settings: string;
+        };
+    };
     [key: string]: unknown;
 }
 
@@ -37,7 +47,7 @@ export default function UserMenu() {
                 <button
                     type="button"
                     aria-label={auth.user.name}
-                    className="group cursor-pointer rounded-full outline-none transition-transform active:scale-95 focus-visible:ring-2 focus-visible:ring-brand-green/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-gray-900"
+                    className="group cursor-pointer rounded-full transition-transform outline-none focus-visible:ring-2 focus-visible:ring-brand-green/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white active:scale-95 dark:focus-visible:ring-offset-gray-900"
                 >
                     <Avatar className="size-9 shadow-sm ring-2 ring-white transition-shadow group-hover:shadow-md dark:ring-gray-800">
                         <AvatarFallback className="bg-gradient-to-br from-brand-green to-green-600 text-sm font-semibold text-white">
@@ -73,9 +83,14 @@ export default function UserMenu() {
                             {nav.editProfile}
                         </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onSelect={() => router.post('/logout')}
-                    >
+                    <DropdownMenuItem asChild>
+                        <Link href={accountSettings().url}>
+                            <Settings />
+                            {nav.settings}
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => router.post('/logout')}>
                         <LogOut />
                         {nav.logout}
                     </DropdownMenuItem>

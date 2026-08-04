@@ -1,15 +1,17 @@
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { format } from 'date-fns';
-import { Check, IdCard, Lock, User } from 'lucide-react';
-import type { FormEvent, ReactNode } from 'react';
+import { IdCard, Lock, User } from 'lucide-react';
+import type { FormEvent } from 'react';
 import { useMemo } from 'react';
 
 import { DatePicker } from '@/components/DatePickerTime';
 import LicenseCard from '@/components/LicenseCard';
+import { PhoneInput, formatUsPhone } from '@/components/PhoneInput';
+import SavedPill from '@/components/SavedPill';
+import SectionCard from '@/components/SectionCard';
 import { Button } from '@/components/ui/button';
 import { Field, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { PhoneInput, formatUsPhone } from '@/components/PhoneInput';
 import AccountLayout from '@/layouts/AccountLayout';
 import { US_STATES } from '@/lib/usStates';
 
@@ -55,53 +57,6 @@ interface PageProps {
     };
     translations: { accountProfile: AccountProfileTranslations };
     [key: string]: unknown;
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-function SavedPill({ label }: { label: string }) {
-    return (
-        <span className="inline-flex items-center gap-1 text-sm font-medium text-brand-green">
-            <Check className="h-4 w-4" />
-            {label}
-        </span>
-    );
-}
-
-function SectionCard({
-    icon,
-    heading,
-    subheading,
-    onSubmit,
-    children,
-}: {
-    icon: ReactNode;
-    heading: string;
-    subheading: string;
-    onSubmit: (event: FormEvent) => void;
-    children: ReactNode;
-}) {
-    return (
-        <form
-            onSubmit={onSubmit}
-            className="rounded-2xl border border-gray-200/80 bg-white p-6 shadow-sm ring-1 ring-black/[0.02] dark:border-gray-700/60 dark:bg-gray-800/50 dark:ring-white/[0.02]"
-        >
-            <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-green/10 text-brand-green">
-                    {icon}
-                </span>
-                <div className="min-w-0">
-                    <h2 className="text-base font-bold text-brand-grey dark:text-gray-100">
-                        {heading}
-                    </h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        {subheading}
-                    </p>
-                </div>
-            </div>
-            {children}
-        </form>
-    );
 }
 
 // ── Page ─────────────────────────────────────────────────────────────────────

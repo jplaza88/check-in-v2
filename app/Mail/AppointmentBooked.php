@@ -6,6 +6,7 @@ namespace App\Mail;
 
 use App\Address\AddressManager;
 use App\Models\Appointment;
+use App\Phone\PhoneFormatter;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
@@ -55,21 +56,9 @@ final class AppointmentBooked extends Mailable implements ShouldQueue
                     ['label' => 'Time', 'value' => $scheduledFor->format('g:i A T')],
                     ['label' => 'PO Number(s)', 'value' => implode(', ', $this->appointment->purchaseOrders->pluck('number')->all())],
                     ['label' => 'Driver', 'value' => $this->appointment->drivers_name],
-                    ['label' => "Driver's Phone Number", 'value' => $this->formatPhone($this->appointment->drivers_cellphone)],
+                    ['label' => "Driver's Phone Number", 'value' => resolve(PhoneFormatter::class)->format($this->appointment->drivers_cellphone)],
                 ],
             ],
         );
-    }
-
-    /**
-     * "+15551234567" -> "+1 (555) 123-4567" for readability.
-     */
-    private function formatPhone(string $phone): string
-    {
-        if (preg_match('/^\+1(\d{3})(\d{3})(\d{4})$/', $phone, $matches) === 1) {
-            return sprintf('+1 (%s) %s-%s', $matches[1], $matches[2], $matches[3]);
-        }
-
-        return $phone;
     }
 }

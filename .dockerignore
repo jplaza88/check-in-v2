@@ -1,7 +1,22 @@
 /vendor
 /node_modules
+# Host build artifacts. packages.php is generated with dev dependencies present,
+# so baking it in makes the image try to boot providers that composer
+# --no-dev never installed (e.g. laravel/boost).
+/bootstrap/cache
+# The image downloads its own Chrome in the node_deps stage; shipping the
+# host's 650 MB copy would only bloat the build context.
+/.puppeteer
 /public/build
 .git
 /tests
 .env*
 /storage/*.key
+# Local dev runtime and logs; the prod stage recreates the directories it needs.
+/storage/logs
+/frankenphp
+/frankenphp-worker.php
+# Scratch reference copy of the Mosaic template, not part of the app.
+/mosaic-react
+/mosaic-react.zip
+/.idea

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use App\Pdf\FakeRecordPdfRenderer;
+use App\Pdf\RecordPdfRenderer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Process;
@@ -28,6 +30,11 @@ pest()->extend(TestCase::class)
         Http::preventStrayRequests();
         Process::preventStrayProcesses();
         Sleep::fake();
+
+        // Browsershot shells out via Symfony's Process, which
+        // preventStrayProcesses() does not intercept, so an unfaked render
+        // would really spawn Chrome. The fake still renders the Blade view.
+        $this->swap(RecordPdfRenderer::class, new FakeRecordPdfRenderer);
 
         $this->freezeTime();
     })

@@ -16,7 +16,10 @@ ENV APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
 COPY . .
-RUN composer dump-autoload --optimize --no-dev   # runs package:discover with full app present
+# bootstrap/cache is dockerignored (host artifacts must not be baked in), so
+# package:discover needs the directory recreated before it can write to it.
+RUN mkdir -p bootstrap/cache \
+    && composer dump-autoload --optimize --no-dev   # runs package:discover with full app present
 
 # Frontend assets (needs PHP for wayfinder:generate, plus Node)
 FROM base AS frontend
@@ -28,9 +31,35 @@ ENV APP_KEY=base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
 # cannot change them afterwards. Must be present before `npm run build`.
 ARG VITE_APP_NAME="Martori Farms"
 ENV VITE_APP_NAME=${VITE_APP_NAME}
+# This stage only compiles assets. puppeteer is a runtime dependency, so its
+# postinstall would otherwise pull ~650MB of Chrome that never leaves the stage
+# -- and fail outright, since the base image has no unzip.
+ENV PUPPETEER_SKIP_DOWNLOAD=true
 COPY --from=vendor /app/vendor ./vendor
 COPY . .
+# The vendor stage's package:discover output, generated without dev packages.
+# The wayfinder vite plugin shells out to artisan, which cannot boot without it.
+COPY --from=vendor /app/bootstrap/cache ./bootstrap/cache
 RUN npm ci && npm run build
+
+# Production JS deps plus the Chrome that Browsershot drives. Separate from the
+# `frontend` stage so the dev tree (playwright, vite, tsc) never reaches the
+# runtime image, and so only these layers rebuild when app code changes.
+FROM base AS node_deps
+# unzip is required: @puppeteer/browsers extracts the Chrome archive with it and
+# fails with "no zip archiver is available" without it.
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs unzip \
+    && rm -rf /var/lib/apt/lists/*
+# .puppeteerrc.cjs points the cache at ./.puppeteer, inside the project, so it
+# can be COPY'd out. The default $HOME/.cache/puppeteer cannot.
+COPY package.json package-lock.json .puppeteerrc.cjs ./
+# Only chrome-headless-shell, not full Chrome: browser.cjs launches with
+# headless: 'shell', so the 389MB full build would never be used. Anything that
+# calls Browsershot->newHeadless() would need it and must add it back.
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+RUN npm ci --omit=dev \
+    && npx puppeteer browsers install chrome-headless-shell
 
 # Runtime — extensions and curl come from the shared base, so no reinstall here.
 FROM base AS prod
@@ -47,12 +76,28 @@ RUN { \
 # Deployed commit SHA, surfaced in-app via config('app.commit').
 ARG GIT_COMMIT=unknown
 ENV GIT_COMMIT=${GIT_COMMIT}
+# Chrome's shared libraries and base fonts, plus the Node that Browsershot
+# shells out to. None are present in the frankenphp image.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 \
+      libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libpango-1.0-0 \
+      libcairo2 libasound2 fonts-liberation \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --chown=www-data:www-data . .
 COPY --from=vendor --chown=www-data:www-data /app/vendor ./vendor
+COPY --from=vendor --chown=www-data:www-data /app/bootstrap/cache ./bootstrap/cache
 COPY --from=frontend --chown=www-data:www-data /app/public/build ./public/build
+COPY --from=node_deps --chown=www-data:www-data /app/node_modules ./node_modules
+COPY --from=node_deps --chown=www-data:www-data /app/.puppeteer ./.puppeteer
 RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views \
         storage/logs bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache
+# www-data's home is not writable; Chrome needs somewhere to put its user data
+# dir, and Browsershot writes temp files.
+ENV HOME=/tmp
 USER www-data
 EXPOSE 80
 HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=5 \

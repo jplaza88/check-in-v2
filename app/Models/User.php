@@ -11,6 +11,8 @@ use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -33,6 +35,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @property-read string|null $remember_token
  * @property-read CarbonImmutable $created_at
  * @property-read CarbonImmutable $updated_at
+ * @property-read Collection<int, CheckIn> $checkIns
+ * @property-read Collection<int, Appointment> $appointments
  */
 #[Fillable(['name', 'email', 'password', 'cellphone', 'drivers_license_number', 'drivers_license_state', 'drivers_license_expiration_date'])]
 #[Hidden(['password', 'remember_token', 'drivers_license_number'])]
@@ -56,6 +60,22 @@ final class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
+     * @return HasMany<CheckIn, $this>
+     */
+    public function checkIns(): HasMany
+    {
+        return $this->hasMany(CheckIn::class);
+    }
+
+    /**
+     * @return HasMany<Appointment, $this>
+     */
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    /**
      * Send the (queued) email verification notification in the driver's
      * current locale, captured now so the worker renders the right language.
      */
@@ -72,7 +92,7 @@ final class User extends Authenticatable implements MustVerifyEmail
      */
     public function sendPasswordResetNotification($token): void
     {
-        $this->notify((new ResetPassword($token))->locale(app()->getLocale()));
+        $this->notify(new ResetPassword($token)->locale(app()->getLocale()));
     }
 
     /**

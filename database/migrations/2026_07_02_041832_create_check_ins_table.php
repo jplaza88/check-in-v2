@@ -51,7 +51,9 @@ return new class extends Migration
 
             $table->index('location_id');
             $table->index(['drivers_cellphone', 'created_at']);
-            $table->index('user_id');
+            // Serves the driver history list, which filters by user and sorts
+            // by created_at. Covers plain user_id lookups as a leftmost prefix.
+            $table->index(['user_id', 'created_at']);
         });
     }
 

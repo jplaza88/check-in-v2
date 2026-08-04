@@ -7,9 +7,14 @@ namespace Database\Factories;
 use App\Enums\AppointmentStatus;
 use App\Models\Appointment;
 use App\Models\Location;
+use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
 
+/**
+ * @extends Factory<Appointment>
+ */
 final class AppointmentFactory extends Factory
 {
     protected $model = Appointment::class;
@@ -27,16 +32,104 @@ final class AppointmentFactory extends Factory
             'scheduled_for' => Date::now(),
             'drivers_name' => $this->faker->name(),
             'drivers_cellphone' => '+1'.$this->faker->numerify('##########'),
-            'status' => $this->faker->randomElement(AppointmentStatus::cases()),
-            'cancelled_at' => Date::now(),
-            'cancelled_reason' => $this->faker->word(),
-            'claimed_via' => $this->faker->word(),
-            'claimed_at' => Date::now(),
+            'locale' => $this->faker->randomElement(['en', 'es']),
+
+            // A freshly booked appointment is Scheduled and has never been
+            // cancelled or claimed. Those fields belong to the states below;
+            // setting them here produced rows that contradicted themselves,
+            // e.g. a "scheduled" appointment carrying a cancellation reason.
+            'status' => AppointmentStatus::Scheduled,
+            'cancelled_at' => null,
+            'cancelled_reason' => null,
+            'claimed_at' => null,
+            'claimed_via' => null,
+
             'created_at' => Date::now(),
             'updated_at' => Date::now(),
 
             'location_id' => Location::factory(),
             'user_id' => null,
         ];
+    }
+
+    /**
+     * Attach the appointment to a driver and mirror their details onto the record,
+     * the way CreateAppointmentAction does for an authenticated driver.
+     *
+     * Note this deliberately leaves claimed_at/claimed_via alone: those are only
+     * stamped by the post-registration claim flow. Use claimed() for that case.
+     */
+    public function forUser(User $user): static
+    {
+        return $this->state(fn (array $attributes): array => array_filter([
+            'user_id' => $user->id,
+            'drivers_name' => $user->name,
+            'drivers_cellphone' => $user->cellphone,
+        ], fn (mixed $value): bool => $value !== null));
+    }
+
+    public function atLocation(Location $location): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'location_id' => $location->id,
+        ]);
+    }
+
+    /**
+     * Set the appointment slot. created_at follows it for past appointments so a
+     * record is never booked after the slot it was booked for.
+     */
+    public function scheduledFor(CarbonInterface $when): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'scheduled_for' => $when,
+            'created_at' => $when->isPast() ? $when : Date::now(),
+            'updated_at' => $when->isPast() ? $when : Date::now(),
+        ]);
+    }
+
+    public function claimed(string $via = 'email_verification'): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'claimed_at' => Date::now(),
+            'claimed_via' => $via,
+        ]);
+    }
+
+    public function scheduled(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => AppointmentStatus::Scheduled,
+        ]);
+    }
+
+    public function completed(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => AppointmentStatus::Completed,
+        ]);
+    }
+
+    public function cancelled(?string $reason = null): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => AppointmentStatus::Cancelled,
+            'cancelled_at' => Date::now(),
+            'cancelled_reason' => $reason ?? $this->faker->sentence(),
+        ]);
+    }
+
+    public function noShow(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => AppointmentStatus::NoShow,
+        ]);
+    }
+
+    public function checkedIn(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'status' => AppointmentStatus::CheckedIn,
+        ]);
     }
 }

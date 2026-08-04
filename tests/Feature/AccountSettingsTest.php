@@ -1,0 +1,112 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Models\Location;
+use App\Models\User;
+use Inertia\Testing\AssertableInertia;
+
+use function Pest\Laravel\get;
+
+function settingsDriver(array $attributes = []): User
+{
+    return User::query()->create([
+        'name' => 'John Driver',
+        'email' => 'driver@example.com',
+        'password' => 'secret-password',
+        ...$attributes,
+    ]);
+}
+
+it('redirects guests to the login page', function (): void {
+    get(route('account.settings'))->assertRedirect(route('login'));
+});
+
+it('renders the settings page for an authenticated driver', function (): void {
+    $this->actingAs(settingsDriver())
+        ->get(route('account.settings'))
+        ->assertSuccessful()
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->component('Account/Settings')
+            ->has('locations')
+            ->has('hasCellphone'));
+});
+
+it('lists only active check-in locations for the usual-location picker', function (): void {
+    $enabled = Location::factory()->create([
+        'is_active' => true,
+        'is_checkins_enabled' => true,
+    ]);
+
+    Location::factory()->create([
+        'is_active' => false,
+        'is_checkins_enabled' => true,
+    ]);
+
+    Location::factory()->create([
+        'is_active' => true,
+        'is_checkins_enabled' => false,
+    ]);
+
+    $this->actingAs(settingsDriver())
+        ->get(route('account.settings'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->has('locations', 1)
+            ->where('locations.0.id', $enabled->uuid)
+            ->where('locations.0.name', $enabled->name));
+});
+
+it('reports whether a phone number is on file so the text-message option can be gated', function (): void {
+    $this->actingAs(settingsDriver())
+        ->get(route('account.settings'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('hasCellphone', false));
+
+    $this->actingAs(settingsDriver([
+        'email' => 'withphone@example.com',
+        'cellphone' => '+15551234567',
+    ]))
+        ->get(route('account.settings'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('hasCellphone', true));
+});
+
+it('ships the settings translations and nav label in every locale', function (string $locale, string $settingsLabel): void {
+    $this->actingAs(settingsDriver())
+        ->withSession(['locale' => $locale])
+        ->get(route('account.settings'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->has('translations.accountSettings.title')
+            ->has('translations.accountSettings.securityAlwaysEmail')
+            ->has('translations.accountSettings.deleteDialogConfirm')
+            ->where('translations.accountNav.settings', $settingsLabel)
+            ->where('translations.publicNavigation.settings', $settingsLabel));
+})->with([
+    'english' => ['en', 'Settings'],
+    'spanish' => ['es', 'Ajustes'],
+    'french' => ['fr', 'Réglages'],
+]);
+
+it('shares hasLicense with every account page so the header chip never vanishes', function (string $routeName): void {
+    $driver = settingsDriver(['drivers_license_number' => 'D1234567']);
+
+    $this->actingAs($driver)
+        ->get(route($routeName))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('hasLicense', true));
+})->with(['account', 'account.settings', 'account.history', 'account.profile']);
+
+it('does not share hasLicense outside the account area', function (): void {
+    $this->actingAs(settingsDriver())
+        ->get(route('home'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('hasLicense', null));
+});
+
+it('never leaks the encrypted licence number to the settings page', function (): void {
+    $driver = settingsDriver(['drivers_license_number' => 'D1234567']);
+
+    $response = $this->actingAs($driver)->get(route('account.settings'));
+
+    expect($response->getContent())->not->toContain('D1234567');
+});
