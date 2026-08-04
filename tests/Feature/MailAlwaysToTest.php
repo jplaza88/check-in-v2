@@ -52,7 +52,10 @@ it('redirects every recipient to the always_to inbox outside production', functi
 });
 
 it('leaves recipients alone when no always_to address is configured', function (): void {
-    expect(config('mail.always_to'))->toBeNull();
+    // Set explicitly rather than leaning on the ambient environment: .env.example
+    // ships `MAIL_ALWAYS_TO=`, so CI resolves the config to '' where a local .env
+    // without the key at all resolves it to null.
+    config(['mail.always_to' => null]);
 
     bootMailRedirect();
 
