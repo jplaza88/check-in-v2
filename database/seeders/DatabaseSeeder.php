@@ -27,15 +27,8 @@ final class DatabaseSeeder extends Seeder
             LocationSeeder::class,
             ScheduleSeeder::class,
             ScheduleOverrideSeeder::class,
+            UserSeeder::class,
+            DriverHistorySeeder::class,
         ]);
-
-        // Demo data only. The reference seeders above are production-safe;
-        // these create a known-credential account and fake driver history.
-        if (! app()->isProduction()) {
-            $this->call([
-                UserSeeder::class,
-                DriverHistorySeeder::class,
-            ]);
-        }
     }
 }
