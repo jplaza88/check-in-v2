@@ -13,9 +13,11 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-version: ['8.3', '8.4', '8.5']
+    # Single version on purpose. The app uses PHP 8.5-only syntax (the pipe
+    # operator, in app/Actions and the factories) and ships on 8.5, so the old
+    # 8.3/8.4 matrix legs could not even parse the source.
+    env:
+      PHP_VERSION: '8.5'
 
     steps:
       - name: Checkout code
@@ -24,17 +26,45 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: ${{ env.PHP_VERSION }}
           tools: composer:v2
-          coverage: xdebug
+          # This job runs `pest` with no coverage flag, so loading Xdebug only
+          # slowed every test down. Coverage thresholds are enforced by the
+          # `test:unit` composer script, which sets XDEBUG_MODE itself.
+          coverage: none
 
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
           node-version: '22'
+          cache: 'npm'
 
       - name: Install Node Dependencies
-        run: npm i
+        run: npm ci
+
+      # `pest` runs every suite, and phpunit.xml includes tests/Browser. npm ci
+      # installs the playwright package but not the browser binaries, so without
+      # this the Browser suite has nothing to drive.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Resolve Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ env.PHP_VERSION }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ env.PHP_VERSION }}-
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader

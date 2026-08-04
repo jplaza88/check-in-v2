@@ -18,15 +18,33 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Reclaim Docker disk space
         # Self-hosted runner: images and build cache accumulate across deploys
-        # and fill the disk. Prune before building so the new image has room.
-        # Runs first, so it never touches the fresh build; volumes are left
-        # alone (staging DB/redis data is safe) and running containers keep
-        # their images.
+        # and fill the disk. This used to prune everything unconditionally,
+        # which threw away the whole layer cache before every build - so each
+        # deploy recompiled the PHP extensions and re-downloaded composer, npm
+        # and Chrome from scratch. Keep the cache by default and only fall back
+        # to a full prune when the disk is actually low. Volumes are left alone
+        # (staging DB/redis data is safe) and running containers keep their
+        # images.
         run: |
           docker system df || true
           docker container prune -f || true
-          docker image prune -af || true
-          docker builder prune -af || true
+          docker image prune -f || true
+          available=$(df -BG --output=avail / | tail -1 | tr -dc '0-9')
+          if [ "${available:-0}" -lt 25 ]; then
+            echo "Only ${available}G free - dropping the build cache to make room."
+            docker image prune -af --filter "until=24h" || true
+            docker builder prune -af || true
+          else
+            # --keep-storage was renamed --max-used-space in newer buildx; pick
+            # whichever this runner's docker actually understands.
+            if docker builder prune --help 2>&1 | grep -q -- --max-used-space; then
+              cap=--max-used-space=20GB
+            else
+              cap=--keep-storage=20GB
+            fi
+            echo "${available}G free - keeping the build cache, capped at 20G ($cap)."
+            docker builder prune -f "$cap" || true
+          fi
           df -h / || true
       - name: Build image
         run: docker build --target prod --build-arg VITE_APP_NAME="${{ vars.VITE_APP_NAME || 'Martori Farms' }}" --build-arg GIT_COMMIT="${{ github.sha }}" -t ghcr.io/${{ github.repository }}:${{ github.sha }} -t ghcr.io/${{ github.repository }}:latest .

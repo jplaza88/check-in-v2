@@ -14,7 +14,7 @@ const QUIET_ZONE = 20;
 function code39Patterns(): array
 {
     /** @var array<string, string> $patterns */
-    $patterns = (new ReflectionClass(Code39::class))->getConstant('PATTERNS');
+    $patterns = new ReflectionClass(Code39::class)->getConstant('PATTERNS');
 
     return $patterns;
 }
