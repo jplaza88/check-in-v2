@@ -105,11 +105,31 @@ export default [
         },
     },
     {
+        // CommonJS config files run in Node, not the browser, so `require`,
+        // `module` and `__dirname` are legitimate there.
+        files: ['**/*.cjs'],
+        languageOptions: {
+            globals: {
+                ...globals.node,
+            },
+        },
+        rules: {
+            '@typescript-eslint/no-require-imports': 'off',
+        },
+    },
+    {
         ignores: [
             'vendor',
             'node_modules',
             'public',
             'bootstrap/ssr',
+            // Chrome's own bundled resources, downloaded by puppeteer's
+            // postinstall. Third-party build output, not our source.
+            '.puppeteer',
+            // Scratch reference copy of the Mosaic template, not part of the
+            // app. Untracked, so CI never sees it; ignoring it keeps a local
+            // lint run honest about what CI will actually report.
+            'mosaic-react',
             'tailwind.config.js',
             'vite.config.ts',
             'resources/js/actions/**',
