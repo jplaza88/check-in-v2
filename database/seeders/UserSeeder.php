@@ -17,12 +17,6 @@ final class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        if (app()->isProduction()) {
-            $this->command?->warn('UserSeeder skipped: refusing to seed a known-credential account in production.');
-
-            return;
-        }
-
         $password = config('app.seed_admin_password');
 
         User::query()->firstOrCreate(
