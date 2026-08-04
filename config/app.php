@@ -32,6 +32,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Seeded Admin Password
+    |--------------------------------------------------------------------------
+    |
+    | The password given to the known-credential admin account created by
+    | UserSeeder. Read through config for the same reason as the commit above:
+    | the seeder runs after `php artisan optimize` on deploy, and env() outside
+    | a config file returns null once the config is cached. Falls back to
+    | "password" for local development; UserSeeder refuses to run in production.
+    |
+    */
+
+    'seed_admin_password' => env('SEED_ADMIN_PASSWORD') ?: 'password',
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------
     |

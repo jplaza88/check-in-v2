@@ -23,7 +23,7 @@ final class UserSeeder extends Seeder
             return;
         }
 
-        $password = env('SEED_ADMIN_PASSWORD') ?: 'password';
+        $password = config('app.seed_admin_password');
 
         User::query()->firstOrCreate(
             ['email' => self::ADMIN_EMAIL],
