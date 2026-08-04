@@ -8,9 +8,11 @@ use App\Enums\UserHistoryEvent;
 use App\Models\User;
 use App\Models\UserHistory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Override;
 
 final class UserHistoryFactory extends Factory
 {
+    #[Override]
     protected $model = UserHistory::class;
 
     /**

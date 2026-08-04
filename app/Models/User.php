@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Override;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
@@ -52,6 +53,7 @@ final class User extends Authenticatable implements MustVerifyEmail
      *
      * @var array<string, mixed>
      */
+    #[Override]
     protected $attributes = [
         'cellphone' => null,
         'drivers_license_number' => null,

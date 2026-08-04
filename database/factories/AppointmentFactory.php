@@ -11,12 +11,14 @@ use App\Models\User;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
+use Override;
 
 /**
  * @extends Factory<Appointment>
  */
 final class AppointmentFactory extends Factory
 {
+    #[Override]
     protected $model = Appointment::class;
 
     public function definition(): array

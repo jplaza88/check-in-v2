@@ -84,7 +84,8 @@ final class DriverHistorySeeder extends Seeder
     }
 
     /**
-     * @param Collection<int, Location> $locations
+     * @param  Collection<int, Location>  $locations
+     *
      * @throws RandomException
      */
     private function seedAppointment(User $driver, Collection $locations, CarbonImmutable $when, int $index): void

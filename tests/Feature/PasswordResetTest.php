@@ -104,7 +104,7 @@ it('holds the forgot-password response to a constant-time floor', function (): v
 });
 
 it('builds the branded reset password mail', function (): void {
-    $mail = (new ResetPassword('tok-123'))->toMail(resetUser());
+    $mail = new ResetPassword('tok-123')->toMail(resetUser());
 
     expect($mail->view)->toBe('mail.reset-password')
         ->and($mail->subject)->toBe(__('messages.resetPasswordEmail.subject'))
@@ -112,7 +112,7 @@ it('builds the branded reset password mail', function (): void {
 });
 
 it('renders the logo, greeting, button, and reset link', function (): void {
-    $mail = (new ResetPassword('tok-123'))->toMail(resetUser());
+    $mail = new ResetPassword('tok-123')->toMail(resetUser());
 
     $html = view($mail->view, $mail->viewData)->render();
 
@@ -126,7 +126,7 @@ it('renders the logo, greeting, button, and reset link', function (): void {
 it('localizes the reset password mail for the driver locale', function (): void {
     app()->setLocale('es');
 
-    $mail = (new ResetPassword('tok-123'))->toMail(resetUser());
+    $mail = new ResetPassword('tok-123')->toMail(resetUser());
     $html = view($mail->view, $mail->viewData)->render();
 
     expect($mail->subject)->toBe(__('messages.resetPasswordEmail.subject', [], 'es'))
