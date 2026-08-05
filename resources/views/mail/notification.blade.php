@@ -18,12 +18,10 @@
             <td align="center">
                 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%;">
 
-                    {{-- Brand header --}}
+                    {{-- Brand header: logo with a text alt so the email stays branded when images are blocked --}}
                     <tr>
                         <td style="padding:0 4px 16px;">
-                            <span style="font-size:15px; font-weight:700; letter-spacing:0.5px; color:#575876;">
-                                {{ config('app.name') }}
-                            </span>
+                            <img src="{{ asset('logo.png') }}" alt="{{ config('app.name') }}" width="140" style="display:block; width:140px; max-width:60%; height:auto; border:0;">
                         </td>
                     </tr>
 
