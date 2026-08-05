@@ -35,6 +35,9 @@ final class DriverHistorySeeder extends Seeder
         [366, 900, 8, 5],
     ];
 
+    /**
+     * @throws RandomException
+     */
     public function run(): void
     {
         $driver = User::query()->where('email', UserSeeder::ADMIN_EMAIL)->first();

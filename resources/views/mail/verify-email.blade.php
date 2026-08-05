@@ -21,7 +21,7 @@
                     {{-- Brand header: logo with a text alt so the email stays branded when images are blocked --}}
                     <tr>
                         <td align="center" style="padding:8px 4px 24px;">
-                            <img src="{{ asset('logo.png') }}" alt="{{ config('app.name') }}" width="200" style="display:block; width:200px; max-width:60%; height:auto; border:0;">
+                            <img src="{{ asset('logo.png') }}" alt="{{ config('app.name') }}" width="140" style="display:block; width:140px; max-width:60%; height:auto; border:0;">
                         </td>
                     </tr>
 
