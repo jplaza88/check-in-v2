@@ -26,6 +26,15 @@ it('renders every settings section without console errors', function (): void {
         ->assertSee('Notifications')
         ->assertSee('Security')
         ->assertSee('Delete account')
+        // The three theme segments, including the System option that maps to a null column.
+        ->assertSee('Light')
+        ->assertSee('Dark')
+        ->assertSee('System')
+        ->assertSee('Usual location')
+        // Both copy toggles, plus the footnote that explains why only the reminder can be a text.
+        ->assertSee('Send me a copy of each check-in')
+        ->assertSee('Send me a copy of each appointment booking')
+        ->assertSee('The appointment reminder is the only message we can also send as a text.')
         ->assertNoJavascriptErrors()
         ->assertNoConsoleLogs();
 });

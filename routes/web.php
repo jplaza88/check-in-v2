@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AccountSettingsController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CheckInController;
 use App\Http\Controllers\CheckInDistanceController;
@@ -55,7 +56,11 @@ Route::middleware('setLocale')->group(function (): void {
     Route::middleware('auth')->group(function (): void {
         Route::get('/account', [AccountController::class, 'index'])->name('account');
         Route::get('/account/profile', [AccountController::class, 'editProfile'])->name('account.profile');
-        Route::get('/account/settings', [AccountController::class, 'settings'])->name('account.settings');
+        Route::get('/account/settings', [AccountSettingsController::class, 'index'])->name('account.settings');
+
+        Route::middleware('throttle:30,1')
+            ->patch('/account/settings', [AccountSettingsController::class, 'update'])
+            ->name('account.settings.update');
 
         Route::get('/account/history', [AccountController::class, 'history'])
             ->name('account.history');

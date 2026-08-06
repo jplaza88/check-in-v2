@@ -1,0 +1,101 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\UpdateAccountSettingsRequest;
+use App\Models\Location;
+use App\Models\User;
+use App\Queries\AppointmentLocations;
+use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Collection;
+use Illuminate\Validation\ValidationException;
+use Inertia\Response;
+
+final class AccountSettingsController extends Controller
+{
+    public function __construct(private readonly AppointmentLocations $locations) {}
+
+    public function index(#[CurrentUser] User $user): Response
+    {
+        $bookable = $this->locations->execute();
+
+        return inertia('Account/Settings', [
+            // Drives the usual-location picker. Bookable locations, not checkable-in ones: the preference
+            // only steers the appointment flow, since check-in ordering comes from the driver's coordinates.
+            'locations' => $bookable
+                ->map(fn (Location $location): array => [
+                    'id' => $location->uuid,
+                    'name' => $location->name,
+                ])
+                ->values()
+                ->all(),
+            // Resolved through the bookable set rather than the relation, so a location that has since been
+            // soft-deleted or had appointments disabled reads as "none" instead of showing an unpickable option.
+            'locationId' => $this->currentLocationUuid($user, $bookable),
+            // The text-message channel is unusable without a number on file,
+            // so the option is disabled rather than silently failing to deliver.
+            'hasCellphone' => $user->cellphone !== null,
+        ]);
+    }
+
+    /**
+     * @throws ValidationException
+     */
+    public function update(UpdateAccountSettingsRequest $request, #[CurrentUser] User $user): RedirectResponse
+    {
+        $attributes = [];
+
+        if ($request->hasTheme()) {
+            $attributes['theme'] = $request->theme();
+        }
+
+        if ($request->hasLocation()) {
+            $attributes['location_id'] = $this->resolveLocationId($request->locationUuid());
+        }
+
+        if ($attributes !== []) {
+            $user->forceFill($attributes)->save();
+        }
+
+        // The page confirms via useForm's recentlySuccessful, the pattern the
+        // profile page already uses; there is no flash plumbing in this app.
+        return back();
+    }
+
+    /**
+     * Trades the public uuid for the primary key, refusing anything the driver could not have booked at.
+     *
+     * @throws ValidationException
+     */
+    private function resolveLocationId(?string $uuid): ?int
+    {
+        if ($uuid === null) {
+            return null;
+        }
+
+        $location = $this->locations->execute()->firstWhere('uuid', $uuid);
+
+        if (! $location instanceof Location) {
+            throw ValidationException::withMessages([
+                'location_id' => __('validation.exists', ['attribute' => 'location']),
+            ]);
+        }
+
+        return $location->id;
+    }
+
+    /**
+     * @param  Collection<int, Location>  $bookable
+     */
+    private function currentLocationUuid(User $user, Collection $bookable): ?string
+    {
+        if ($user->location_id === null) {
+            return null;
+        }
+
+        return $bookable->firstWhere('id', $user->location_id)?->uuid;
+    }
+}

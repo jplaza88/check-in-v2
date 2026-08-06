@@ -129,8 +129,9 @@ return [
         'themeDescription' => 'Use a dark screen at night.',
         'themeLight' => 'Light',
         'themeDark' => 'Dark',
+        'themeSystem' => 'System',
         'defaultLocationLabel' => 'Usual location',
-        'defaultLocationDescription' => 'We will select this first when you check in.',
+        'defaultLocationDescription' => 'We will list this first when you book an appointment.',
         'defaultLocationNone' => 'No usual location',
 
         'notificationsHeading' => 'Notifications',
@@ -142,8 +143,11 @@ return [
         'channelNeedsPhone' => 'Add your phone number first',
         'checkInCopyLabel' => 'Send me a copy of each check-in',
         'checkInCopyDescription' => 'A receipt with your reference number.',
+        'appointmentCopyLabel' => 'Send me a copy of each appointment booking',
+        'appointmentCopyDescription' => 'A confirmation with your reference number, date and location.',
         'appointmentReminderLabel' => 'Remind me before an appointment',
         'appointmentReminderDescription' => 'A reminder the day before.',
+        'copiesAlwaysEmail' => 'Your copies always come by email, because each one carries a receipt you can keep. The appointment reminder is the only message we can also send as a text.',
         'securityAlwaysEmail' => 'Password resets and account security messages always come by email, so we can keep your account safe. This setting does not change those.',
 
         'securityHeading' => 'Security',
@@ -406,6 +410,7 @@ return [
         'closedForCheckInWithoutReason' => ':name is not available for check-in right now.',
         'closedForCheckInToday' => ':name is closed for check-in today. Please come back during posted hours.',
         'selectLocationToContinue' => 'Please select a location to continue.',
+        'retryLocation' => 'Try again',
     ],
 
     'appointmentSelectLocation' => [
@@ -413,6 +418,7 @@ return [
         'closed' => 'Closed',
         'open' => 'Open',
         'nearest' => 'Nearest',
+        'yourUsual' => 'Your usual',
         'specialHoursToday' => 'Special hours today',
         'closingSoon' => 'Closing soon',
         'closedToday' => 'Closed today',

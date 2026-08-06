@@ -24,6 +24,9 @@ return new class extends Migration
             $table->text('drivers_license_number')->nullable();
             $table->string('drivers_license_state')->nullable();
             $table->date('drivers_license_expiration_date')->nullable();
+            $table->string('locale', 5)->nullable();
+            $table->string('theme')->nullable();
+            $table->foreignId('location_id')->nullable()->constrained('locations')->nullOnDelete();
             $table->unsignedBigInteger('pending_check_in_id')->nullable();
             $table->unsignedBigInteger('pending_appointment_id')->nullable();
             $table->text('two_factor_secret')->nullable();

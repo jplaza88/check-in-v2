@@ -32,20 +32,25 @@ it('renders the settings page for an authenticated driver', function (): void {
             ->has('hasCellphone'));
 });
 
-it('lists only active check-in locations for the usual-location picker', function (): void {
+/*
+ * Bookable locations, not checkable-in ones: the preference only steers the appointment flow, so
+ * offering a location that the appointment picker never lists would be a dead choice.
+ */
+it('lists only active appointment locations for the usual-location picker', function (): void {
     $enabled = Location::factory()->create([
         'is_active' => true,
-        'is_checkins_enabled' => true,
+        'is_appointments_enabled' => true,
     ]);
 
     Location::factory()->create([
         'is_active' => false,
-        'is_checkins_enabled' => true,
+        'is_appointments_enabled' => true,
     ]);
 
     Location::factory()->create([
         'is_active' => true,
-        'is_checkins_enabled' => false,
+        'is_appointments_enabled' => false,
+        'is_checkins_enabled' => true,
     ]);
 
     $this->actingAs(settingsDriver())
@@ -54,6 +59,51 @@ it('lists only active check-in locations for the usual-location picker', functio
             ->has('locations', 1)
             ->where('locations.0.id', $enabled->uuid)
             ->where('locations.0.name', $enabled->name));
+});
+
+it('passes the stored usual location back as a uuid', function (): void {
+    $location = Location::factory()->create([
+        'is_active' => true,
+        'is_appointments_enabled' => true,
+    ]);
+
+    $driver = settingsDriver();
+    $driver->forceFill(['location_id' => $location->id])->save();
+
+    $this->actingAs($driver)
+        ->get(route('account.settings'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('locationId', $location->uuid));
+});
+
+it('reports no usual location once the stored one stops being bookable', function (): void {
+    $location = Location::factory()->create([
+        'is_active' => true,
+        'is_appointments_enabled' => false,
+    ]);
+
+    $driver = settingsDriver();
+    $driver->forceFill(['location_id' => $location->id])->save();
+
+    $this->actingAs($driver)
+        ->get(route('account.settings'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('locationId', null));
+});
+
+it('keeps the raw location foreign key out of the shared auth user', function (): void {
+    $location = Location::factory()->create([
+        'is_active' => true,
+        'is_appointments_enabled' => true,
+    ]);
+
+    $driver = settingsDriver();
+    $driver->forceFill(['location_id' => $location->id])->save();
+
+    $this->actingAs($driver)
+        ->get(route('account.settings'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->missing('auth.user.location_id'));
 });
 
 it('reports whether a phone number is on file so the text-message option can be gated', function (): void {
@@ -77,6 +127,9 @@ it('ships the settings translations and nav label in every locale', function (st
         ->get(route('account.settings'))
         ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
             ->has('translations.accountSettings.title')
+            ->has('translations.accountSettings.appointmentCopyLabel')
+            ->has('translations.accountSettings.appointmentCopyDescription')
+            ->has('translations.accountSettings.copiesAlwaysEmail')
             ->has('translations.accountSettings.securityAlwaysEmail')
             ->has('translations.accountSettings.deleteDialogConfirm')
             ->where('translations.accountNav.settings', $settingsLabel)

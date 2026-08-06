@@ -1,7 +1,9 @@
 import { useThemeProvider } from '@/utils/ThemeContext';
 
 export default function ThemeToggle() {
-  const { currentTheme, changeCurrentTheme } = useThemeProvider();
+  // Keys off the resolved theme, not the stored choice: a driver following the OS still needs the
+  // switch to show what they are actually looking at, and tapping it commits to the opposite.
+  const { resolvedTheme, changeCurrentTheme } = useThemeProvider();
 
   return (
       <div>
@@ -10,10 +12,10 @@ export default function ThemeToggle() {
               name="light-switch"
               id="light-switch"
               className="light-switch sr-only"
-              checked={currentTheme === 'light'}
+              checked={resolvedTheme === 'light'}
               onChange={() =>
                   changeCurrentTheme(
-                      currentTheme === 'light' ? 'dark' : 'light',
+                      resolvedTheme === 'light' ? 'dark' : 'light',
                   )
               }
           />

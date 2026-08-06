@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { update } from '@/actions/App/Http/Controllers/AccountSettingsController';
 import LocaleController from '@/actions/App/Http/Controllers/LocaleController';
 import SavedPill from '@/components/SavedPill';
 import SectionCard from '@/components/SectionCard';
@@ -51,6 +52,7 @@ interface SettingsTranslations {
     themeDescription: string;
     themeLight: string;
     themeDark: string;
+    themeSystem: string;
     defaultLocationLabel: string;
     defaultLocationDescription: string;
     defaultLocationNone: string;
@@ -63,8 +65,11 @@ interface SettingsTranslations {
     channelNeedsPhone: string;
     checkInCopyLabel: string;
     checkInCopyDescription: string;
+    appointmentCopyLabel: string;
+    appointmentCopyDescription: string;
     appointmentReminderLabel: string;
     appointmentReminderDescription: string;
+    copiesAlwaysEmail: string;
     securityAlwaysEmail: string;
     securityHeading: string;
     securitySubheading: string;
@@ -91,6 +96,7 @@ interface SettingsTranslations {
 
 interface PageProps {
     locations: { id: string; name: string }[];
+    locationId: string | null;
     hasCellphone: boolean;
     currentLocale: string;
     localesLabels: Record<string, string>;
@@ -110,6 +116,7 @@ const SELECT_CLASSES =
 export default function Settings() {
     const {
         locations,
+        locationId,
         hasCellphone,
         currentLocale,
         localesLabels,
@@ -119,13 +126,36 @@ export default function Settings() {
 
     const { currentTheme, changeCurrentTheme } = useThemeProvider();
 
-    // No preference schema exists yet, so these live in component state and
-    // reset on reload. Nothing here fakes a save.
+    // Notifications have no preference schema yet, so these live in component
+    // state and reset on reload. Nothing here fakes a save.
     const [channel, setChannel] = useState<Channel>('email');
     const [checkInCopy, setCheckInCopy] = useState(true);
+    const [appointmentCopy, setAppointmentCopy] = useState(true);
     const [appointmentReminder, setAppointmentReminder] = useState(true);
-    const [defaultLocation, setDefaultLocation] = useState('');
+
     const [locationCleared, setLocationCleared] = useState(false);
+
+    // Saves on change rather than behind a button: it is a single select, and the row has nowhere
+    // natural to put a submit control without unbalancing the others in the card. Driven by router
+    // rather than useForm because useForm reads `data` from the render closure, so setting it and
+    // submitting in the same handler would post the previous selection.
+    const [usualLocation, setUsualLocation] = useState(locationId ?? '');
+    const [usualLocationSaved, setUsualLocationSaved] = useState(false);
+
+    const saveUsualLocation = (value: string) => {
+        setUsualLocation(value);
+        setUsualLocationSaved(false);
+
+        router.patch(
+            update.url(),
+            { location_id: value === '' ? null : value },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => setUsualLocationSaved(true),
+            },
+        );
+    };
 
     const switchLocale = (code: string) => {
         if (code === currentLocale) {
@@ -194,11 +224,7 @@ export default function Settings() {
                             control={
                                 <SegmentedControl
                                     label={t.themeLabel}
-                                    value={
-                                        currentTheme === 'light'
-                                            ? 'light'
-                                            : 'dark'
-                                    }
+                                    value={currentTheme}
                                     onChange={changeCurrentTheme}
                                     segments={[
                                         {
@@ -206,6 +232,10 @@ export default function Settings() {
                                             label: t.themeLight,
                                         },
                                         { value: 'dark', label: t.themeDark },
+                                        {
+                                            value: 'system',
+                                            label: t.themeSystem,
+                                        },
                                     ]}
                                 />
                             }
@@ -217,26 +247,31 @@ export default function Settings() {
                             label={t.defaultLocationLabel}
                             description={t.defaultLocationDescription}
                             control={
-                                <select
-                                    aria-label={t.defaultLocationLabel}
-                                    value={defaultLocation}
-                                    onChange={(e) =>
-                                        setDefaultLocation(e.target.value)
-                                    }
-                                    className={SELECT_CLASSES}
-                                >
-                                    <option value="">
-                                        {t.defaultLocationNone}
-                                    </option>
-                                    {locations.map((location) => (
-                                        <option
-                                            key={location.id}
-                                            value={location.id}
-                                        >
-                                            {location.name}
+                                <div className="space-y-2">
+                                    <select
+                                        aria-label={t.defaultLocationLabel}
+                                        value={usualLocation}
+                                        onChange={(e) =>
+                                            saveUsualLocation(e.target.value)
+                                        }
+                                        className={SELECT_CLASSES}
+                                    >
+                                        <option value="">
+                                            {t.defaultLocationNone}
                                         </option>
-                                    ))}
-                                </select>
+                                        {locations.map((location) => (
+                                            <option
+                                                key={location.id}
+                                                value={location.id}
+                                            >
+                                                {location.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {usualLocationSaved && (
+                                        <SavedPill label={t.saved} />
+                                    )}
+                                </div>
                             }
                         />
                     </div>
@@ -304,6 +339,18 @@ export default function Settings() {
                         />
 
                         <SettingRow
+                            label={t.appointmentCopyLabel}
+                            description={t.appointmentCopyDescription}
+                            control={
+                                <Switch
+                                    checked={appointmentCopy}
+                                    onCheckedChange={setAppointmentCopy}
+                                    aria-label={t.appointmentCopyLabel}
+                                />
+                            }
+                        />
+
+                        <SettingRow
                             label={t.appointmentReminderLabel}
                             description={t.appointmentReminderDescription}
                             control={
@@ -316,9 +363,15 @@ export default function Settings() {
                         />
                     </div>
 
-                    <p className="px-6 py-4 text-xs text-gray-500 dark:text-gray-400">
-                        {t.securityAlwaysEmail}
-                    </p>
+                    {/*
+                     * The channel picker sits above three toggles but only steers one of them, so
+                     * say which. Same footnote treatment as the password-reset line below it: the
+                     * exceptions live next to the control they qualify, not in a help page.
+                     */}
+                    <div className="space-y-2 px-6 py-4 text-xs text-gray-500 dark:text-gray-400">
+                        <p>{t.copiesAlwaysEmail}</p>
+                        <p>{t.securityAlwaysEmail}</p>
+                    </div>
                 </SectionCard>
 
                 {/* Security */}

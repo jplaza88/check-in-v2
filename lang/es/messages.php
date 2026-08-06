@@ -126,8 +126,9 @@ return [
         'themeDescription' => 'Usa la pantalla oscura de noche.',
         'themeLight' => 'Clara',
         'themeDark' => 'Oscura',
+        'themeSystem' => 'Sistema',
         'defaultLocationLabel' => 'Lugar habitual',
-        'defaultLocationDescription' => 'Lo elegiremos primero cuando te registres.',
+        'defaultLocationDescription' => 'Lo mostraremos primero cuando agendes una cita.',
         'defaultLocationNone' => 'Sin lugar habitual',
 
         'notificationsHeading' => 'Avisos',
@@ -139,8 +140,11 @@ return [
         'channelNeedsPhone' => 'Agrega tu número primero',
         'checkInCopyLabel' => 'Envíame una copia de cada registro',
         'checkInCopyDescription' => 'Un comprobante con tu número de referencia.',
+        'appointmentCopyLabel' => 'Envíame una copia de cada cita que agende',
+        'appointmentCopyDescription' => 'Una confirmación con tu número de referencia, la fecha y el lugar.',
         'appointmentReminderLabel' => 'Recuérdame antes de una cita',
         'appointmentReminderDescription' => 'Un recordatorio el día anterior.',
+        'copiesAlwaysEmail' => 'Tus copias siempre llegan por correo, porque cada una incluye un comprobante que puedes guardar. El recordatorio de cita es el único aviso que también podemos enviarte por mensaje de texto.',
         'securityAlwaysEmail' => 'Los cambios de contraseña y los mensajes de seguridad siempre llegan por correo, para mantener tu cuenta protegida. Esta opción no cambia eso.',
 
         'securityHeading' => 'Seguridad',
@@ -392,6 +396,7 @@ return [
         'checkInUnavailable' => 'Registro no disponible',
         'outsideExceptionHours' => ':name tiene horario especial hoy: :open - :close. Por favor regrese durante el horario de atención.',
         'selectLocationToContinue' => 'Por favor seleccione una ubicación para continuar.',
+        'retryLocation' => 'Intentar de nuevo',
     ],
 
     'appointmentSelectLocation' => [
@@ -399,6 +404,7 @@ return [
         'closed' => 'Cerrado',
         'open' => 'Abierto',
         'nearest' => 'Más cercano',
+        'yourUsual' => 'Tu habitual',
         'specialHoursToday' => 'Horario especial hoy',
         'closingSoon' => 'Cierra pronto',
         'closedToday' => 'Cerrado hoy',

@@ -126,8 +126,9 @@ return [
         'themeDescription' => 'Utilisez un écran sombre la nuit.',
         'themeLight' => 'Clair',
         'themeDark' => 'Sombre',
+        'themeSystem' => 'Système',
         'defaultLocationLabel' => 'Site habituel',
-        'defaultLocationDescription' => 'Nous le choisirons en premier à votre arrivée.',
+        'defaultLocationDescription' => 'Nous le placerons en premier lors de la prise de rendez-vous.',
         'defaultLocationNone' => 'Aucun site habituel',
 
         'notificationsHeading' => 'Alertes',
@@ -139,8 +140,11 @@ return [
         'channelNeedsPhone' => "Ajoutez d'abord votre numéro",
         'checkInCopyLabel' => 'Envoyez-moi une copie de chaque enregistrement',
         'checkInCopyDescription' => 'Un reçu avec votre numéro de référence.',
+        'appointmentCopyLabel' => 'Envoyez-moi une copie de chaque rendez-vous réservé',
+        'appointmentCopyDescription' => 'Une confirmation avec votre numéro de référence, la date et le lieu.',
         'appointmentReminderLabel' => 'Rappelez-moi avant un rendez-vous',
         'appointmentReminderDescription' => 'Un rappel la veille.',
+        'copiesAlwaysEmail' => 'Vos copies arrivent toujours par e-mail, car chacune contient un reçu que vous pouvez conserver. Le rappel de rendez-vous est le seul message que nous pouvons aussi envoyer par SMS.',
         'securityAlwaysEmail' => "Les réinitialisations de mot de passe et les messages de sécurité arrivent toujours par e-mail, pour protéger votre compte. Ce réglage n'y change rien.",
 
         'securityHeading' => 'Sécurité',
@@ -392,6 +396,7 @@ return [
         'checkInUnavailable' => 'Enregistrement non disponible',
         'outsideExceptionHours' => ":name a des horaires spéciaux aujourd'hui : :open - :close. Veuillez revenir pendant les heures d'ouverture.",
         'selectLocationToContinue' => 'Veuillez sélectionner un emplacement pour continuer.',
+        'retryLocation' => 'Réessayer',
     ],
 
     'appointmentSelectLocation' => [
@@ -399,6 +404,7 @@ return [
         'closed' => 'Fermé',
         'open' => 'Ouvert',
         'nearest' => 'Le plus proche',
+        'yourUsual' => 'Votre site habituel',
         'specialHoursToday' => "Horaires spéciaux aujourd'hui",
         'closingSoon' => 'Ferme bientôt',
         'closedToday' => "Fermé aujourd'hui",
