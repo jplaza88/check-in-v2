@@ -147,7 +147,7 @@ return [
         'appointmentCopyDescription' => 'A confirmation with your reference number, date and location.',
         'appointmentReminderLabel' => 'Remind me before an appointment',
         'appointmentReminderDescription' => 'A reminder the day before.',
-        'copiesAlwaysEmail' => 'Your copies always come by email, because each one carries a receipt you can keep. The appointment reminder is the only message we can also send as a text.',
+        'copiesAlwaysEmail' => 'A text gives you the reference number and a link to the full details. The PDF receipt only comes by email, so choose Both if you want the paperwork as well.',
         'securityAlwaysEmail' => 'Password resets and account security messages always come by email, so we can keep your account safe. This setting does not change those.',
 
         'securityHeading' => 'Security',
@@ -204,6 +204,41 @@ return [
         'statusScheduled' => 'Scheduled',
         'statusNoShow' => 'No show',
         'statusCheckedIn' => 'Checked in',
+    ],
+
+    'checkInCopyEmail' => [
+        'subject' => 'Your check-in :reference at :location',
+        'preheader' => 'Your copy of the check-in at :location.',
+        'eyebrow' => 'Your copy',
+        'title' => 'You are checked in',
+        'intro' => 'Here is your copy. The PDF receipt is attached; keep it for your records or forward it to your dispatcher.',
+    ],
+
+    'appointmentCopyEmail' => [
+        'subject' => 'Your appointment :reference at :location',
+        'preheader' => 'Your copy of the booking at :location.',
+        'eyebrow' => 'Your copy',
+        'title' => 'Your appointment is booked',
+        'intro' => 'Here is your copy. The PDF confirmation is attached; keep it for your records or forward it to your dispatcher.',
+    ],
+
+    /*
+     * One text message is 160 GSM-7 characters and the driver is billed for a
+     * second, so the budget is tight: the link alone is ~90 of it, since the
+     * uuid is 36 and the domain is longer in production than in development.
+     *
+     * That leaves no room for the location name, which is the one variable-width
+     * value here and could be anything an admin types - so it stays out, and the
+     * linked page carries it along with the time and the rest of the detail. The
+     * app name does stay: a bare link from an unknown number is indistinguishable
+     * from a phishing text. :url requires signing in.
+     */
+    'checkInCopySms' => [
+        'body' => ':app: you are checked in. Ref :reference. :url',
+    ],
+
+    'appointmentCopySms' => [
+        'body' => ':app: your appointment is booked. Ref :reference. :url',
     ],
 
     'recordDocumentEmail' => [

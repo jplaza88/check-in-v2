@@ -16,6 +16,7 @@ final readonly class BookAppointmentAction
         private CreateAppointmentAction $createAppointment,
         private CreatePurchaseOrdersAction $createPurchaseOrders,
         private SendAppointmentBookedEmailAction $sendAppointmentBookedEmail,
+        private SendAppointmentCopyAction $sendAppointmentCopy,
     ) {}
 
     /**
@@ -36,6 +37,9 @@ final readonly class BookAppointmentAction
         // Queued after the commit so the notification never references an
         // appointment that was rolled back.
         $this->sendAppointmentBookedEmail->handle($appointment);
+
+        // The driver's own copy, if they are signed in and have asked for it.
+        $this->sendAppointmentCopy->handle($appointment);
 
         return $appointment;
     }

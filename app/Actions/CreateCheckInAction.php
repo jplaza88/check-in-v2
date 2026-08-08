@@ -7,6 +7,7 @@ namespace App\Actions;
 use App\DTOs\CheckInLocationDTO;
 use App\Enums\CheckInErpStatus;
 use App\Enums\CheckInStatus;
+use App\Enums\RecordHistoryEvent;
 use App\Locale\LocaleManager;
 use App\Models\CheckIn;
 use App\Models\Location;
@@ -19,7 +20,10 @@ use RuntimeException;
 
 final readonly class CreateCheckInAction
 {
-    public function __construct(private LocaleManager $localeManager) {}
+    public function __construct(
+        private LocaleManager $localeManager,
+        private RecordHistoryAction $history,
+    ) {}
 
     /**
      * @param  array<string, mixed>  $validated
@@ -33,7 +37,7 @@ final readonly class CreateCheckInAction
 
         throw_if(! $location instanceof Location, RuntimeException::class, 'Invalid location');
 
-        return CheckIn::query()->create([
+        $checkIn = CheckIn::query()->create([
             ...Arr::except($validated, ['po_numbers']),
             'uuid' => Str::uuid()->toString(),
             'reference_number' => $this->generateReferenceNumber(),
@@ -43,6 +47,15 @@ final readonly class CreateCheckInAction
             'erp_status' => CheckInErpStatus::Pending,
             'locale' => $this->localeManager->getLocale(request()),
         ]);
+
+        // The opening row of the trail an admin reads.
+        $this->history->handle(
+            record: $checkIn,
+            event: RecordHistoryEvent::Created,
+            context: ['guest' => ! $user instanceof User],
+        );
+
+        return $checkIn;
     }
 
     /**

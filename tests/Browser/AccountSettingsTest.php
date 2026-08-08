@@ -31,10 +31,10 @@ it('renders every settings section without console errors', function (): void {
         ->assertSee('Dark')
         ->assertSee('System')
         ->assertSee('Usual location')
-        // Both copy toggles, plus the footnote that explains why only the reminder can be a text.
+        // Both copy toggles, plus the footnote explaining what a text carries that an email does not.
         ->assertSee('Send me a copy of each check-in')
         ->assertSee('Send me a copy of each appointment booking')
-        ->assertSee('The appointment reminder is the only message we can also send as a text.')
+        ->assertSee('The PDF receipt only comes by email')
         ->assertNoJavascriptErrors()
         ->assertNoConsoleLogs();
 });

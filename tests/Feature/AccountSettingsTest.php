@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\NotificationChannel;
 use App\Models\Location;
 use App\Models\User;
 use Inertia\Testing\AssertableInertia;
@@ -119,6 +120,35 @@ it('reports whether a phone number is on file so the text-message option can be 
         ->get(route('account.settings'))
         ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
             ->where('hasCellphone', true));
+});
+
+/*
+ * All three toggles default on and the channel defaults to email, so a driver
+ * who has never opened this page still receives their copies.
+ */
+it('passes the notification preferences, defaulting to everything on by email', function (): void {
+    $this->actingAs(settingsDriver())
+        ->get(route('account.settings'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('notifications.checkInCopy', true)
+            ->where('notifications.appointmentCopy', true)
+            ->where('notifications.appointmentReminder', true)
+            ->where('notifications.channel', 'email'));
+});
+
+it('passes the stored notification preferences back', function (): void {
+    $driver = settingsDriver();
+    $driver->forceFill([
+        'notify_check_in_copy' => false,
+        'notification_channel' => NotificationChannel::Both,
+    ])->save();
+
+    $this->actingAs($driver)
+        ->get(route('account.settings'))
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('notifications.checkInCopy', false)
+            ->where('notifications.appointmentCopy', true)
+            ->where('notifications.channel', 'both'));
 });
 
 it('ships the settings translations and nav label in every locale', function (string $locale, string $settingsLabel): void {

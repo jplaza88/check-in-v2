@@ -98,6 +98,12 @@ interface PageProps {
     locations: { id: string; name: string }[];
     locationId: string | null;
     hasCellphone: boolean;
+    notifications: {
+        checkInCopy: boolean;
+        appointmentCopy: boolean;
+        appointmentReminder: boolean;
+        channel: Channel;
+    };
     currentLocale: string;
     localesLabels: Record<string, string>;
     translations: { accountSettings: SettingsTranslations };
@@ -118,6 +124,7 @@ export default function Settings() {
         locations,
         locationId,
         hasCellphone,
+        notifications,
         currentLocale,
         localesLabels,
         translations,
@@ -126,14 +133,49 @@ export default function Settings() {
 
     const { currentTheme, changeCurrentTheme } = useThemeProvider();
 
-    // Notifications have no preference schema yet, so these live in component
-    // state and reset on reload. Nothing here fakes a save.
-    const [channel, setChannel] = useState<Channel>('email');
-    const [checkInCopy, setCheckInCopy] = useState(true);
-    const [appointmentCopy, setAppointmentCopy] = useState(true);
-    const [appointmentReminder, setAppointmentReminder] = useState(true);
+    const [channel, setChannel] = useState<Channel>(notifications.channel);
+    const [checkInCopy, setCheckInCopy] = useState(notifications.checkInCopy);
+    const [appointmentCopy, setAppointmentCopy] = useState(
+        notifications.appointmentCopy,
+    );
+    const [appointmentReminder, setAppointmentReminder] = useState(
+        notifications.appointmentReminder,
+    );
 
     const [locationCleared, setLocationCleared] = useState(false);
+
+    // Every rule on the request is `sometimes`, so a patch carries only the
+    // control that moved. State leads and reverts on failure: a switch that
+    // ignores the tap while a round-trip is in flight reads as broken.
+    const savePreference = (
+        field: string,
+        value: boolean | Channel,
+        revert: () => void,
+    ) => {
+        router.patch(
+            update.url(),
+            { [field]: value },
+            { preserveScroll: true, preserveState: true, onError: revert },
+        );
+    };
+
+    const saveToggle = (
+        field: string,
+        value: boolean,
+        set: (next: boolean) => void,
+    ) => {
+        set(value);
+        savePreference(field, value, () => set(!value));
+    };
+
+    const saveChannel = (next: Channel) => {
+        const previous = channel;
+
+        setChannel(next);
+        savePreference('notification_channel', next, () =>
+            setChannel(previous),
+        );
+    };
 
     // Saves on change rather than behind a button: it is a single select, and the row has nowhere
     // natural to put a submit control without unbalancing the others in the card. Driven by router
@@ -296,7 +338,7 @@ export default function Settings() {
                                     <SegmentedControl
                                         label={t.channelLabel}
                                         value={channel}
-                                        onChange={setChannel}
+                                        onChange={saveChannel}
                                         segments={[
                                             {
                                                 value: 'email',
@@ -332,7 +374,13 @@ export default function Settings() {
                             control={
                                 <Switch
                                     checked={checkInCopy}
-                                    onCheckedChange={setCheckInCopy}
+                                    onCheckedChange={(value) =>
+                                        saveToggle(
+                                            'notify_check_in_copy',
+                                            value,
+                                            setCheckInCopy,
+                                        )
+                                    }
                                     aria-label={t.checkInCopyLabel}
                                 />
                             }
@@ -344,7 +392,13 @@ export default function Settings() {
                             control={
                                 <Switch
                                     checked={appointmentCopy}
-                                    onCheckedChange={setAppointmentCopy}
+                                    onCheckedChange={(value) =>
+                                        saveToggle(
+                                            'notify_appointment_copy',
+                                            value,
+                                            setAppointmentCopy,
+                                        )
+                                    }
                                     aria-label={t.appointmentCopyLabel}
                                 />
                             }
@@ -356,7 +410,13 @@ export default function Settings() {
                             control={
                                 <Switch
                                     checked={appointmentReminder}
-                                    onCheckedChange={setAppointmentReminder}
+                                    onCheckedChange={(value) =>
+                                        saveToggle(
+                                            'notify_appointment_reminder',
+                                            value,
+                                            setAppointmentReminder,
+                                        )
+                                    }
                                     aria-label={t.appointmentReminderLabel}
                                 />
                             }
@@ -364,9 +424,10 @@ export default function Settings() {
                     </div>
 
                     {/*
-                     * The channel picker sits above three toggles but only steers one of them, so
-                     * say which. Same footnote treatment as the password-reset line below it: the
-                     * exceptions live next to the control they qualify, not in a help page.
+                     * The channel picker steers all three toggles, but the two channels do not
+                     * carry the same thing: a text cannot hold a PDF. Same footnote treatment as
+                     * the password-reset line below it, so the exceptions live next to the control
+                     * they qualify rather than in a help page.
                      */}
                     <div className="space-y-2 px-6 py-4 text-xs text-gray-500 dark:text-gray-400">
                         <p>{t.copiesAlwaysEmail}</p>

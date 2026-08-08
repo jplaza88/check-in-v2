@@ -38,6 +38,12 @@ final class AccountSettingsController extends Controller
             // The text-message channel is unusable without a number on file,
             // so the option is disabled rather than silently failing to deliver.
             'hasCellphone' => $user->cellphone !== null,
+            'notifications' => [
+                'checkInCopy' => $user->notify_check_in_copy,
+                'appointmentCopy' => $user->notify_appointment_copy,
+                'appointmentReminder' => $user->notify_appointment_reminder,
+                'channel' => $user->notification_channel->value,
+            ],
         ]);
     }
 
@@ -54,6 +60,16 @@ final class AccountSettingsController extends Controller
 
         if ($request->hasLocation()) {
             $attributes['location_id'] = $this->resolveLocationId($request->locationUuid());
+        }
+
+        foreach (UpdateAccountSettingsRequest::NOTIFICATION_TOGGLES as $toggle) {
+            if ($request->hasNotificationToggle($toggle)) {
+                $attributes[$toggle] = $request->notificationToggle($toggle);
+            }
+        }
+
+        if ($request->hasNotificationChannel()) {
+            $attributes['notification_channel'] = $request->notificationChannel();
         }
 
         if ($attributes !== []) {

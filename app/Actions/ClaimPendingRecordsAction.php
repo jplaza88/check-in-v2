@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
+use App\Enums\RecordHistoryEvent;
 use App\Models\Appointment;
 use App\Models\CheckIn;
 use App\Models\User;
@@ -21,6 +22,8 @@ final class ClaimPendingRecordsAction
 {
     private const string CLAIMED_VIA = 'email_verification';
 
+    public function __construct(private readonly RecordHistoryAction $history) {}
+
     /**
      * @throws Throwable
      */
@@ -37,18 +40,32 @@ final class ClaimPendingRecordsAction
                 'claimed_via' => self::CLAIMED_VIA,
             ];
 
+            /*
+             * Recorded by hand rather than by the status hook in AppServiceProvider:
+             * these are mass updates, and Query::update() fires no model events.
+             * The row is only written when the update actually matched, so a
+             * record already claimed by someone else leaves no misleading entry.
+             */
             if ($user->pending_check_in_id !== null) {
-                CheckIn::query()
+                $claimed = CheckIn::query()
                     ->whereKey($user->pending_check_in_id)
                     ->whereNull('user_id')
                     ->update($claim);
+
+                if ($claimed > 0) {
+                    $this->recordClaim(CheckIn::query()->find($user->pending_check_in_id), $user);
+                }
             }
 
             if ($user->pending_appointment_id !== null) {
-                Appointment::query()
+                $claimed = Appointment::query()
                     ->whereKey($user->pending_appointment_id)
                     ->whereNull('user_id')
                     ->update($claim);
+
+                if ($claimed > 0) {
+                    $this->recordClaim(Appointment::query()->find($user->pending_appointment_id), $user);
+                }
             }
 
             $user->forceFill([
@@ -56,5 +73,19 @@ final class ClaimPendingRecordsAction
                 'pending_appointment_id' => null,
             ])->save();
         });
+    }
+
+    private function recordClaim(CheckIn|Appointment|null $record, User $user): void
+    {
+        if ($record === null) {
+            return;
+        }
+
+        $this->history->handle(
+            record: $record,
+            event: RecordHistoryEvent::Claimed,
+            subject: self::CLAIMED_VIA,
+            user: $user,
+        );
     }
 }

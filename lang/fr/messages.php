@@ -144,7 +144,7 @@ return [
         'appointmentCopyDescription' => 'Une confirmation avec votre numéro de référence, la date et le lieu.',
         'appointmentReminderLabel' => 'Rappelez-moi avant un rendez-vous',
         'appointmentReminderDescription' => 'Un rappel la veille.',
-        'copiesAlwaysEmail' => 'Vos copies arrivent toujours par e-mail, car chacune contient un reçu que vous pouvez conserver. Le rappel de rendez-vous est le seul message que nous pouvons aussi envoyer par SMS.',
+        'copiesAlwaysEmail' => "Un SMS vous donne le numéro de référence et un lien vers le détail complet. Le reçu PDF n'arrive que par e-mail : choisissez Les deux si vous voulez aussi le document.",
         'securityAlwaysEmail' => "Les réinitialisations de mot de passe et les messages de sécurité arrivent toujours par e-mail, pour protéger votre compte. Ce réglage n'y change rien.",
 
         'securityHeading' => 'Sécurité',
@@ -201,6 +201,35 @@ return [
         'statusScheduled' => 'Planifié',
         'statusNoShow' => 'Absent',
         'statusCheckedIn' => 'Enregistré',
+    ],
+
+    'checkInCopyEmail' => [
+        'subject' => 'Votre enregistrement :reference à :location',
+        'preheader' => "Votre copie de l'enregistrement à :location.",
+        'eyebrow' => 'Votre copie',
+        'title' => 'Vous êtes enregistré',
+        'intro' => 'Voici votre copie. Le reçu PDF est joint ; conservez-le ou transmettez-le à votre répartiteur.',
+    ],
+
+    'appointmentCopyEmail' => [
+        'subject' => 'Votre rendez-vous :reference à :location',
+        'preheader' => 'Votre copie du rendez-vous à :location.',
+        'eyebrow' => 'Votre copie',
+        'title' => 'Votre rendez-vous est réservé',
+        'intro' => 'Voici votre copie. La confirmation PDF est jointe ; conservez-la ou transmettez-la à votre répartiteur.',
+    ],
+
+    /*
+     * Volontairement courts : un SMS fait 160 caractères et le second est
+     * facturé au conducteur. :url est la page d'historique, qui demande une
+     * connexion.
+     */
+    'checkInCopySms' => [
+        'body' => ':app: vous êtes enregistré. Réf :reference. :url',
+    ],
+
+    'appointmentCopySms' => [
+        'body' => ':app: votre rendez-vous est réservé. Réf :reference. :url',
     ],
 
     'recordDocumentEmail' => [

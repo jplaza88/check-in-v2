@@ -144,7 +144,7 @@ return [
         'appointmentCopyDescription' => 'Una confirmación con tu número de referencia, la fecha y el lugar.',
         'appointmentReminderLabel' => 'Recuérdame antes de una cita',
         'appointmentReminderDescription' => 'Un recordatorio el día anterior.',
-        'copiesAlwaysEmail' => 'Tus copias siempre llegan por correo, porque cada una incluye un comprobante que puedes guardar. El recordatorio de cita es el único aviso que también podemos enviarte por mensaje de texto.',
+        'copiesAlwaysEmail' => 'Un mensaje de texto te da el número de referencia y un enlace a todos los detalles. El comprobante en PDF solo llega por correo, así que elige Los dos si también quieres el documento.',
         'securityAlwaysEmail' => 'Los cambios de contraseña y los mensajes de seguridad siempre llegan por correo, para mantener tu cuenta protegida. Esta opción no cambia eso.',
 
         'securityHeading' => 'Seguridad',
@@ -201,6 +201,35 @@ return [
         'statusScheduled' => 'Programada',
         'statusNoShow' => 'No se presentó',
         'statusCheckedIn' => 'Registrado',
+    ],
+
+    'checkInCopyEmail' => [
+        'subject' => 'Tu registro :reference en :location',
+        'preheader' => 'Tu copia del registro en :location.',
+        'eyebrow' => 'Tu copia',
+        'title' => 'Tu registro está listo',
+        'intro' => 'Aquí tienes tu copia. El comprobante en PDF viene adjunto; guárdalo o envíaselo a tu despachador.',
+    ],
+
+    'appointmentCopyEmail' => [
+        'subject' => 'Tu cita :reference en :location',
+        'preheader' => 'Tu copia de la cita en :location.',
+        'eyebrow' => 'Tu copia',
+        'title' => 'Tu cita está agendada',
+        'intro' => 'Aquí tienes tu copia. La confirmación en PDF viene adjunta; guárdala o envíasela a tu despachador.',
+    ],
+
+    /*
+     * Deliberadamente cortos: un mensaje de texto son 160 caracteres y el
+     * segundo se le cobra al conductor. :url es la página de historial, que
+     * pide iniciar sesión.
+     */
+    'checkInCopySms' => [
+        'body' => ':app: tu registro está hecho. Ref :reference. :url',
+    ],
+
+    'appointmentCopySms' => [
+        'body' => ':app: tu cita está agendada. Ref :reference. :url',
     ],
 
     'recordDocumentEmail' => [
