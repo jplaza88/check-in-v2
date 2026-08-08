@@ -170,6 +170,8 @@ return [
         'deleteDialogBody' => 'Se borrarán tu perfil y tus datos guardados. Tus registros y citas anteriores se quedan con el patio, pero ya no estarán ligados a ti.',
         'deleteDialogCancel' => 'Conservar mi cuenta',
         'deleteDialogConfirm' => 'Sí, eliminarla',
+        'deletePasswordLabel' => 'Ingresa tu contraseña para confirmar',
+        'deletePasswordPlaceholder' => 'Tu contraseña',
     ],
 
     'accountHistory' => [
@@ -658,5 +660,10 @@ return [
         'fallbackLabel' => 'Si el botón de arriba no funciona, copia y pega este enlace en tu navegador:',
         'security' => 'Si no solicitaste restablecer la contraseña, no es necesario hacer nada y puedes ignorar este correo con seguridad.',
         'footer' => 'Este es un mensaje automático de :app. Por favor, no respondas.',
+    ],
+
+    // Ver el bloque en lang/en: sin validation.php publicado, lo no anulado aquí sale en inglés.
+    'validation' => [
+        'currentPassword' => 'Esa no es tu contraseña actual.',
     ],
 ];

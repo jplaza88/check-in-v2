@@ -62,6 +62,13 @@ Route::middleware('setLocale')->group(function (): void {
             ->patch('/account/settings', [AccountSettingsController::class, 'update'])
             ->name('account.settings.update');
 
+        // Named for the account rather than the settings, because that is what it
+        // destroys. Throttled harder than the preference saves: it is irreversible,
+        // and the password check makes it worth guessing at.
+        Route::middleware('throttle:6,1')
+            ->delete('/account', [AccountSettingsController::class, 'destroy'])
+            ->name('account.destroy');
+
         Route::get('/account/history', [AccountController::class, 'history'])
             ->name('account.history');
 

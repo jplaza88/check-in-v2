@@ -173,6 +173,8 @@ return [
         'deleteDialogBody' => 'Your profile and saved details will be removed. Your past check-ins and appointments stay with the yard, but will no longer be linked to you.',
         'deleteDialogCancel' => 'Keep my account',
         'deleteDialogConfirm' => 'Yes, delete it',
+        'deletePasswordLabel' => 'Enter your password to confirm',
+        'deletePasswordPlaceholder' => 'Your password',
     ],
 
     'accountHistory' => [
@@ -679,5 +681,14 @@ return [
         'fallbackLabel' => 'If the button above does not work, copy and paste this link into your browser:',
         'security' => 'If you did not request a password reset, no action is needed and you can safely ignore this email.',
         'footer' => 'This is an automated message from :app. Please do not reply.',
+    ],
+
+    /*
+     * Overrides for Laravel's built-in validation messages. No validation.php is
+     * published in any locale, so anything not overridden here falls back to the
+     * framework's English string regardless of the driver's language.
+     */
+    'validation' => [
+        'currentPassword' => 'That is not your current password.',
     ],
 ];

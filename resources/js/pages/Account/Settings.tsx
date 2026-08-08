@@ -1,4 +1,4 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import {
     Bell,
     KeyRound,
@@ -21,7 +21,6 @@ import SegmentedControl from '@/components/settings/SegmentedControl';
 import SettingRow from '@/components/settings/SettingRow';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -31,9 +30,14 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import AccountLayout from '@/layouts/AccountLayout';
-import { profile as accountProfile } from '@/routes/account';
+import {
+    destroy as destroyAccount,
+    profile as accountProfile,
+} from '@/routes/account';
 import { clearDriverCoords } from '@/utils/driverCoords';
 import { useThemeProvider } from '@/utils/ThemeContext';
 
@@ -92,6 +96,8 @@ interface SettingsTranslations {
     deleteDialogBody: string;
     deleteDialogCancel: string;
     deleteDialogConfirm: string;
+    deletePasswordLabel: string;
+    deletePasswordPlaceholder: string;
 }
 
 interface PageProps {
@@ -214,6 +220,29 @@ export default function Settings() {
     const forgetLocation = () => {
         clearDriverCoords();
         setLocationCleared(true);
+    };
+
+    // Controlled so a rejected password leaves the dialog open with its error
+    // showing. Closing is ours to decide, not the confirm button's.
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const deleteForm = useForm({ password: '' });
+
+    const openDeleteDialog = (open: boolean) => {
+        setDeleteOpen(open);
+
+        // Never leave a typed password sitting in memory behind a closed dialog.
+        if (!open) {
+            deleteForm.reset('password');
+            deleteForm.clearErrors();
+        }
+    };
+
+    const deleteAccount = () => {
+        deleteForm.delete(destroyAccount.url(), {
+            preserveScroll: true,
+            onSuccess: () => setDeleteOpen(false),
+            onError: () => deleteForm.reset('password'),
+        });
     };
 
     return (
@@ -505,13 +534,21 @@ export default function Settings() {
                             icon={Trash2}
                             label={t.deleteLabel}
                             description={t.deleteDescription}
-                            badge={t.soon}
                             control={
-                                <AlertDialog>
+                                <AlertDialog
+                                    open={deleteOpen}
+                                    onOpenChange={openDeleteDialog}
+                                >
                                     <AlertDialogTrigger asChild>
+                                        {/*
+                                         * Test hook: this button and the card heading above it
+                                         * both read "Delete account", so text alone cannot
+                                         * pick it out.
+                                         */}
                                         <Button
                                             type="button"
                                             variant="destructive"
+                                            data-testid="delete-account"
                                             className="h-11 cursor-pointer rounded-4xl px-5 text-sm font-semibold"
                                         >
                                             {t.deleteAction}
@@ -528,6 +565,40 @@ export default function Settings() {
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
 
+                                        <Field
+                                            data-invalid={
+                                                !!deleteForm.errors.password ||
+                                                undefined
+                                            }
+                                        >
+                                            <FieldLabel htmlFor="delete_password">
+                                                {t.deletePasswordLabel}
+                                            </FieldLabel>
+                                            <Input
+                                                id="delete_password"
+                                                name="delete_password"
+                                                type="password"
+                                                autoComplete="current-password"
+                                                placeholder={
+                                                    t.deletePasswordPlaceholder
+                                                }
+                                                value={deleteForm.data.password}
+                                                aria-invalid={
+                                                    !!deleteForm.errors
+                                                        .password || undefined
+                                                }
+                                                onChange={(e) =>
+                                                    deleteForm.setData(
+                                                        'password',
+                                                        e.target.value,
+                                                    )
+                                                }
+                                            />
+                                            <FieldError>
+                                                {deleteForm.errors.password}
+                                            </FieldError>
+                                        </Field>
+
                                         <AlertDialogFooter>
                                             <AlertDialogCancel asChild>
                                                 <Button
@@ -538,16 +609,24 @@ export default function Settings() {
                                                     {t.deleteDialogCancel}
                                                 </Button>
                                             </AlertDialogCancel>
-                                            <AlertDialogAction asChild>
-                                                <Button
-                                                    type="button"
-                                                    disabled
-                                                    variant="destructive"
-                                                    className="h-11 w-full cursor-not-allowed rounded-4xl text-sm font-semibold sm:w-auto sm:px-5"
-                                                >
-                                                    {t.deleteDialogConfirm}
-                                                </Button>
-                                            </AlertDialogAction>
+                                            {/*
+                                             * A plain Button, not AlertDialogAction: that one closes the
+                                             * dialog on click, which would throw away a rejected password
+                                             * before the error could be shown.
+                                             */}
+                                            <Button
+                                                type="button"
+                                                variant="destructive"
+                                                disabled={
+                                                    deleteForm.processing ||
+                                                    deleteForm.data.password ===
+                                                        ''
+                                                }
+                                                onClick={deleteAccount}
+                                                className="h-11 w-full cursor-pointer rounded-4xl text-sm font-semibold sm:w-auto sm:px-5"
+                                            >
+                                                {t.deleteDialogConfirm}
+                                            </Button>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
                                 </AlertDialog>

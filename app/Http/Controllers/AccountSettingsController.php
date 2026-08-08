@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Actions\DeleteAccountAction;
+use App\Http\Requests\DeleteAccountRequest;
 use App\Http\Requests\UpdateAccountSettingsRequest;
 use App\Models\Location;
 use App\Models\User;
@@ -11,8 +13,10 @@ use App\Queries\AppointmentLocations;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Inertia\Response;
+use Throwable;
 
 final class AccountSettingsController extends Controller
 {
@@ -79,6 +83,32 @@ final class AccountSettingsController extends Controller
         // The page confirms via useForm's recentlySuccessful, the pattern the
         // profile page already uses; there is no flash plumbing in this app.
         return back();
+    }
+
+    /**
+     * Delete the driver's account for good.
+     *
+     * The action is injected here rather than through the constructor, which
+     * carries only what the two settings screens need.
+     *
+     * @throws Throwable
+     */
+    public function destroy(
+        DeleteAccountRequest $request,
+        #[CurrentUser] User $user,
+        DeleteAccountAction $deleteAccount,
+    ): RedirectResponse {
+        $request->validated();
+
+        $deleteAccount->handle($user);
+
+        // Signed out after the delete, not before, so #[CurrentUser] still
+        // resolves through the action.
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return to_route('home');
     }
 
     /**

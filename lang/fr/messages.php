@@ -170,6 +170,8 @@ return [
         'deleteDialogBody' => 'Votre profil et vos informations enregistrées seront supprimés. Vos enregistrements et rendez-vous passés restent chez le site, mais ne seront plus liés à vous.',
         'deleteDialogCancel' => 'Garder mon compte',
         'deleteDialogConfirm' => 'Oui, supprimer',
+        'deletePasswordLabel' => 'Saisissez votre mot de passe pour confirmer',
+        'deletePasswordPlaceholder' => 'Votre mot de passe',
     ],
 
     'accountHistory' => [
@@ -658,5 +660,10 @@ return [
         'fallbackLabel' => 'Si le bouton ci-dessus ne fonctionne pas, copiez et collez ce lien dans votre navigateur :',
         'security' => "Si vous n'avez pas demandé de réinitialisation, aucune action n'est requise et vous pouvez ignorer cet e-mail en toute sécurité.",
         'footer' => 'Ceci est un message automatique de :app. Merci de ne pas y répondre.',
+    ],
+
+    // Voir le bloc dans lang/en : sans validation.php publié, ce qui n'est pas redéfini ici sort en anglais.
+    'validation' => [
+        'currentPassword' => "Ce n'est pas votre mot de passe actuel.",
     ],
 ];
