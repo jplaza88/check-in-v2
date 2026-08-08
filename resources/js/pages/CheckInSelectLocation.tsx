@@ -21,6 +21,7 @@ interface CheckInTranslations {
     fetchDistancesErrorTitle: string;
     fetchDistancesErrorMessage: string;
     checkInUnavailable: string;
+    retryLocation: string;
 }
 
 interface Translations {
@@ -70,7 +71,7 @@ export default function SelectLocation() {
 
     // User coordinates
     const [sortedLocations, setSortedLocations] = useState<Location[] | null>(null);
-    const { coords, loading, error, warning } = useGeolocation();
+    const { coords, loading, error, warning, retry } = useGeolocation();
 
     const { data, post } = useHttp({'latitude': 0,'longitude': 0});
 
@@ -155,6 +156,16 @@ export default function SelectLocation() {
     const [dismissed, setDismissed] = useState(false);
     const alert = dismissed ? null : getAlert();
 
+    /*
+     * Check-in is gated on verified proximity, so with no coordinates or no distances there is nothing
+     * selectable here. The list stays hidden rather than offering locations the gate would refuse, and
+     * the driver gets a way to try again instead of skeletons that never resolve.
+     *
+     * retry() also covers the distance-fetch failure: it republishes the cached coordinates, which
+     * re-triggers the effect below and with it fetchDistances.
+     */
+    const needsRetry = !loading && (error !== null || warning !== null || fetchError);
+
     const handleSelectLocation = (locationId: string, isRetry = false) => {
         setCheckInError(null);
         setDismissed(false);
@@ -227,8 +238,24 @@ export default function SelectLocation() {
                             {alert?.message}
                         </AlertBanner>
 
+                        {/* Retry, when there are no coordinates to sort or gate by */}
+                        {needsRetry && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setDismissed(false);
+                                    setFetchError(false);
+                                    retry();
+                                }}
+                                className="min-h-11 w-full cursor-pointer rounded-lg border border-gray-200 bg-white px-5 text-sm font-semibold text-brand-grey shadow-sm transition hover:border-gray-300 dark:border-gray-700/60 dark:bg-gray-800 dark:text-gray-100 dark:hover:border-gray-600"
+                            >
+                                {pageTranslations.retryLocation}
+                            </button>
+                        )}
+
                         {/* Skeleton */}
-                        {(loading || sortedLocations === null) &&
+                        {!needsRetry &&
+                            (loading || sortedLocations === null) &&
                             Array.from({ length: 3 }).map((_, i) => (
                                 <div
                                     key={i}

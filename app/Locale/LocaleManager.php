@@ -19,12 +19,15 @@ final readonly class LocaleManager
     public function getLocale(Request $request): string
     {
         /*
-         * Prioritize locale stored in session since the only way it can live in session is when user explicitly
-         * changes the language in the navbar.
+         * The account column wins: it is only ever written when a signed-in driver explicitly picks a language,
+         * so it should follow them across devices and outlive any one session. Session comes next for guests,
+         * who can only have one by explicitly changing the language in the navbar. Browser detection is a guess,
+         * so it ranks below both.
          */
 
-        return $this->session->getLocale()
-            ?? $this->browser->detectLocale($request)
+        return $this->sanitize($request->user()?->locale)
+            ?? $this->sanitize($this->session->getLocale())
+            ?? $this->sanitize($this->browser->detectLocale($request))
             ?? config('app.locale');
     }
 
@@ -47,6 +50,18 @@ final readonly class LocaleManager
         }
 
         return $routeTranslations;
+    }
+
+    /**
+     * Every candidate has to survive this before it is trusted.
+     *
+     * Browser detection in particular returns whatever language tag the browser sent, so an unsupported one
+     * such as 'de' would otherwise be accepted, find no lang/de/messages.php, and render every page with an
+     * empty translations array.
+     */
+    private function sanitize(?string $locale): ?string
+    {
+        return $locale !== null && in_array($locale, config('app.locales'), true) ? $locale : null;
     }
 
     /**

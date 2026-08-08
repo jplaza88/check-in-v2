@@ -11,6 +11,7 @@ interface AppointmentSelectLocation {
     closingSoon: string;
     specialHoursToday: string;
     closedToday: string;
+    yourUsual: string;
 }
 
 interface Translations {
@@ -19,6 +20,7 @@ interface Translations {
 
 interface PageProps {
     locations: Location[];
+    usualLocationId: string | null;
     translations: Translations;
     errors: { uuid?: string };
     [key: string]: unknown;
@@ -38,7 +40,8 @@ interface Location {
 
 export default function AppointmentSelectLocation() {
     // Translations
-    const { translations, locations, errors } = usePage<PageProps>().props;
+    const { translations, locations, usualLocationId, errors } =
+        usePage<PageProps>().props;
     const pageTranslations: AppointmentSelectLocation = translations.appointmentSelectLocation;
 
     const [submittingLocationId, setSubmittingLocationId] = useState<string | null>(null);
@@ -176,7 +179,7 @@ export default function AppointmentSelectLocation() {
                                                 {location.address}
                                             </div>
 
-                                            {/* Hours + Open/Closed + Nearest */}
+                                            {/* Hours + Your usual */}
                                             <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                                                 <span
                                                     aria-label={`Today's hours of operation: ${location.todayOpenCloseTime}`}
@@ -185,6 +188,20 @@ export default function AppointmentSelectLocation() {
                                                         location.todayOpenCloseTime
                                                     }
                                                 </span>
+
+                                                {location.id ===
+                                                    usualLocationId && (
+                                                    <span
+                                                        aria-label={
+                                                            pageTranslations.yourUsual
+                                                        }
+                                                        className="inline-flex rounded-full bg-blue-500/10 px-2.5 py-1 text-xs font-medium text-blue-600 dark:text-blue-400"
+                                                    >
+                                                        {
+                                                            pageTranslations.yourUsual
+                                                        }
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

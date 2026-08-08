@@ -1,4 +1,4 @@
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, useForm, usePage } from '@inertiajs/react';
 import {
     Bell,
     KeyRound,
@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 
+import { update } from '@/actions/App/Http/Controllers/AccountSettingsController';
 import LocaleController from '@/actions/App/Http/Controllers/LocaleController';
 import SavedPill from '@/components/SavedPill';
 import SectionCard from '@/components/SectionCard';
@@ -20,7 +21,6 @@ import SegmentedControl from '@/components/settings/SegmentedControl';
 import SettingRow from '@/components/settings/SettingRow';
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -30,9 +30,14 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { Field, FieldError, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import AccountLayout from '@/layouts/AccountLayout';
-import { profile as accountProfile } from '@/routes/account';
+import {
+    destroy as destroyAccount,
+    profile as accountProfile,
+} from '@/routes/account';
 import { clearDriverCoords } from '@/utils/driverCoords';
 import { useThemeProvider } from '@/utils/ThemeContext';
 
@@ -51,6 +56,7 @@ interface SettingsTranslations {
     themeDescription: string;
     themeLight: string;
     themeDark: string;
+    themeSystem: string;
     defaultLocationLabel: string;
     defaultLocationDescription: string;
     defaultLocationNone: string;
@@ -63,8 +69,11 @@ interface SettingsTranslations {
     channelNeedsPhone: string;
     checkInCopyLabel: string;
     checkInCopyDescription: string;
+    appointmentCopyLabel: string;
+    appointmentCopyDescription: string;
     appointmentReminderLabel: string;
     appointmentReminderDescription: string;
+    copiesAlwaysEmail: string;
     securityAlwaysEmail: string;
     securityHeading: string;
     securitySubheading: string;
@@ -87,11 +96,20 @@ interface SettingsTranslations {
     deleteDialogBody: string;
     deleteDialogCancel: string;
     deleteDialogConfirm: string;
+    deletePasswordLabel: string;
+    deletePasswordPlaceholder: string;
 }
 
 interface PageProps {
     locations: { id: string; name: string }[];
+    locationId: string | null;
     hasCellphone: boolean;
+    notifications: {
+        checkInCopy: boolean;
+        appointmentCopy: boolean;
+        appointmentReminder: boolean;
+        channel: Channel;
+    };
     currentLocale: string;
     localesLabels: Record<string, string>;
     translations: { accountSettings: SettingsTranslations };
@@ -110,7 +128,9 @@ const SELECT_CLASSES =
 export default function Settings() {
     const {
         locations,
+        locationId,
         hasCellphone,
+        notifications,
         currentLocale,
         localesLabels,
         translations,
@@ -119,13 +139,71 @@ export default function Settings() {
 
     const { currentTheme, changeCurrentTheme } = useThemeProvider();
 
-    // No preference schema exists yet, so these live in component state and
-    // reset on reload. Nothing here fakes a save.
-    const [channel, setChannel] = useState<Channel>('email');
-    const [checkInCopy, setCheckInCopy] = useState(true);
-    const [appointmentReminder, setAppointmentReminder] = useState(true);
-    const [defaultLocation, setDefaultLocation] = useState('');
+    const [channel, setChannel] = useState<Channel>(notifications.channel);
+    const [checkInCopy, setCheckInCopy] = useState(notifications.checkInCopy);
+    const [appointmentCopy, setAppointmentCopy] = useState(
+        notifications.appointmentCopy,
+    );
+    const [appointmentReminder, setAppointmentReminder] = useState(
+        notifications.appointmentReminder,
+    );
+
     const [locationCleared, setLocationCleared] = useState(false);
+
+    // Every rule on the request is `sometimes`, so a patch carries only the
+    // control that moved. State leads and reverts on failure: a switch that
+    // ignores the tap while a round-trip is in flight reads as broken.
+    const savePreference = (
+        field: string,
+        value: boolean | Channel,
+        revert: () => void,
+    ) => {
+        router.patch(
+            update.url(),
+            { [field]: value },
+            { preserveScroll: true, preserveState: true, onError: revert },
+        );
+    };
+
+    const saveToggle = (
+        field: string,
+        value: boolean,
+        set: (next: boolean) => void,
+    ) => {
+        set(value);
+        savePreference(field, value, () => set(!value));
+    };
+
+    const saveChannel = (next: Channel) => {
+        const previous = channel;
+
+        setChannel(next);
+        savePreference('notification_channel', next, () =>
+            setChannel(previous),
+        );
+    };
+
+    // Saves on change rather than behind a button: it is a single select, and the row has nowhere
+    // natural to put a submit control without unbalancing the others in the card. Driven by router
+    // rather than useForm because useForm reads `data` from the render closure, so setting it and
+    // submitting in the same handler would post the previous selection.
+    const [usualLocation, setUsualLocation] = useState(locationId ?? '');
+    const [usualLocationSaved, setUsualLocationSaved] = useState(false);
+
+    const saveUsualLocation = (value: string) => {
+        setUsualLocation(value);
+        setUsualLocationSaved(false);
+
+        router.patch(
+            update.url(),
+            { location_id: value === '' ? null : value },
+            {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: () => setUsualLocationSaved(true),
+            },
+        );
+    };
 
     const switchLocale = (code: string) => {
         if (code === currentLocale) {
@@ -142,6 +220,29 @@ export default function Settings() {
     const forgetLocation = () => {
         clearDriverCoords();
         setLocationCleared(true);
+    };
+
+    // Controlled so a rejected password leaves the dialog open with its error
+    // showing. Closing is ours to decide, not the confirm button's.
+    const [deleteOpen, setDeleteOpen] = useState(false);
+    const deleteForm = useForm({ password: '' });
+
+    const openDeleteDialog = (open: boolean) => {
+        setDeleteOpen(open);
+
+        // Never leave a typed password sitting in memory behind a closed dialog.
+        if (!open) {
+            deleteForm.reset('password');
+            deleteForm.clearErrors();
+        }
+    };
+
+    const deleteAccount = () => {
+        deleteForm.delete(destroyAccount.url(), {
+            preserveScroll: true,
+            onSuccess: () => setDeleteOpen(false),
+            onError: () => deleteForm.reset('password'),
+        });
     };
 
     return (
@@ -194,11 +295,7 @@ export default function Settings() {
                             control={
                                 <SegmentedControl
                                     label={t.themeLabel}
-                                    value={
-                                        currentTheme === 'light'
-                                            ? 'light'
-                                            : 'dark'
-                                    }
+                                    value={currentTheme}
                                     onChange={changeCurrentTheme}
                                     segments={[
                                         {
@@ -206,6 +303,10 @@ export default function Settings() {
                                             label: t.themeLight,
                                         },
                                         { value: 'dark', label: t.themeDark },
+                                        {
+                                            value: 'system',
+                                            label: t.themeSystem,
+                                        },
                                     ]}
                                 />
                             }
@@ -217,26 +318,31 @@ export default function Settings() {
                             label={t.defaultLocationLabel}
                             description={t.defaultLocationDescription}
                             control={
-                                <select
-                                    aria-label={t.defaultLocationLabel}
-                                    value={defaultLocation}
-                                    onChange={(e) =>
-                                        setDefaultLocation(e.target.value)
-                                    }
-                                    className={SELECT_CLASSES}
-                                >
-                                    <option value="">
-                                        {t.defaultLocationNone}
-                                    </option>
-                                    {locations.map((location) => (
-                                        <option
-                                            key={location.id}
-                                            value={location.id}
-                                        >
-                                            {location.name}
+                                <div className="space-y-2">
+                                    <select
+                                        aria-label={t.defaultLocationLabel}
+                                        value={usualLocation}
+                                        onChange={(e) =>
+                                            saveUsualLocation(e.target.value)
+                                        }
+                                        className={SELECT_CLASSES}
+                                    >
+                                        <option value="">
+                                            {t.defaultLocationNone}
                                         </option>
-                                    ))}
-                                </select>
+                                        {locations.map((location) => (
+                                            <option
+                                                key={location.id}
+                                                value={location.id}
+                                            >
+                                                {location.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    {usualLocationSaved && (
+                                        <SavedPill label={t.saved} />
+                                    )}
+                                </div>
                             }
                         />
                     </div>
@@ -261,7 +367,7 @@ export default function Settings() {
                                     <SegmentedControl
                                         label={t.channelLabel}
                                         value={channel}
-                                        onChange={setChannel}
+                                        onChange={saveChannel}
                                         segments={[
                                             {
                                                 value: 'email',
@@ -297,8 +403,32 @@ export default function Settings() {
                             control={
                                 <Switch
                                     checked={checkInCopy}
-                                    onCheckedChange={setCheckInCopy}
+                                    onCheckedChange={(value) =>
+                                        saveToggle(
+                                            'notify_check_in_copy',
+                                            value,
+                                            setCheckInCopy,
+                                        )
+                                    }
                                     aria-label={t.checkInCopyLabel}
+                                />
+                            }
+                        />
+
+                        <SettingRow
+                            label={t.appointmentCopyLabel}
+                            description={t.appointmentCopyDescription}
+                            control={
+                                <Switch
+                                    checked={appointmentCopy}
+                                    onCheckedChange={(value) =>
+                                        saveToggle(
+                                            'notify_appointment_copy',
+                                            value,
+                                            setAppointmentCopy,
+                                        )
+                                    }
+                                    aria-label={t.appointmentCopyLabel}
                                 />
                             }
                         />
@@ -309,16 +439,29 @@ export default function Settings() {
                             control={
                                 <Switch
                                     checked={appointmentReminder}
-                                    onCheckedChange={setAppointmentReminder}
+                                    onCheckedChange={(value) =>
+                                        saveToggle(
+                                            'notify_appointment_reminder',
+                                            value,
+                                            setAppointmentReminder,
+                                        )
+                                    }
                                     aria-label={t.appointmentReminderLabel}
                                 />
                             }
                         />
                     </div>
 
-                    <p className="px-6 py-4 text-xs text-gray-500 dark:text-gray-400">
-                        {t.securityAlwaysEmail}
-                    </p>
+                    {/*
+                     * The channel picker steers all three toggles, but the two channels do not
+                     * carry the same thing: a text cannot hold a PDF. Same footnote treatment as
+                     * the password-reset line below it, so the exceptions live next to the control
+                     * they qualify rather than in a help page.
+                     */}
+                    <div className="space-y-2 px-6 py-4 text-xs text-gray-500 dark:text-gray-400">
+                        <p>{t.copiesAlwaysEmail}</p>
+                        <p>{t.securityAlwaysEmail}</p>
+                    </div>
                 </SectionCard>
 
                 {/* Security */}
@@ -391,13 +534,21 @@ export default function Settings() {
                             icon={Trash2}
                             label={t.deleteLabel}
                             description={t.deleteDescription}
-                            badge={t.soon}
                             control={
-                                <AlertDialog>
+                                <AlertDialog
+                                    open={deleteOpen}
+                                    onOpenChange={openDeleteDialog}
+                                >
                                     <AlertDialogTrigger asChild>
+                                        {/*
+                                         * Test hook: this button and the card heading above it
+                                         * both read "Delete account", so text alone cannot
+                                         * pick it out.
+                                         */}
                                         <Button
                                             type="button"
                                             variant="destructive"
+                                            data-testid="delete-account"
                                             className="h-11 cursor-pointer rounded-4xl px-5 text-sm font-semibold"
                                         >
                                             {t.deleteAction}
@@ -414,6 +565,40 @@ export default function Settings() {
                                             </AlertDialogDescription>
                                         </AlertDialogHeader>
 
+                                        <Field
+                                            data-invalid={
+                                                !!deleteForm.errors.password ||
+                                                undefined
+                                            }
+                                        >
+                                            <FieldLabel htmlFor="delete_password">
+                                                {t.deletePasswordLabel}
+                                            </FieldLabel>
+                                            <Input
+                                                id="delete_password"
+                                                name="delete_password"
+                                                type="password"
+                                                autoComplete="current-password"
+                                                placeholder={
+                                                    t.deletePasswordPlaceholder
+                                                }
+                                                value={deleteForm.data.password}
+                                                aria-invalid={
+                                                    !!deleteForm.errors
+                                                        .password || undefined
+                                                }
+                                                onChange={(e) =>
+                                                    deleteForm.setData(
+                                                        'password',
+                                                        e.target.value,
+                                                    )
+                                                }
+                                            />
+                                            <FieldError>
+                                                {deleteForm.errors.password}
+                                            </FieldError>
+                                        </Field>
+
                                         <AlertDialogFooter>
                                             <AlertDialogCancel asChild>
                                                 <Button
@@ -424,16 +609,24 @@ export default function Settings() {
                                                     {t.deleteDialogCancel}
                                                 </Button>
                                             </AlertDialogCancel>
-                                            <AlertDialogAction asChild>
-                                                <Button
-                                                    type="button"
-                                                    disabled
-                                                    variant="destructive"
-                                                    className="h-11 w-full cursor-not-allowed rounded-4xl text-sm font-semibold sm:w-auto sm:px-5"
-                                                >
-                                                    {t.deleteDialogConfirm}
-                                                </Button>
-                                            </AlertDialogAction>
+                                            {/*
+                                             * A plain Button, not AlertDialogAction: that one closes the
+                                             * dialog on click, which would throw away a rejected password
+                                             * before the error could be shown.
+                                             */}
+                                            <Button
+                                                type="button"
+                                                variant="destructive"
+                                                disabled={
+                                                    deleteForm.processing ||
+                                                    deleteForm.data.password ===
+                                                        ''
+                                                }
+                                                onClick={deleteAccount}
+                                                className="h-11 w-full cursor-pointer rounded-4xl text-sm font-semibold sm:w-auto sm:px-5"
+                                            >
+                                                {t.deleteDialogConfirm}
+                                            </Button>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
                                 </AlertDialog>

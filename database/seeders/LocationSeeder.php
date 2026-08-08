@@ -25,14 +25,14 @@ final class LocationSeeder extends Seeder
                 'max_distance_allowed' => 5,
                 'phone' => '(954) 781-0003',
                 'phone_ext' => null,
-                'email' => 'pompano@martorifarms.com',
+                'email' => 'admin@juanplaza.dev',
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'checkin' => [
                         'email_addresses' => [
-                            'ci-pompano@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'show_truck_color' => false,
                         'show_empty_weight_lbs' => false,
@@ -46,7 +46,7 @@ final class LocationSeeder extends Seeder
                     ],
                     'appointment' => [
                         'email_addresses' => [
-                            'ci-pompano@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
@@ -63,14 +63,14 @@ final class LocationSeeder extends Seeder
                 'max_distance_allowed' => 500,
                 'phone' => '(954) 781-0003',
                 'phone_ext' => null,
-                'email' => 'pennterminal@martorifarms.com',
+                'email' => 'admin@juanplaza.dev',
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'checkin' => [
                         'email_addresses' => [
-                            'ci-pennterminal@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'show_truck_color' => false,
                         'show_empty_weight_lbs' => false,
@@ -84,7 +84,7 @@ final class LocationSeeder extends Seeder
                     ],
                     'appointment' => [
                         'email_addresses' => [
-                            'ci-pennterminal@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
@@ -101,14 +101,14 @@ final class LocationSeeder extends Seeder
                 'max_distance_allowed' => 5,
                 'phone' => '(954) 781-0003',
                 'phone_ext' => null,
-                'email' => 'channel@martorifarms.com',
+                'email' => 'admin@juanplaza.dev',
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'checkin' => [
                         'email_addresses' => [
-                            'ci-channel@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'show_truck_color' => false,
                         'show_empty_weight_lbs' => false,
@@ -122,7 +122,7 @@ final class LocationSeeder extends Seeder
                     ],
                     'appointment' => [
                         'email_addresses' => [
-                            'ci-channel@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
@@ -139,14 +139,14 @@ final class LocationSeeder extends Seeder
                 'max_distance_allowed' => 5,
                 'phone' => '(954) 781-0003',
                 'phone_ext' => null,
-                'email' => 'channel@martorifarms.com',
+                'email' => 'admin@juanplaza.dev',
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'checkin' => [
                         'email_addresses' => [
-                            'ci-channel@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'show_truck_color' => false,
                         'show_empty_weight_lbs' => false,
@@ -160,7 +160,7 @@ final class LocationSeeder extends Seeder
                     ],
                     'appointment' => [
                         'email_addresses' => [
-                            'ci-channel@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
@@ -177,14 +177,14 @@ final class LocationSeeder extends Seeder
                 'max_distance_allowed' => 5,
                 'phone' => '(480) 998-1444',
                 'phone_ext' => null,
-                'email' => 'firebaugh@martorifarms.com',
+                'email' => 'admin@juanplaza.dev',
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'checkin' => [
                         'email_addresses' => [
-                            'ci-firebaugh@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'show_truck_color' => true,
                         'show_empty_weight_lbs' => true,
@@ -198,7 +198,7 @@ final class LocationSeeder extends Seeder
                     ],
                     'appointment' => [
                         'email_addresses' => [
-                            'ci-firebaugh@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
@@ -215,14 +215,14 @@ final class LocationSeeder extends Seeder
                 'max_distance_allowed' => 5,
                 'phone' => '(480) 998-1444',
                 'phone_ext' => null,
-                'email' => 'aguila@martorifarms.com',
+                'email' => 'admin@juanplaza.dev',
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'checkin' => [
                         'email_addresses' => [
-                            'ci-aguila@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'show_truck_color' => true,
                         'show_empty_weight_lbs' => true,
@@ -236,7 +236,7 @@ final class LocationSeeder extends Seeder
                     ],
                     'appointment' => [
                         'email_addresses' => [
-                            'ci-aguila@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
@@ -253,14 +253,14 @@ final class LocationSeeder extends Seeder
                 'max_distance_allowed' => 5,
                 'phone' => '(480) 998-1444',
                 'phone_ext' => null,
-                'email' => 'maricopa@martorifarms.com',
+                'email' => 'admin@juanplaza.dev',
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'checkin' => [
                         'email_addresses' => [
-                            'ci-maricopa@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'show_truck_color' => true,
                         'show_empty_weight_lbs' => true,
@@ -274,7 +274,7 @@ final class LocationSeeder extends Seeder
                     ],
                     'appointment' => [
                         'email_addresses' => [
-                            'ci-maricopa@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
@@ -291,14 +291,14 @@ final class LocationSeeder extends Seeder
                 'max_distance_allowed' => 5000,
                 'phone' => '(480) 998-1444',
                 'phone_ext' => null,
-                'email' => 'courthouse@martorifarms.com',
+                'email' => 'admin@juanplaza.dev',
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'checkin' => [
                         'email_addresses' => [
-                            'ci-courthouse@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'show_truck_color' => true,
                         'show_empty_weight_lbs' => true,
@@ -312,7 +312,7 @@ final class LocationSeeder extends Seeder
                     ],
                     'appointment' => [
                         'email_addresses' => [
-                            'ci-courthouse@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,
@@ -329,14 +329,14 @@ final class LocationSeeder extends Seeder
                 'max_distance_allowed' => 5,
                 'phone' => '(480) 998-1444',
                 'phone_ext' => null,
-                'email' => 'salinas@martorifarms.com',
+                'email' => 'admin@juanplaza.dev',
                 'is_active' => true,
                 'is_checkins_enabled' => true,
                 'is_appointments_enabled' => true,
                 'config' => json_encode([
                     'checkin' => [
                         'email_addresses' => [
-                            'ci-salinas@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'show_truck_color' => true,
                         'show_empty_weight_lbs' => true,
@@ -350,7 +350,7 @@ final class LocationSeeder extends Seeder
                     ],
                     'appointment' => [
                         'email_addresses' => [
-                            'ci-salinas@martorifarms.com',
+                            'admin@juanplaza.dev',
                         ],
                         'max_booking_days_ahead' => 5,
                         'slot_interval_minutes' => 15,

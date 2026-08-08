@@ -24,6 +24,23 @@ return new class extends Migration
             $table->text('drivers_license_number')->nullable();
             $table->string('drivers_license_state')->nullable();
             $table->date('drivers_license_expiration_date')->nullable();
+            $table->string('locale', 5)->nullable();
+            $table->string('theme')->nullable();
+            /*
+             * Notification preferences. Not nullable: an opt-out toggle has no
+             * meaningful "never chosen" state the way locale and theme do, and
+             * keeping them NOT NULL lets a future reminder job filter recipients
+             * with a plain indexable where clause. Defaults live here so the
+             * database is the source of truth; App\Models\User mirrors them in
+             * $attributes so an unsaved model reads the same.
+             */
+            $table->boolean('notify_check_in_copy')->default(true);
+            $table->boolean('notify_appointment_copy')->default(true);
+            $table->boolean('notify_appointment_reminder')->default(true);
+            // Email rather than both: a text costs money per send, and most
+            // drivers have no number on file at signup, so opting in is deliberate.
+            $table->string('notification_channel')->default('email');
+            $table->foreignId('location_id')->nullable()->constrained('locations')->nullOnDelete();
             $table->unsignedBigInteger('pending_check_in_id')->nullable();
             $table->unsignedBigInteger('pending_appointment_id')->nullable();
             $table->text('two_factor_secret')->nullable();

@@ -129,8 +129,9 @@ return [
         'themeDescription' => 'Use a dark screen at night.',
         'themeLight' => 'Light',
         'themeDark' => 'Dark',
+        'themeSystem' => 'System',
         'defaultLocationLabel' => 'Usual location',
-        'defaultLocationDescription' => 'We will select this first when you check in.',
+        'defaultLocationDescription' => 'We will list this first when you book an appointment.',
         'defaultLocationNone' => 'No usual location',
 
         'notificationsHeading' => 'Notifications',
@@ -142,8 +143,11 @@ return [
         'channelNeedsPhone' => 'Add your phone number first',
         'checkInCopyLabel' => 'Send me a copy of each check-in',
         'checkInCopyDescription' => 'A receipt with your reference number.',
+        'appointmentCopyLabel' => 'Send me a copy of each appointment booking',
+        'appointmentCopyDescription' => 'A confirmation with your reference number, date and location.',
         'appointmentReminderLabel' => 'Remind me before an appointment',
         'appointmentReminderDescription' => 'A reminder the day before.',
+        'copiesAlwaysEmail' => 'A text gives you the reference number and a link to the full details. The PDF receipt only comes by email, so choose Both if you want the paperwork as well.',
         'securityAlwaysEmail' => 'Password resets and account security messages always come by email, so we can keep your account safe. This setting does not change those.',
 
         'securityHeading' => 'Security',
@@ -169,6 +173,8 @@ return [
         'deleteDialogBody' => 'Your profile and saved details will be removed. Your past check-ins and appointments stay with the yard, but will no longer be linked to you.',
         'deleteDialogCancel' => 'Keep my account',
         'deleteDialogConfirm' => 'Yes, delete it',
+        'deletePasswordLabel' => 'Enter your password to confirm',
+        'deletePasswordPlaceholder' => 'Your password',
     ],
 
     'accountHistory' => [
@@ -200,6 +206,41 @@ return [
         'statusScheduled' => 'Scheduled',
         'statusNoShow' => 'No show',
         'statusCheckedIn' => 'Checked in',
+    ],
+
+    'checkInCopyEmail' => [
+        'subject' => 'Your check-in :reference at :location',
+        'preheader' => 'Your copy of the check-in at :location.',
+        'eyebrow' => 'Your copy',
+        'title' => 'You are checked in',
+        'intro' => 'Here is your copy. The PDF receipt is attached; keep it for your records or forward it to your dispatcher.',
+    ],
+
+    'appointmentCopyEmail' => [
+        'subject' => 'Your appointment :reference at :location',
+        'preheader' => 'Your copy of the booking at :location.',
+        'eyebrow' => 'Your copy',
+        'title' => 'Your appointment is booked',
+        'intro' => 'Here is your copy. The PDF confirmation is attached; keep it for your records or forward it to your dispatcher.',
+    ],
+
+    /*
+     * One text message is 160 GSM-7 characters and the driver is billed for a
+     * second, so the budget is tight: the link alone is ~90 of it, since the
+     * uuid is 36 and the domain is longer in production than in development.
+     *
+     * That leaves no room for the location name, which is the one variable-width
+     * value here and could be anything an admin types - so it stays out, and the
+     * linked page carries it along with the time and the rest of the detail. The
+     * app name does stay: a bare link from an unknown number is indistinguishable
+     * from a phishing text. :url requires signing in.
+     */
+    'checkInCopySms' => [
+        'body' => ':app: you are checked in. Ref :reference. :url',
+    ],
+
+    'appointmentCopySms' => [
+        'body' => ':app: your appointment is booked. Ref :reference. :url',
     ],
 
     'recordDocumentEmail' => [
@@ -406,6 +447,7 @@ return [
         'closedForCheckInWithoutReason' => ':name is not available for check-in right now.',
         'closedForCheckInToday' => ':name is closed for check-in today. Please come back during posted hours.',
         'selectLocationToContinue' => 'Please select a location to continue.',
+        'retryLocation' => 'Try again',
     ],
 
     'appointmentSelectLocation' => [
@@ -413,6 +455,7 @@ return [
         'closed' => 'Closed',
         'open' => 'Open',
         'nearest' => 'Nearest',
+        'yourUsual' => 'Your usual',
         'specialHoursToday' => 'Special hours today',
         'closingSoon' => 'Closing soon',
         'closedToday' => 'Closed today',
@@ -638,5 +681,14 @@ return [
         'fallbackLabel' => 'If the button above does not work, copy and paste this link into your browser:',
         'security' => 'If you did not request a password reset, no action is needed and you can safely ignore this email.',
         'footer' => 'This is an automated message from :app. Please do not reply.',
+    ],
+
+    /*
+     * Overrides for Laravel's built-in validation messages. No validation.php is
+     * published in any locale, so anything not overridden here falls back to the
+     * framework's English string regardless of the driver's language.
+     */
+    'validation' => [
+        'currentPassword' => 'That is not your current password.',
     ],
 ];

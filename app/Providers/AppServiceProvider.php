@@ -4,23 +4,26 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Listeners\AttachPendingRecordsToUser;
+use App\Actions\RecordHistoryAction;
+use App\Enums\RecordHistoryEvent;
 use App\Models\Appointment;
 use App\Models\AppointmentSchedule;
 use App\Models\AppointmentScheduleOverride;
+use App\Models\CheckIn;
 use App\Models\CheckInSchedule;
 use App\Models\CheckInScheduleOverride;
 use App\Models\Location;
 use App\Pdf\BrowsershotRecordPdfRenderer;
 use App\Pdf\RecordPdfRenderer;
 use App\Schedule\WeeklyScheduleResolver;
+use App\Sms\LogSmsSender;
+use App\Sms\SmsSender;
+use BackedEnum;
 use Carbon\CarbonImmutable;
-use Illuminate\Auth\Events\Verified;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
@@ -39,6 +42,14 @@ final class AppServiceProvider extends ServiceProvider
 
         // bind, not singleton: Octane keeps singletons across requests.
         $this->app->bind(RecordPdfRenderer::class, BrowsershotRecordPdfRenderer::class);
+
+        /*
+         * No carrier account yet, so texts are logged rather than sent. FlowRoute
+         * lands as a second SmsSender implementation and one changed line here.
+         * Note that Mail::alwaysTo() has no SMS equivalent, so whoever wires the
+         * carrier up needs a non-production guard of their own.
+         */
+        $this->app->bind(SmsSender::class, LogSmsSender::class);
     }
 
     /**
@@ -112,16 +123,63 @@ final class AppServiceProvider extends ServiceProvider
 
         $this->flushScheduleCacheOnDataChanges();
 
-        $this->registerEventListeners();
+        $this->recordStatusTransitions();
     }
 
-    /**
-     * Attach a driver's pending guest check-in / appointment once their email
-     * is verified.
+    /*
+     * Deliberately no event listener registration here.
+     *
+     * Laravel discovers anything in app/Listeners whose method name starts with
+     * "handle" and typehints an event, so registering one explicitly as well
+     * makes it fire twice. AttachPendingRecordsToUser was registered here and
+     * ran twice on every verification; it survived only because the claim is
+     * guarded by whereNull('user_id') and the second pass matched no rows.
+     *
+     * RecordNotificationHistory is picked up the same way, which is also why a
+     * new notification joins the trail without touching this file.
      */
-    private function registerEventListeners(): void
+
+    /**
+     * Record status transitions on the records themselves, so the ERP sync gets
+     * its history for free rather than having to remember to write it.
+     *
+     * Model events do not fire for mass Query::update(), which is how
+     * ClaimPendingRecordsAction writes - that one records explicitly, and any
+     * future bulk status update needs the same.
+     */
+    private function recordStatusTransitions(): void
     {
-        Event::listen(Verified::class, AttachPendingRecordsToUser::class);
+        // Only check-ins carry an ERP status; appointments have no such column.
+        $models = [
+            CheckIn::class => ['status', 'erp_status'],
+            Appointment::class => ['status'],
+        ];
+
+        foreach ($models as $model => $columns) {
+            $model::saved(static function (CheckIn|Appointment $record) use ($columns): void {
+                foreach ($columns as $column) {
+                    if (! $record->wasChanged($column)) {
+                        continue;
+                    }
+
+                    // Read through getAttribute: the column is a variable here,
+                    // and both sides may or may not have been cast to an enum.
+                    $scalar = static fn (mixed $value): mixed => $value instanceof BackedEnum
+                        ? $value->value
+                        : $value;
+
+                    resolve(RecordHistoryAction::class)->handle(
+                        record: $record,
+                        event: RecordHistoryEvent::StatusChanged,
+                        subject: $column,
+                        context: [
+                            'from' => $scalar($record->getOriginal($column)),
+                            'to' => $scalar($record->getAttribute($column)),
+                        ],
+                    );
+                }
+            });
+        }
     }
 
     /**
@@ -222,8 +280,16 @@ final class AppServiceProvider extends ServiceProvider
         date_default_timezone_set(config('app.timezone'));
     }
 
+    /**
+     * CheckIn was missing here, so its polymorphic rows stored the class name
+     * while appointments stored the alias. The record_history migration
+     * realigns the purchase_orders rows written before this was fixed.
+     */
     private function enforceMorphMaps(): void
     {
-        Relation::morphMap(['appointment' => Appointment::class]);
+        Relation::morphMap([
+            'appointment' => Appointment::class,
+            'check_in' => CheckIn::class,
+        ]);
     }
 }

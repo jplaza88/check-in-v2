@@ -16,6 +16,7 @@ final readonly class CompleteCheckInAction
         private CreateCheckInAction $createCheckIn,
         private CreatePurchaseOrdersAction $createPurchaseOrders,
         private SendCheckInCompletedEmailAction $sendCheckInCompletedEmail,
+        private SendCheckInCopyAction $sendCheckInCopy,
     ) {}
 
     /**
@@ -36,6 +37,9 @@ final readonly class CompleteCheckInAction
         // Queued after the commit so the notification never references a
         // check-in that was rolled back.
         $this->sendCheckInCompletedEmail->handle($checkIn);
+
+        // The driver's own copy, if they are signed in and have asked for it.
+        $this->sendCheckInCopy->handle($checkIn);
 
         return $checkIn;
     }

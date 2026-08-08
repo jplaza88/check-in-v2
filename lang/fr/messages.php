@@ -126,8 +126,9 @@ return [
         'themeDescription' => 'Utilisez un écran sombre la nuit.',
         'themeLight' => 'Clair',
         'themeDark' => 'Sombre',
+        'themeSystem' => 'Système',
         'defaultLocationLabel' => 'Site habituel',
-        'defaultLocationDescription' => 'Nous le choisirons en premier à votre arrivée.',
+        'defaultLocationDescription' => 'Nous le placerons en premier lors de la prise de rendez-vous.',
         'defaultLocationNone' => 'Aucun site habituel',
 
         'notificationsHeading' => 'Alertes',
@@ -139,8 +140,11 @@ return [
         'channelNeedsPhone' => "Ajoutez d'abord votre numéro",
         'checkInCopyLabel' => 'Envoyez-moi une copie de chaque enregistrement',
         'checkInCopyDescription' => 'Un reçu avec votre numéro de référence.',
+        'appointmentCopyLabel' => 'Envoyez-moi une copie de chaque rendez-vous réservé',
+        'appointmentCopyDescription' => 'Une confirmation avec votre numéro de référence, la date et le lieu.',
         'appointmentReminderLabel' => 'Rappelez-moi avant un rendez-vous',
         'appointmentReminderDescription' => 'Un rappel la veille.',
+        'copiesAlwaysEmail' => "Un SMS vous donne le numéro de référence et un lien vers le détail complet. Le reçu PDF n'arrive que par e-mail : choisissez Les deux si vous voulez aussi le document.",
         'securityAlwaysEmail' => "Les réinitialisations de mot de passe et les messages de sécurité arrivent toujours par e-mail, pour protéger votre compte. Ce réglage n'y change rien.",
 
         'securityHeading' => 'Sécurité',
@@ -166,6 +170,8 @@ return [
         'deleteDialogBody' => 'Votre profil et vos informations enregistrées seront supprimés. Vos enregistrements et rendez-vous passés restent chez le site, mais ne seront plus liés à vous.',
         'deleteDialogCancel' => 'Garder mon compte',
         'deleteDialogConfirm' => 'Oui, supprimer',
+        'deletePasswordLabel' => 'Saisissez votre mot de passe pour confirmer',
+        'deletePasswordPlaceholder' => 'Votre mot de passe',
     ],
 
     'accountHistory' => [
@@ -197,6 +203,35 @@ return [
         'statusScheduled' => 'Planifié',
         'statusNoShow' => 'Absent',
         'statusCheckedIn' => 'Enregistré',
+    ],
+
+    'checkInCopyEmail' => [
+        'subject' => 'Votre enregistrement :reference à :location',
+        'preheader' => "Votre copie de l'enregistrement à :location.",
+        'eyebrow' => 'Votre copie',
+        'title' => 'Vous êtes enregistré',
+        'intro' => 'Voici votre copie. Le reçu PDF est joint ; conservez-le ou transmettez-le à votre répartiteur.',
+    ],
+
+    'appointmentCopyEmail' => [
+        'subject' => 'Votre rendez-vous :reference à :location',
+        'preheader' => 'Votre copie du rendez-vous à :location.',
+        'eyebrow' => 'Votre copie',
+        'title' => 'Votre rendez-vous est réservé',
+        'intro' => 'Voici votre copie. La confirmation PDF est jointe ; conservez-la ou transmettez-la à votre répartiteur.',
+    ],
+
+    /*
+     * Volontairement courts : un SMS fait 160 caractères et le second est
+     * facturé au conducteur. :url est la page d'historique, qui demande une
+     * connexion.
+     */
+    'checkInCopySms' => [
+        'body' => ':app: vous êtes enregistré. Réf :reference. :url',
+    ],
+
+    'appointmentCopySms' => [
+        'body' => ':app: votre rendez-vous est réservé. Réf :reference. :url',
     ],
 
     'recordDocumentEmail' => [
@@ -392,6 +427,7 @@ return [
         'checkInUnavailable' => 'Enregistrement non disponible',
         'outsideExceptionHours' => ":name a des horaires spéciaux aujourd'hui : :open - :close. Veuillez revenir pendant les heures d'ouverture.",
         'selectLocationToContinue' => 'Veuillez sélectionner un emplacement pour continuer.',
+        'retryLocation' => 'Réessayer',
     ],
 
     'appointmentSelectLocation' => [
@@ -399,6 +435,7 @@ return [
         'closed' => 'Fermé',
         'open' => 'Ouvert',
         'nearest' => 'Le plus proche',
+        'yourUsual' => 'Votre site habituel',
         'specialHoursToday' => "Horaires spéciaux aujourd'hui",
         'closingSoon' => 'Ferme bientôt',
         'closedToday' => "Fermé aujourd'hui",
@@ -623,5 +660,10 @@ return [
         'fallbackLabel' => 'Si le bouton ci-dessus ne fonctionne pas, copiez et collez ce lien dans votre navigateur :',
         'security' => "Si vous n'avez pas demandé de réinitialisation, aucune action n'est requise et vous pouvez ignorer cet e-mail en toute sécurité.",
         'footer' => 'Ceci est un message automatique de :app. Merci de ne pas y répondre.',
+    ],
+
+    // Voir le bloc dans lang/en : sans validation.php publié, ce qui n'est pas redéfini ici sort en anglais.
+    'validation' => [
+        'currentPassword' => "Ce n'est pas votre mot de passe actuel.",
     ],
 ];

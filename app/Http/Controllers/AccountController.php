@@ -14,12 +14,10 @@ use App\Http\Requests\HistoryRecordRequest;
 use App\Mail\RecordDocumentMail;
 use App\Models\Appointment;
 use App\Models\CheckIn;
-use App\Models\Location;
 use App\Models\User;
 use App\Pdf\RecordPdfDocument;
 use App\Pdf\RecordPdfDocumentFactory;
 use App\Pdf\RecordPdfStore;
-use App\Queries\CheckInLocations;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response as HttpResponse;
@@ -110,23 +108,6 @@ final class AccountController extends Controller
         HistoryRecordFinder $finder,
     ): RedirectResponse {
         return $this->queueDocument($user, $finder->appointment($user, $request->uuid()));
-    }
-
-    public function settings(#[CurrentUser] User $user, CheckInLocations $locations): Response
-    {
-        return inertia('Account/Settings', [
-            // Drives the default check-in location picker.
-            'locations' => $locations->execute()
-                ->map(fn (Location $location): array => [
-                    'id' => $location->uuid,
-                    'name' => $location->name,
-                ])
-                ->values()
-                ->all(),
-            // The text-message channel is unusable without a number on file,
-            // so the option is disabled rather than silently failing to deliver.
-            'hasCellphone' => $user->cellphone !== null,
-        ]);
     }
 
     public function editProfile(#[CurrentUser] User $user): Response

@@ -1,5 +1,5 @@
 import { usePage } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getDriverCoords, saveDriverCoords } from '@/utils/driverCoords';
 interface Coords {
     latitude: number;
@@ -12,6 +12,14 @@ interface GeolocationState {
     warning: string | null;
 }
 
+interface GeolocationResult extends GeolocationState {
+    /**
+     * Re-runs the lookup. Denying the browser prompt is otherwise a dead end, since the effect below
+     * only fires on mount and recovering would mean changing a browser setting and reloading.
+     */
+    retry: () => void;
+}
+
 const DEFAULT_OPTIONS: PositionOptions = {
     enableHighAccuracy: false,
     timeout: 10_000,
@@ -19,7 +27,7 @@ const DEFAULT_OPTIONS: PositionOptions = {
 };
 export function useGeolocation(
     options: PositionOptions = DEFAULT_OPTIONS,
-): GeolocationState {
+): GeolocationResult {
     const [state, setState] = useState<GeolocationState>({
         coords: null,
         loading: true,
@@ -30,11 +38,10 @@ export function useGeolocation(
     const { userCoordsBrowserTtl } = usePage<{ userCoordsBrowserTtl: number }>()
         .props;
 
-    useEffect(() => {
+    const request = useCallback(() => {
         const cached = getDriverCoords();
 
         if (cached) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
             setState({
                 coords: {
                     latitude: cached.latitude,
@@ -64,6 +71,8 @@ export function useGeolocation(
             return;
         }
 
+        setState({ coords: null, loading: true, error: null, warning: null });
+
         const success = (pos: GeolocationPosition) => {
             saveDriverCoords(
                 pos.coords.latitude,
@@ -87,7 +96,16 @@ export function useGeolocation(
         };
 
         navigator.geolocation.getCurrentPosition(success, error, options);
+    }, [options, userCoordsBrowserTtl]);
+
+    // Mount only. `request` is stable for the current caller, but depending on it would re-prompt on
+    // every render for anyone who passes an inline options object, so the prompt stays pinned to mount
+    // and re-running it is left to the explicit retry below.
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        request();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    return state;
+    return { ...state, retry: request };
 }

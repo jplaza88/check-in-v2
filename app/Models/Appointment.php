@@ -69,6 +69,17 @@ final class Appointment extends Model
         return $this->morphMany(PurchaseOrder::class, 'purchasable');
     }
 
+    /**
+     * The append-only trail of what happened to this booking. See
+     * {@see CheckIn::history()}.
+     *
+     * @return MorphMany<RecordHistory, $this>
+     */
+    public function history(): MorphMany
+    {
+        return $this->morphMany(RecordHistory::class, 'recordable')->oldest();
+    }
+
     public function getRouteKeyName(): string
     {
         return 'uuid';

@@ -6,6 +6,7 @@ namespace App\Actions;
 
 use App\DTOs\AppointmentLocationDTO;
 use App\Enums\AppointmentStatus;
+use App\Enums\RecordHistoryEvent;
 use App\Locale\LocaleManager;
 use App\Models\Appointment;
 use App\Models\Location;
@@ -19,7 +20,10 @@ use Throwable;
 
 final readonly class CreateAppointmentAction
 {
-    public function __construct(private LocaleManager $localeManager) {}
+    public function __construct(
+        private LocaleManager $localeManager,
+        private RecordHistoryAction $history,
+    ) {}
 
     /**
      * @param  array<string, mixed>  $validated
@@ -35,7 +39,7 @@ final readonly class CreateAppointmentAction
 
         throw_if(! $location instanceof Location, RuntimeException::class, 'Invalid location');
 
-        return Appointment::query()->create([
+        $appointment = Appointment::query()->create([
             'uuid' => Str::uuid()->toString(),
             'reference_number' => $this->generateReferenceNumber(),
             'location_id' => $location->id,
@@ -46,6 +50,15 @@ final readonly class CreateAppointmentAction
             'locale' => $this->localeManager->getLocale(request()),
             'status' => AppointmentStatus::Scheduled,
         ]);
+
+        // The opening row of the trail an admin reads.
+        $this->history->handle(
+            record: $appointment,
+            event: RecordHistoryEvent::Created,
+            context: ['guest' => ! $user instanceof User],
+        );
+
+        return $appointment;
     }
 
     /**

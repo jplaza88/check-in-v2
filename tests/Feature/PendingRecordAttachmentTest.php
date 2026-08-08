@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Enums\RecordHistoryEvent;
 use App\Models\Appointment;
 use App\Models\CheckIn;
 use App\Models\Location;
@@ -78,4 +79,35 @@ it('does not claim a check-in that already has a user', function (): void {
     expect($checkIn->user_id)->toBe($owner->id)
         ->and($checkIn->claimed_at)->toBeNull()
         ->and($other->refresh()->pending_check_in_id)->toBeNull();
+});
+
+/*
+ * The claim is a mass Query::update(), which fires no model events, so the
+ * trail row is written by hand. This is the test that catches it going missing.
+ */
+it('records the claim on the record trail', function (): void {
+    $checkIn = CheckIn::factory()->create(['user_id' => null]);
+    $user = driverWithPending(['pending_check_in_id' => $checkIn->id]);
+
+    event(new Verified($user));
+
+    $row = $checkIn->history()
+        ->where('event', RecordHistoryEvent::Claimed)
+        ->sole();
+
+    expect($row->subject)->toBe('email_verification')
+        ->and($row->user_id)->toBe($user->id);
+});
+
+/*
+ * The listener is auto-discovered from app/Listeners, so registering it
+ * explicitly as well would run the claim twice and log it twice.
+ */
+it('records the claim exactly once', function (): void {
+    $checkIn = CheckIn::factory()->create(['user_id' => null]);
+    $user = driverWithPending(['pending_check_in_id' => $checkIn->id]);
+
+    event(new Verified($user));
+
+    expect($checkIn->history()->where('event', RecordHistoryEvent::Claimed)->count())->toBe(1);
 });

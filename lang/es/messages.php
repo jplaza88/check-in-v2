@@ -126,8 +126,9 @@ return [
         'themeDescription' => 'Usa la pantalla oscura de noche.',
         'themeLight' => 'Clara',
         'themeDark' => 'Oscura',
+        'themeSystem' => 'Sistema',
         'defaultLocationLabel' => 'Lugar habitual',
-        'defaultLocationDescription' => 'Lo elegiremos primero cuando te registres.',
+        'defaultLocationDescription' => 'Lo mostraremos primero cuando agendes una cita.',
         'defaultLocationNone' => 'Sin lugar habitual',
 
         'notificationsHeading' => 'Avisos',
@@ -139,8 +140,11 @@ return [
         'channelNeedsPhone' => 'Agrega tu número primero',
         'checkInCopyLabel' => 'Envíame una copia de cada registro',
         'checkInCopyDescription' => 'Un comprobante con tu número de referencia.',
+        'appointmentCopyLabel' => 'Envíame una copia de cada cita que agende',
+        'appointmentCopyDescription' => 'Una confirmación con tu número de referencia, la fecha y el lugar.',
         'appointmentReminderLabel' => 'Recuérdame antes de una cita',
         'appointmentReminderDescription' => 'Un recordatorio el día anterior.',
+        'copiesAlwaysEmail' => 'Un mensaje de texto te da el número de referencia y un enlace a todos los detalles. El comprobante en PDF solo llega por correo, así que elige Los dos si también quieres el documento.',
         'securityAlwaysEmail' => 'Los cambios de contraseña y los mensajes de seguridad siempre llegan por correo, para mantener tu cuenta protegida. Esta opción no cambia eso.',
 
         'securityHeading' => 'Seguridad',
@@ -166,6 +170,8 @@ return [
         'deleteDialogBody' => 'Se borrarán tu perfil y tus datos guardados. Tus registros y citas anteriores se quedan con el patio, pero ya no estarán ligados a ti.',
         'deleteDialogCancel' => 'Conservar mi cuenta',
         'deleteDialogConfirm' => 'Sí, eliminarla',
+        'deletePasswordLabel' => 'Ingresa tu contraseña para confirmar',
+        'deletePasswordPlaceholder' => 'Tu contraseña',
     ],
 
     'accountHistory' => [
@@ -197,6 +203,35 @@ return [
         'statusScheduled' => 'Programada',
         'statusNoShow' => 'No se presentó',
         'statusCheckedIn' => 'Registrado',
+    ],
+
+    'checkInCopyEmail' => [
+        'subject' => 'Tu registro :reference en :location',
+        'preheader' => 'Tu copia del registro en :location.',
+        'eyebrow' => 'Tu copia',
+        'title' => 'Tu registro está listo',
+        'intro' => 'Aquí tienes tu copia. El comprobante en PDF viene adjunto; guárdalo o envíaselo a tu despachador.',
+    ],
+
+    'appointmentCopyEmail' => [
+        'subject' => 'Tu cita :reference en :location',
+        'preheader' => 'Tu copia de la cita en :location.',
+        'eyebrow' => 'Tu copia',
+        'title' => 'Tu cita está agendada',
+        'intro' => 'Aquí tienes tu copia. La confirmación en PDF viene adjunta; guárdala o envíasela a tu despachador.',
+    ],
+
+    /*
+     * Deliberadamente cortos: un mensaje de texto son 160 caracteres y el
+     * segundo se le cobra al conductor. :url es la página de historial, que
+     * pide iniciar sesión.
+     */
+    'checkInCopySms' => [
+        'body' => ':app: tu registro está hecho. Ref :reference. :url',
+    ],
+
+    'appointmentCopySms' => [
+        'body' => ':app: tu cita está agendada. Ref :reference. :url',
     ],
 
     'recordDocumentEmail' => [
@@ -392,6 +427,7 @@ return [
         'checkInUnavailable' => 'Registro no disponible',
         'outsideExceptionHours' => ':name tiene horario especial hoy: :open - :close. Por favor regrese durante el horario de atención.',
         'selectLocationToContinue' => 'Por favor seleccione una ubicación para continuar.',
+        'retryLocation' => 'Intentar de nuevo',
     ],
 
     'appointmentSelectLocation' => [
@@ -399,6 +435,7 @@ return [
         'closed' => 'Cerrado',
         'open' => 'Abierto',
         'nearest' => 'Más cercano',
+        'yourUsual' => 'Tu habitual',
         'specialHoursToday' => 'Horario especial hoy',
         'closingSoon' => 'Cierra pronto',
         'closedToday' => 'Cerrado hoy',
@@ -623,5 +660,10 @@ return [
         'fallbackLabel' => 'Si el botón de arriba no funciona, copia y pega este enlace en tu navegador:',
         'security' => 'Si no solicitaste restablecer la contraseña, no es necesario hacer nada y puedes ignorar este correo con seguridad.',
         'footer' => 'Este es un mensaje automático de :app. Por favor, no respondas.',
+    ],
+
+    // Ver el bloque en lang/en: sin validation.php publicado, lo no anulado aquí sale en inglés.
+    'validation' => [
+        'currentPassword' => 'Esa no es tu contraseña actual.',
     ],
 ];

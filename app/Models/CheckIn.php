@@ -106,6 +106,19 @@ final class CheckIn extends Model
         return $this->morphMany(PurchaseOrder::class, 'purchasable');
     }
 
+    /**
+     * The append-only trail of what happened to this check-in.
+     *
+     * Ordered oldest-first at the relation, so a timeline is one eager load
+     * with no sorting at the call site.
+     *
+     * @return MorphMany<RecordHistory, $this>
+     */
+    public function history(): MorphMany
+    {
+        return $this->morphMany(RecordHistory::class, 'recordable')->oldest();
+    }
+
     public function getRouteKeyName(): string
     {
         return 'uuid';

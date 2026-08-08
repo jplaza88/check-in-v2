@@ -23,10 +23,32 @@ final class AppointmentController extends Controller
 {
     public function __construct(private readonly AppointmentSession $session) {}
 
-    public function selectLocation(AppointmentScheduleResolver $resolver): Response
+    public function selectLocation(AppointmentScheduleResolver $resolver, #[CurrentUser] ?User $user = null): Response
     {
+        $locations = $resolver->getLocations();
+
+        // Only honour the stored preference if it is still bookable. The resolver's list is already
+        // filtered to active, appointments-enabled locations, so membership is the whole check, and a
+        // location that has since been retired quietly reads as "none".
+        $usualLocationId = $user?->location?->uuid;
+
+        if ($usualLocationId !== null && $locations->doesntContain(fn (AppointmentLocationDTO $location): bool => $location->id === $usualLocationId)) {
+            $usualLocationId = null;
+        }
+
+        if ($usualLocationId !== null) {
+            // Stable in PHP 8, so everything else keeps the resolver's ordering.
+            $locations = $locations
+                ->sortByDesc(fn (AppointmentLocationDTO $location): bool => $location->id === $usualLocationId)
+                ->values();
+        }
+
         return inertia('AppointmentSelectLocation', [
-            'locations' => $resolver->getLocations(),
+            'locations' => $locations,
+            // A separate scalar rather than a flag on the DTO: AppointmentLocationDTO is serialized into
+            // the session by gate(), so widening it would break bookings that are mid-flight across a
+            // deploy. Being someone's usual location is a fact about the viewer, not about the location.
+            'usualLocationId' => $usualLocationId,
         ]);
     }
 
