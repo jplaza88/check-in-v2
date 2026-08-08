@@ -6,10 +6,12 @@ namespace Database\Factories;
 
 use App\Enums\CheckInErpStatus;
 use App\Enums\CheckInStatus;
+use App\Enums\ReferenceType;
 use App\Enums\TrailerChute;
 use App\Models\CheckIn;
 use App\Models\Location;
 use App\Models\User;
+use App\Reference\ReferenceNumberGenerator;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
@@ -25,14 +27,9 @@ final class CheckInFactory extends Factory
 
     public function definition(): array
     {
-        $chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-
         return [
             'uuid' => $this->faker->uuid(),
-            'reference_number' => implode('', array_map(
-                fn (): string => $chars[random_int(0, mb_strlen($chars) - 1)],
-                range(1, 8),
-            )),
+            'reference_number' => resolve(ReferenceNumberGenerator::class)->generate(ReferenceType::CheckIn),
             'status' => CheckInStatus::Pending,
             'erp_status' => CheckInErpStatus::Pending,
             'customer' => $this->faker->company(),

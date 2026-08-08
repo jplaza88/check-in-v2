@@ -71,6 +71,11 @@ final class CheckInCopy extends Notification implements RecordNotification, Shou
      * {@see \App\Account\HistoryRecordFinder} already scopes to the owning
      * driver. That is why no signed URL is involved: a signed URL would open
      * the record for anyone the text was forwarded to, where this 404s.
+     *
+     * It goes out shortened, via {@see \App\ShortLink\ShortLinkUrlGenerator},
+     * because the account history path plus a uuid ran to about 87 characters
+     * of a 160-character segment. Shortening changes the length and nothing
+     * else: the code expands to this same auth-gated URL.
      */
     public function toSms(User $notifiable): SmsMessage
     {
@@ -79,7 +84,7 @@ final class CheckInCopy extends Notification implements RecordNotification, Shou
             body: __('messages.checkInCopySms.body', [
                 'app' => (string) config('app.name'),
                 'reference' => $this->checkIn->reference_number,
-                'url' => route('account.history.checkIn', $this->checkIn->uuid),
+                'url' => $this->checkIn->shortUrl(),
             ]),
         );
     }

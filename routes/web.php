@@ -13,12 +13,10 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\ScheduleController;
 use Illuminate\Support\Facades\Route;
 
-$locales = implode('|', config('app.locales'));
-
-Route::prefix('locale')->group(function () use ($locales): void {
+Route::prefix('locale')->group(function (): void {
 
     Route::post('/{locale}', LocaleController::class)
-        ->where('locale', $locales)
+        ->where('locale', implode('|', config('app.locales')))
         ->name('localeSwitch');
 });
 

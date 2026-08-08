@@ -24,6 +24,10 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function (): void {
             Route::middleware(['web', 'setLocale'])
                 ->group(base_path('routes/auth.php'));
+
+            // Last, so the bare /{code} form cannot shadow a real page.
+            Route::middleware('throttle:60,1')
+                ->group(base_path('routes/shortlink.php'));
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {

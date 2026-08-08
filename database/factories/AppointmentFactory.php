@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Enums\AppointmentStatus;
+use App\Enums\ReferenceType;
 use App\Models\Appointment;
 use App\Models\Location;
 use App\Models\User;
+use App\Reference\ReferenceNumberGenerator;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
@@ -23,14 +25,9 @@ final class AppointmentFactory extends Factory
 
     public function definition(): array
     {
-        $chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-
         return [
             'uuid' => $this->faker->uuid(),
-            'reference_number' => implode('', array_map(
-                fn (): string => $chars[random_int(0, mb_strlen($chars) - 1)],
-                range(1, 8),
-            )),
+            'reference_number' => resolve(ReferenceNumberGenerator::class)->generate(ReferenceType::Appointment),
             'scheduled_for' => Date::now(),
             'drivers_name' => $this->faker->name(),
             'drivers_cellphone' => '+1'.$this->faker->numerify('##########'),

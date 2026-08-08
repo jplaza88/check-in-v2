@@ -142,7 +142,7 @@ it('carries the locale stamped on the check-in', function (): void {
     );
 });
 
-it('renders the text message with the reference and a link to the record', function (): void {
+it('renders the text message with the reference and a short link to the record', function (): void {
     $driver = copyDriver([
         'cellphone' => '+12015550123',
         'notification_channel' => NotificationChannel::Sms,
@@ -155,8 +155,30 @@ it('renders the text message with the reference and a link to the record', funct
         $checkIn = $notification->checkIn;
 
         return str_contains($message->body, $checkIn->reference_number)
-            && str_contains($message->body, route('account.history.checkIn', $checkIn->uuid))
+            && str_contains($message->body, $checkIn->shortUrl())
             && $message->to === '+12015550123';
+    });
+});
+
+/*
+ * The link is short, but it still resolves to the auth-gated record rather than
+ * exposing it, which is the property the shortening had to preserve.
+ */
+it('sends a short link that expands to the record', function (): void {
+    $driver = copyDriver([
+        'cellphone' => '+12015550123',
+        'notification_channel' => NotificationChannel::Sms,
+    ]);
+
+    checkInAs($driver);
+
+    Notification::assertSentTo($driver, CheckInCopy::class, function (CheckInCopy $notification) use ($driver): bool {
+        $checkIn = $notification->checkIn;
+        $url = $notification->toSms($driver)->body;
+
+        // The old link was the account history path plus a 36-character uuid.
+        return ! str_contains($url, $checkIn->uuid)
+            && str_contains($url, '/r/'.$checkIn->shortLink()->firstOrFail()->code);
     });
 });
 

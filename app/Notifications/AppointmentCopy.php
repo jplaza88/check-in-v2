@@ -59,6 +59,7 @@ final class AppointmentCopy extends Notification implements RecordNotification, 
         return new AppointmentCopyMail($this->appointment)->to($notifiable->email);
     }
 
+    /** Auth-gated and shortened for the same reasons as {@see CheckInCopy::toSms()}. */
     public function toSms(User $notifiable): SmsMessage
     {
         return new SmsMessage(
@@ -66,7 +67,7 @@ final class AppointmentCopy extends Notification implements RecordNotification, 
             body: __('messages.appointmentCopySms.body', [
                 'app' => (string) config('app.name'),
                 'reference' => $this->appointment->reference_number,
-                'url' => route('account.history.appointment', $this->appointment->uuid),
+                'url' => $this->appointment->shortUrl(),
             ]),
         );
     }

@@ -226,14 +226,16 @@ return [
 
     /*
      * One text message is 160 GSM-7 characters and the driver is billed for a
-     * second, so the budget is tight: the link alone is ~90 of it, since the
-     * uuid is 36 and the domain is longer in production than in development.
+     * second, so the budget matters. :url used to be the account history path
+     * plus a 36-character uuid, around 90 characters on its own. It is now a
+     * short code (see App\ShortLink\ShortLinkUrlGenerator), which brings the
+     * whole body to roughly 76 and leaves room even on a long client domain.
      *
-     * That leaves no room for the location name, which is the one variable-width
-     * value here and could be anything an admin types - so it stays out, and the
-     * linked page carries it along with the time and the rest of the detail. The
-     * app name does stay: a bare link from an unknown number is indistinguishable
-     * from a phishing text. :url requires signing in.
+     * The location name still stays out. It is the one variable-width value
+     * here, could be anything an admin types, and the linked page already
+     * carries it along with the time and the rest of the detail. The app name
+     * stays too: a bare link from an unknown number is indistinguishable from a
+     * phishing text. :url still requires signing in.
      */
     'checkInCopySms' => [
         'body' => ':app: you are checked in. Ref :reference. :url',

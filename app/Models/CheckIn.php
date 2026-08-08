@@ -8,6 +8,7 @@ use App\Casts\Encrypted;
 use App\Enums\CheckInErpStatus;
 use App\Enums\CheckInStatus;
 use App\Enums\TrailerChute;
+use App\ShortLink\HasShortLink;
 use Carbon\CarbonImmutable;
 use Database\Factories\CheckInFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -72,6 +73,7 @@ final class CheckIn extends Model
     /** @use HasFactory<CheckInFactory> */
     use HasFactory;
 
+    use HasShortLink;
     use SoftDeletes;
 
     /**

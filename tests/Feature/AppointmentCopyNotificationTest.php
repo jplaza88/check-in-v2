@@ -121,7 +121,7 @@ it('carries the locale stamped on the booking', function (): void {
     );
 });
 
-it('renders the text message with the reference and a link to the record', function (): void {
+it('renders the text message with the reference and a short link to the record', function (): void {
     $driver = bookingDriver(['cellphone' => '+12015550123']);
     $appointment = Appointment::factory()->forUser($driver)->create();
 
@@ -129,7 +129,9 @@ it('renders the text message with the reference and a link to the record', funct
 
     expect($message->to)->toBe('+12015550123')
         ->and($message->body)->toContain($appointment->reference_number)
-        ->and($message->body)->toContain(route('account.history.appointment', $appointment->uuid));
+        ->and($message->body)->toContain($appointment->shortUrl())
+        // The old link carried the 36-character uuid inline.
+        ->and($message->body)->not->toContain($appointment->uuid);
 });
 
 it('keeps the text message inside one segment in every locale', function (string $locale): void {

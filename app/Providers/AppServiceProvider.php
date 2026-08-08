@@ -15,6 +15,8 @@ use App\Models\CheckInScheduleOverride;
 use App\Models\Location;
 use App\Pdf\BrowsershotRecordPdfRenderer;
 use App\Pdf\RecordPdfRenderer;
+use App\Reference\RandomCode;
+use App\Reference\SecureRandomCode;
 use App\Schedule\WeeklyScheduleResolver;
 use App\Sms\LogSmsSender;
 use App\Sms\SmsSender;
@@ -50,6 +52,13 @@ final class AppServiceProvider extends ServiceProvider
          * carrier up needs a non-production guard of their own.
          */
         $this->app->bind(SmsSender::class, LogSmsSender::class);
+
+        /*
+         * Reference numbers and short link codes both draw from here. Bound so
+         * a test can script the draw and force the collision each generator
+         * guards against, which is otherwise too rare to cover.
+         */
+        $this->app->bind(RandomCode::class, SecureRandomCode::class);
     }
 
     /**

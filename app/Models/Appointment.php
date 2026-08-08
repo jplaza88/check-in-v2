@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\AppointmentStatus;
+use App\ShortLink\HasShortLink;
 use Carbon\CarbonImmutable;
 use Database\Factories\AppointmentFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -43,6 +44,7 @@ final class Appointment extends Model
     /** @use HasFactory<AppointmentFactory> */
     use HasFactory;
 
+    use HasShortLink;
     use SoftDeletes;
 
     /**
