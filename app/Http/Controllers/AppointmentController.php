@@ -32,7 +32,7 @@ final class AppointmentController extends Controller
         // location that has since been retired quietly reads as "none".
         $usualLocationId = $user?->location?->uuid;
 
-        if ($usualLocationId !== null && ! $locations->contains(fn (AppointmentLocationDTO $location): bool => $location->id === $usualLocationId)) {
+        if ($usualLocationId !== null && $locations->doesntContain(fn (AppointmentLocationDTO $location): bool => $location->id === $usualLocationId)) {
             $usualLocationId = null;
         }
 

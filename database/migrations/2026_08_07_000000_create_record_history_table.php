@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Models\CheckIn;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -34,7 +35,7 @@ return new class extends Migration
          * the ones already stored. A no-op on a freshly migrated database.
          */
         DB::table('purchase_orders')
-            ->where('purchasable_type', 'App\Models\CheckIn')
+            ->where('purchasable_type', CheckIn::class)
             ->update(['purchasable_type' => 'check_in']);
     }
 

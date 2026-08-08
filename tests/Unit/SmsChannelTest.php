@@ -35,7 +35,7 @@ final class MailOnlyNotification extends Notification {}
 
 function notifiableWith(?string $number): object
 {
-    return new class($number)
+    return new readonly class($number)
     {
         public function __construct(private ?string $number) {}
 

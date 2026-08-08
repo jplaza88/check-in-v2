@@ -18,11 +18,11 @@ use Throwable;
  * record was claimed, then clears the pending references — all in one
  * transaction.
  */
-final class ClaimPendingRecordsAction
+final readonly class ClaimPendingRecordsAction
 {
     private const string CLAIMED_VIA = 'email_verification';
 
-    public function __construct(private readonly RecordHistoryAction $history) {}
+    public function __construct(private RecordHistoryAction $history) {}
 
     /**
      * @throws Throwable

@@ -39,7 +39,7 @@ function localeRequest(?string $acceptLanguage = null, ?User $user = null): Requ
 it('prefers the account over everything else', function (): void {
     session(['locale' => 'fr']);
 
-    $locale = app(LocaleManager::class)
+    $locale = resolve(LocaleManager::class)
         ->getLocale(localeRequest('es-MX,es', localeDriver('en')));
 
     expect($locale)->toBe('en');
@@ -48,20 +48,20 @@ it('prefers the account over everything else', function (): void {
 it('falls back to the session when the account has no locale', function (): void {
     session(['locale' => 'fr']);
 
-    $locale = app(LocaleManager::class)
+    $locale = resolve(LocaleManager::class)
         ->getLocale(localeRequest('es-MX,es', localeDriver()));
 
     expect($locale)->toBe('fr');
 });
 
 it('falls back to the browser when there is no account and no session', function (): void {
-    $locale = app(LocaleManager::class)->getLocale(localeRequest('es-MX,es'));
+    $locale = resolve(LocaleManager::class)->getLocale(localeRequest('es-MX,es'));
 
     expect($locale)->toBe('es');
 });
 
 it('falls back to the configured locale when the browser offers nothing', function (): void {
-    $locale = app(LocaleManager::class)->getLocale(localeRequest());
+    $locale = resolve(LocaleManager::class)->getLocale(localeRequest());
 
     expect($locale)->toBe(config('app.locale'));
 });
@@ -71,7 +71,7 @@ it('falls back to the configured locale when the browser offers nothing', functi
  * rather than accepted and then quietly resolved against a lang/ directory that does not exist.
  */
 it('ignores a browser language the app does not ship', function (): void {
-    $locale = app(LocaleManager::class)->getLocale(localeRequest('de-DE,de'));
+    $locale = resolve(LocaleManager::class)->getLocale(localeRequest('de-DE,de'));
 
     expect($locale)->toBe(config('app.locale'));
 });
@@ -79,20 +79,20 @@ it('ignores a browser language the app does not ship', function (): void {
 it('ignores an unsupported locale stored on the account or in the session', function (): void {
     session(['locale' => 'de']);
 
-    expect(app(LocaleManager::class)->getLocale(localeRequest()))
+    expect(resolve(LocaleManager::class)->getLocale(localeRequest()))
         ->toBe(config('app.locale'));
 
-    expect(app(LocaleManager::class)->getLocale(localeRequest(null, localeDriver('de'))))
+    expect(resolve(LocaleManager::class)->getLocale(localeRequest(null, localeDriver('de'))))
         ->toBe(config('app.locale'));
 });
 
 it('returns no translations for a locale that ships no messages file', function (): void {
-    expect(app(LocaleManager::class)->getTranslationsForRoute('account.settings', 'de'))
+    expect(resolve(LocaleManager::class)->getTranslationsForRoute('account.settings', 'de'))
         ->toBe([]);
 });
 
 it('loads only the keys mapped to the route', function (): void {
-    $translations = app(LocaleManager::class)
+    $translations = resolve(LocaleManager::class)
         ->getTranslationsForRoute('account.settings', 'en');
 
     expect($translations)->toHaveKey('accountSettings')
