@@ -75,10 +75,30 @@ it('sends the driver their copy by default', function (): void {
  * No form collects an email address or a phone number from a guest, so there is
  * nowhere to send a copy and no preference to read.
  */
-it('sends nothing for a guest check-in', function (): void {
+it('texts a guest their check-in confirmation', function (): void {
+    // The check-in form requires a cellphone and collects no email, so a text
+    // is both the only way to reach a guest and the only thing they could have
+    // expected. No account means no preference to consult.
     checkInAs(null);
 
-    Notification::assertNothingSent();
+    Notification::assertSentOnDemand(
+        CheckInCopy::class,
+        fn (CheckInCopy $notification, array $channels, object $notifiable): bool => $channels === [SmsChannel::class]
+            && $notifiable->routes['sms'] === '+12015550123',
+    );
+});
+
+it('sends a guest a text with the reference and no link', function (): void {
+    $checkIn = CheckIn::factory()->create(['drivers_cellphone' => '+12015550123']);
+
+    $body = new CheckInCopy($checkIn)
+        ->toSms(Notification::route('sms', '+12015550123'))
+        ->body;
+
+    // A guest cannot reach the auth-gated target a registered driver's link
+    // points at, so the text carries the reference alone.
+    expect($body)->toContain($checkIn->reference_number)
+        ->and($body)->not->toContain('http');
 });
 
 it('sends nothing when the driver has turned the copy off', function (): void {
@@ -195,6 +215,24 @@ it('keeps the text message inside one segment in every locale', function (string
     $checkIn = CheckIn::factory()->forUser($driver)->create();
 
     $body = new CheckInCopy($checkIn)->toSms($driver)->body;
+
+    expect(mb_strlen($body))->toBeLessThanOrEqual(160)
+        ->and($body)->toContain($checkIn->reference_number);
+})->with(['en', 'es', 'fr']);
+
+/*
+ * The guest body trades the link for an instruction, so it has its own budget
+ * to hold. Guests are the larger audience, which makes a second billed segment
+ * here more expensive than on the registered-driver path.
+ */
+it('keeps the guest text inside one segment in every locale', function (string $locale): void {
+    App::setLocale($locale);
+
+    $checkIn = CheckIn::factory()->create(['drivers_cellphone' => '+12015550123']);
+
+    $body = new CheckInCopy($checkIn)
+        ->toSms(Notification::route('sms', '+12015550123'))
+        ->body;
 
     expect(mb_strlen($body))->toBeLessThanOrEqual(160)
         ->and($body)->toContain($checkIn->reference_number);

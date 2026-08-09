@@ -240,6 +240,19 @@ return [
      */
     'checkInCopySms' => [
         'body' => ':app: tu registro está hecho. Ref :reference. :url',
+        'guestBody' => ':app: tu registro está hecho. Ref :reference. Muestra esta referencia en la entrada.',
+    ],
+
+    'appointmentReminderEmail' => [
+        'subject' => 'Recordatorio: tu cita :reference en :location',
+        'preheader' => 'Tu cita en :location es mañana.',
+        'eyebrow' => 'Recordatorio',
+        'title' => 'Tu cita es mañana',
+        'intro' => 'Estos son los detalles para mañana. Si tus planes cambiaron, puedes cancelar desde tu cuenta.',
+    ],
+
+    'appointmentReminderSms' => [
+        'body' => ':app: recordatorio, tu cita es mañana. Ref :reference. :url',
     ],
 
     'appointmentCancellationEmail' => [
@@ -269,6 +282,7 @@ return [
 
     'appointmentCopySms' => [
         'body' => ':app: tu cita está agendada. Ref :reference. :url',
+        'guestBody' => ':app: tu cita está agendada. Ref :reference. Muestra esta referencia en la entrada.',
     ],
 
     'recordDocumentEmail' => [

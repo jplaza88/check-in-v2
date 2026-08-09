@@ -251,10 +251,26 @@ return [
      */
     'checkInCopySms' => [
         'body' => ':app: you are checked in. Ref :reference. :url',
+        // No link: a guest has no account, so the account-history target the
+        // registered driver's link points at is unreachable for them.
+        'guestBody' => ':app: you are checked in. Ref :reference. Show this reference at the gate.',
     ],
 
     'appointmentCopySms' => [
         'body' => ':app: your appointment is booked. Ref :reference. :url',
+        'guestBody' => ':app: your appointment is booked. Ref :reference. Show this reference at the gate.',
+    ],
+
+    'appointmentReminderEmail' => [
+        'subject' => 'Reminder: your appointment :reference at :location',
+        'preheader' => 'Your appointment at :location is tomorrow.',
+        'eyebrow' => 'Reminder',
+        'title' => 'Your appointment is tomorrow',
+        'intro' => 'Here are the details for tomorrow. If your plans have changed, you can cancel from your account.',
+    ],
+
+    'appointmentReminderSms' => [
+        'body' => ':app: reminder, your appointment is tomorrow. Ref :reference. :url',
     ],
 
     'appointmentCancellationEmail' => [

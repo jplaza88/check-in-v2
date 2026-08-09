@@ -31,13 +31,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property-read string|null $cancelled_reason
  * @property-read CarbonImmutable|null $claimed_at
  * @property-read string|null $claimed_via
+ * @property-read CarbonImmutable|null $reminder_sent_at
  * @property-read CarbonImmutable $created_at
  * @property-read CarbonImmutable $updated_at
  * @property-read CarbonImmutable|null $deleted_at
  * @property-read Location $location
  * @property-read User|null $user
  */
-#[Fillable(['uuid', 'reference_number', 'location_id', 'user_id', 'scheduled_for', 'drivers_name', 'drivers_cellphone', 'locale', 'status', 'cancelled_at', 'cancelled_reason', 'claimed_at', 'claimed_via'])]
+#[Fillable(['uuid', 'reference_number', 'location_id', 'user_id', 'scheduled_for', 'drivers_name', 'drivers_cellphone', 'locale', 'status', 'cancelled_at', 'cancelled_reason', 'claimed_at', 'claimed_via', 'reminder_sent_at'])]
 #[Hidden(['id'])]
 final class Appointment extends Model
 {
@@ -95,6 +96,7 @@ final class Appointment extends Model
             'status' => AppointmentStatus::class,
             'cancelled_at' => 'datetime',
             'claimed_at' => 'datetime',
+            'reminder_sent_at' => 'datetime',
         ];
     }
 }

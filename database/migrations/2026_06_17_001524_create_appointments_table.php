@@ -25,6 +25,11 @@ return new class extends Migration
             $table->text('cancelled_reason')->nullable();
             $table->timestampTz('claimed_at')->nullable();
             $table->string('claimed_via')->nullable();
+            // Stamped when the day-before reminder is queued, and the only thing
+            // stopping the hourly command sending it twice. If rescheduling is
+            // ever built, moving scheduled_for must null this or the booking
+            // silently loses its reminder.
+            $table->timestampTz('reminder_sent_at')->nullable();
 
             $table->timestampsTz();
             $table->softDeletes();
@@ -34,6 +39,9 @@ return new class extends Migration
             // Serves the driver history list, which filters by user and sorts
             // by scheduled_for. Covers plain user_id lookups as a leftmost prefix.
             $table->index(['user_id', 'scheduled_for']);
+            // Serves the hourly reminder sweep, which filters on exactly this
+            // pair. Neither index above works for it as a leftmost prefix.
+            $table->index(['status', 'scheduled_for']);
         });
     }
 

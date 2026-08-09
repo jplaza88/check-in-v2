@@ -240,6 +240,19 @@ return [
      */
     'checkInCopySms' => [
         'body' => ':app: vous êtes enregistré. Réf :reference. :url',
+        'guestBody' => ':app: vous êtes enregistré. Réf :reference. Présentez cette référence à l\'entrée.',
+    ],
+
+    'appointmentReminderEmail' => [
+        'subject' => 'Rappel : votre rendez-vous :reference à :location',
+        'preheader' => 'Votre rendez-vous à :location a lieu demain.',
+        'eyebrow' => 'Rappel',
+        'title' => 'Votre rendez-vous a lieu demain',
+        'intro' => 'Voici les détails pour demain. Si vos plans ont changé, vous pouvez annuler depuis votre compte.',
+    ],
+
+    'appointmentReminderSms' => [
+        'body' => ':app: rappel, votre rendez-vous a lieu demain. Réf :reference. :url',
     ],
 
     'appointmentCancellationEmail' => [
@@ -269,6 +282,7 @@ return [
 
     'appointmentCopySms' => [
         'body' => ':app: votre rendez-vous est réservé. Réf :reference. :url',
+        'guestBody' => ':app: votre rendez-vous est réservé. Réf :reference. Présentez cette référence à l\'entrée.',
     ],
 
     'recordDocumentEmail' => [

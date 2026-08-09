@@ -42,6 +42,7 @@ final class AppointmentFactory extends Factory
             'cancelled_reason' => null,
             'claimed_at' => null,
             'claimed_via' => null,
+            'reminder_sent_at' => null,
 
             'created_at' => Date::now(),
             'updated_at' => Date::now(),
@@ -129,6 +130,17 @@ final class AppointmentFactory extends Factory
     {
         return $this->state(fn (array $attributes): array => [
             'status' => AppointmentStatus::CheckedIn,
+        ]);
+    }
+
+    /**
+     * The day-before reminder has already gone out, so the hourly sweep must
+     * leave this booking alone.
+     */
+    public function reminded(): static
+    {
+        return $this->state(fn (array $attributes): array => [
+            'reminder_sent_at' => Date::now(),
         ]);
     }
 }
