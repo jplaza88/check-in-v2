@@ -33,6 +33,18 @@ return [
         'taglineSub' => 'Sucede. Ingresa tu correo y te ayudamos a volver al camino.',
     ],
 
+    'confirmPassword' => [
+        'eyebrow' => 'Verificación de seguridad',
+        'title' => 'Confirma tu contraseña',
+        'subtitle' => 'Tu perfil contiene los datos de tu licencia, así que vuelve a ingresar tu contraseña para continuar. No te lo pediremos de nuevo por un rato.',
+        'passwordLabel' => 'Contraseña',
+        'passwordPlaceholder' => 'Ingresa tu contraseña',
+        'confirm' => 'Confirmar',
+        'required' => 'Confirma tu contraseña antes de cambiar tu perfil.',
+        'tagline' => 'Frescura de nuestros campos a su muelle.',
+        'taglineSub' => 'Una comprobación rápida de que eres tú antes de mostrar o cambiar algo delicado.',
+    ],
+
     'verifyEmailPage' => [
         'eyebrow' => 'Un paso más',
         'title' => 'Verifica tu correo electrónico',

@@ -61,7 +61,15 @@ Route::middleware('setLocale')->group(function (): void {
      * for the same reason.
      */
     Route::middleware('auth')->group(function (): void {
-        Route::get('/account/profile', [AccountController::class, 'editProfile'])->name('account.profile');
+        // password.confirm, not verified: this page decrypts and displays the
+        // driver's licence number - the one field encrypted at rest - and is
+        // also where the email that guards the account is changed. A live
+        // session on an unlocked phone should not be enough for either. The
+        // confirmation lasts config('auth.password_timeout'), so it costs one
+        // password entry per session rather than one per action.
+        Route::middleware('password.confirm')
+            ->get('/account/profile', [AccountController::class, 'editProfile'])
+            ->name('account.profile');
 
         // Named for the account rather than the settings, because that is what it
         // destroys. Throttled harder than the preference saves: it is irreversible,

@@ -68,3 +68,16 @@ function something(): void
 {
     // ..
 }
+
+/**
+ * Marks the session as having just confirmed a password.
+ *
+ * The profile page and Fortify's PUT /user/profile-information both sit behind
+ * password confirmation, so any test that exercises them has to satisfy it.
+ * Tests that are about the confirmation itself drive the real endpoint instead
+ * of calling this - see PasswordConfirmationTest.
+ */
+function confirmPassword(): void
+{
+    session(['auth.password_confirmed_at' => now()->unix()]);
+}

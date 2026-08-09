@@ -55,4 +55,17 @@ Route::middleware(['auth', 'setLocale'])->group(function (): void {
         ? redirect()->intended(HomeRedirect::for())
         : inertia('Auth/VerifyEmail', ['status' => session('status')]))
         ->name('verification.notice');
+
+    /*
+    | Where the "password.confirm" middleware sends drivers, and missing for the
+    | same reason verification.notice was: Fortify registers this GET only when
+    | views are enabled (vendor routes.php, `if ($enableViews)`), so with
+    | views => false it owns the POST at the same path and nothing else.
+    |
+    | Deliberately not behind "verified". The profile page is the escape hatch
+    | for a driver who mistyped their email at registration, and gating that
+    | hatch behind a screen they cannot reach would close it.
+    */
+    Route::get('/user/confirm-password', fn () => inertia('Auth/ConfirmPassword'))
+        ->name('password.confirm');
 });

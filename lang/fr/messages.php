@@ -33,6 +33,18 @@ return [
         'taglineSub' => 'Ça arrive. Saisissez votre e-mail et nous vous remettons sur la route.',
     ],
 
+    'confirmPassword' => [
+        'eyebrow' => 'Vérification de sécurité',
+        'title' => 'Confirmez votre mot de passe',
+        'subtitle' => 'Votre profil contient les informations de votre permis. Saisissez à nouveau votre mot de passe pour continuer. Nous ne le redemanderons pas avant un moment.',
+        'passwordLabel' => 'Mot de passe',
+        'passwordPlaceholder' => 'Saisissez votre mot de passe',
+        'confirm' => 'Confirmer',
+        'required' => 'Veuillez confirmer votre mot de passe avant de modifier votre profil.',
+        'tagline' => 'La fraîcheur de nos champs à votre quai.',
+        'taglineSub' => "Une vérification rapide qu'il s'agit bien de vous avant d'afficher ou de modifier des informations sensibles.",
+    ],
+
     'verifyEmailPage' => [
         'eyebrow' => 'Une dernière étape',
         'title' => 'Vérifiez votre adresse e-mail',

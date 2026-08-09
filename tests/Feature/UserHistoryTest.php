@@ -40,6 +40,15 @@ function profilePayload(array $overrides = []): array
     ];
 }
 
+/*
+ * The profile page and the profile-update endpoint sit behind password
+ * confirmation. These tests are about what the profile does, not about the
+ * gate, so they satisfy it up front. PasswordConfirmationTest covers the gate.
+ */
+beforeEach(function (): void {
+    confirmPassword();
+});
+
 it('records a profile update with the before and after values', function (): void {
     Notification::fake();
 

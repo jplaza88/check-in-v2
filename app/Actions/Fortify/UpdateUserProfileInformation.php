@@ -7,6 +7,7 @@ namespace App\Actions\Fortify;
 use App\Actions\RecordUserHistoryAction;
 use App\Enums\UserHistoryEvent;
 use App\Models\User;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -28,6 +29,8 @@ final readonly class UpdateUserProfileInformation implements UpdatesUserProfileI
      */
     public function update(User $user, array $input): void
     {
+        $this->assertPasswordRecentlyConfirmed();
+
         $input['cellphone'] = $this->normalizeCellphone($input['cellphone'] ?? null);
 
         Validator::make($input, [
@@ -82,6 +85,38 @@ final readonly class UpdateUserProfileInformation implements UpdatesUserProfileI
         if ($requiresReverification) {
             $user->sendEmailVerificationNotification();
         }
+    }
+
+    /**
+     * Refuse the update unless the password was confirmed recently.
+     *
+     * Enforced here rather than as route middleware because Fortify hardcodes
+     * `['auth']` on PUT /user/profile-information (vendor routes.php) and
+     * exposes no confirmPassword option for it, the way it does for two-factor
+     * and passkeys. Gating only the GET page would leave the endpoint itself
+     * open to a direct request from a hijacked session - which is the whole
+     * thing being defended against, since changing the email here is a complete
+     * account-takeover path via a password reset to the new address.
+     *
+     * Same session key and timeout the framework's RequirePassword middleware
+     * uses, so confirming once at the profile page covers this too.
+     *
+     * @throws ValidationException
+     */
+    private function assertPasswordRecentlyConfirmed(): void
+    {
+        $confirmedAt = session('auth.password_confirmed_at');
+
+        $isFresh = is_int($confirmedAt)
+            && Date::now()->unix() - $confirmedAt < (int) config('auth.password_timeout', 10800);
+
+        if ($isFresh) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'password' => __('messages.confirmPassword.required'),
+        ]);
     }
 
     /**

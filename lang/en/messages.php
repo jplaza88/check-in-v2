@@ -33,6 +33,18 @@ return [
         'taglineSub' => "It happens. Enter your email and we'll get you back on the road.",
     ],
 
+    'confirmPassword' => [
+        'eyebrow' => 'Security check',
+        'title' => 'Confirm your password',
+        'subtitle' => 'Your profile holds your licence details, so please re-enter your password before continuing. We will not ask again for a while.',
+        'passwordLabel' => 'Password',
+        'passwordPlaceholder' => 'Enter your password',
+        'confirm' => 'Confirm',
+        'required' => 'Please confirm your password before changing your profile.',
+        'tagline' => 'Fresh from our fields to your dock.',
+        'taglineSub' => 'A quick check that it is really you before we show or change anything sensitive.',
+    ],
+
     'verifyEmailPage' => [
         'eyebrow' => 'One more step',
         'title' => 'Verify your email address',

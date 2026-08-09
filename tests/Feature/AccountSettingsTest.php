@@ -20,6 +20,15 @@ function settingsDriver(array $attributes = []): User
     ]);
 }
 
+/*
+ * The profile page and the profile-update endpoint sit behind password
+ * confirmation. These tests are about what the profile does, not about the
+ * gate, so they satisfy it up front. PasswordConfirmationTest covers the gate.
+ */
+beforeEach(function (): void {
+    confirmPassword();
+});
+
 it('redirects guests to the login page', function (): void {
     get(route('account.settings'))->assertRedirect(route('login'));
 });
