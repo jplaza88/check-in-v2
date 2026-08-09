@@ -15,6 +15,7 @@ function updateDriver(): User
         'name' => 'John Driver',
         'email' => 'driver@example.com',
         'password' => 'secret-password',
+        'email_verified_at' => now(),
     ]);
 }
 

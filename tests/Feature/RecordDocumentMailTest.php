@@ -18,6 +18,7 @@ function mailDriver(string $email = 'driver@example.com'): User
         'name' => 'John Driver',
         'email' => $email,
         'password' => 'secret-password',
+        'email_verified_at' => now(),
     ]);
 }
 

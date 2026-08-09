@@ -33,6 +33,20 @@ return [
         'taglineSub' => 'Ça arrive. Saisissez votre e-mail et nous vous remettons sur la route.',
     ],
 
+    'verifyEmailPage' => [
+        'eyebrow' => 'Une dernière étape',
+        'title' => 'Vérifiez votre adresse e-mail',
+        'subtitle' => 'Nous avons envoyé un lien de vérification à :email. Ouvrez-le pour activer votre compte et voir vos enregistrements.',
+        'resend' => 'Renvoyer le lien',
+        'sent' => 'Nous avons envoyé un nouveau lien de vérification. Il peut mettre une minute à arriver.',
+        'spamHint' => 'Vous ne le trouvez pas ? Vérifiez votre dossier de courrier indésirable.',
+        'wrongEmailPrompt' => 'Mauvaise adresse e-mail ?',
+        'wrongEmailLink' => 'Modifiez-la sur votre profil',
+        'logout' => 'Se déconnecter',
+        'tagline' => 'La fraîcheur de nos champs à votre quai.',
+        'taglineSub' => 'Confirmer votre e-mail garde votre historique lié à vous et nous permet de vous joindre au sujet de vos rendez-vous.',
+    ],
+
     'resetPassword' => [
         'eyebrow' => 'Réinitialisation du mot de passe',
         'title' => 'Définir un nouveau mot de passe',
@@ -97,10 +111,6 @@ return [
         'nudgeAddLicenseTitle' => 'Ajoutez votre permis',
         'nudgeAddLicenseBody' => "Enregistrez votre permis une fois et nous le remplirons pour vous à l'enregistrement.",
         'nudgeAddLicenseCta' => 'Ajouter le permis',
-        'nudgeVerifyEmailTitle' => 'Vérifiez votre e-mail',
-        'nudgeVerifyEmailBody' => 'Confirmez votre adresse e-mail pour sécuriser votre compte.',
-        'nudgeVerifyEmailCta' => 'Renvoyer le lien',
-        'nudgeVerifyEmailSent' => 'Lien de vérification envoyé',
     ],
 
     'accountNav' => [
@@ -109,6 +119,8 @@ return [
         'profile' => 'Profil',
         'settings' => 'Réglages',
         'emailVerified' => 'E-mail vérifié',
+        'emailUnverified' => 'E-mail non vérifié',
+        'verifyNow' => 'Vérifier maintenant',
         'licenseOnFile' => 'Permis enregistré',
     ],
 
@@ -228,6 +240,31 @@ return [
      */
     'checkInCopySms' => [
         'body' => ':app: vous êtes enregistré. Réf :reference. :url',
+    ],
+
+    'appointmentCancellationEmail' => [
+        'subject' => 'Annulé : votre rendez-vous :reference à :location',
+        'preheader' => 'Votre rendez-vous à :location a été annulé.',
+        'eyebrow' => 'Annulé',
+        'title' => 'Votre rendez-vous a été annulé',
+        'intro' => 'Le créneau a été libéré. Si vous devez toujours venir, réservez un nouveau rendez-vous.',
+    ],
+
+    'appointmentCancellationSms' => [
+        'body' => ':app: votre rendez-vous est annulé. Réf :reference. :url',
+    ],
+
+    'appointmentCancel' => [
+        'title' => 'Annuler ce rendez-vous',
+        'body' => 'Le créneau sera libéré et le site sera prévenu. Cette action est irréversible.',
+        'reasonLabel' => 'Pourquoi annulez-vous ?',
+        'reasonPlaceholder' => "Chargement annulé, camion à l'atelier, retard...",
+        'reasonRequired' => 'Dites-nous pourquoi vous annulez.',
+        'notCancellable' => 'Ce rendez-vous ne peut plus être annulé en ligne. Veuillez appeler le site.',
+        'submit' => 'Annuler le rendez-vous',
+        'confirm' => 'Oui, annuler',
+        'dismiss' => 'Conserver le rendez-vous',
+        'cancelled' => 'Rendez-vous annulé',
     ],
 
     'appointmentCopySms' => [

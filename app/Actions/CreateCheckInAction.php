@@ -30,7 +30,8 @@ final readonly class CreateCheckInAction
     ) {}
 
     /**
-     * @param  array<string, mixed>  $validated
+     * @param array<string, mixed> $validated
+     * @throws Throwable
      */
     public function handle(
         array $validated,
@@ -60,7 +61,6 @@ final readonly class CreateCheckInAction
             when: fn (Throwable $e): bool => $e instanceof UniqueConstraintViolationException,
         );
 
-        // The opening row of the trail an admin reads.
         $this->history->handle(
             record: $checkIn,
             event: RecordHistoryEvent::Created,

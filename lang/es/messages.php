@@ -33,6 +33,20 @@ return [
         'taglineSub' => 'Sucede. Ingresa tu correo y te ayudamos a volver al camino.',
     ],
 
+    'verifyEmailPage' => [
+        'eyebrow' => 'Un paso más',
+        'title' => 'Verifica tu correo electrónico',
+        'subtitle' => 'Enviamos un enlace de verificación a :email. Ábrelo para activar tu cuenta y ver tus registros.',
+        'resend' => 'Reenviar el enlace',
+        'sent' => 'Enviamos un nuevo enlace de verificación. Puede tardar un minuto en llegar.',
+        'spamHint' => '¿No lo encuentras? Revisa tu carpeta de correo no deseado.',
+        'wrongEmailPrompt' => '¿Correo electrónico incorrecto?',
+        'wrongEmailLink' => 'Cámbialo en tu perfil',
+        'logout' => 'Cerrar sesión',
+        'tagline' => 'Frescura de nuestros campos a su muelle.',
+        'taglineSub' => 'Confirmar tu correo mantiene tu historial de registros ligado a ti y nos permite contactarte sobre tus citas.',
+    ],
+
     'resetPassword' => [
         'eyebrow' => 'Restablecer contraseña',
         'title' => 'Crea una nueva contraseña',
@@ -97,10 +111,6 @@ return [
         'nudgeAddLicenseTitle' => 'Agrega tu licencia',
         'nudgeAddLicenseBody' => 'Guarda tu licencia una vez y la completaremos por ti en el registro.',
         'nudgeAddLicenseCta' => 'Agregar licencia',
-        'nudgeVerifyEmailTitle' => 'Verifica tu correo',
-        'nudgeVerifyEmailBody' => 'Confirma tu correo electrónico para mantener tu cuenta segura.',
-        'nudgeVerifyEmailCta' => 'Reenviar enlace',
-        'nudgeVerifyEmailSent' => 'Enlace de verificación enviado',
     ],
 
     'accountNav' => [
@@ -109,6 +119,8 @@ return [
         'profile' => 'Perfil',
         'settings' => 'Ajustes',
         'emailVerified' => 'Correo verificado',
+        'emailUnverified' => 'Correo sin verificar',
+        'verifyNow' => 'Verificar ahora',
         'licenseOnFile' => 'Licencia guardada',
     ],
 
@@ -228,6 +240,31 @@ return [
      */
     'checkInCopySms' => [
         'body' => ':app: tu registro está hecho. Ref :reference. :url',
+    ],
+
+    'appointmentCancellationEmail' => [
+        'subject' => 'Cancelada: tu cita :reference en :location',
+        'preheader' => 'Tu cita en :location ha sido cancelada.',
+        'eyebrow' => 'Cancelada',
+        'title' => 'Tu cita ha sido cancelada',
+        'intro' => 'El horario ha quedado libre. Si aún necesitas venir, agenda una nueva cita.',
+    ],
+
+    'appointmentCancellationSms' => [
+        'body' => ':app: tu cita fue cancelada. Ref :reference. :url',
+    ],
+
+    'appointmentCancel' => [
+        'title' => 'Cancelar esta cita',
+        'body' => 'El horario quedará libre y avisaremos a la instalación. Esto no se puede deshacer.',
+        'reasonLabel' => '¿Por qué cancelas?',
+        'reasonPlaceholder' => 'Se canceló la carga, el camión está en el taller, voy retrasado...',
+        'reasonRequired' => 'Dinos por qué estás cancelando.',
+        'notCancellable' => 'Esta cita ya no se puede cancelar en línea. Llama a la instalación.',
+        'submit' => 'Cancelar cita',
+        'confirm' => 'Sí, cancelarla',
+        'dismiss' => 'Mantener la cita',
+        'cancelled' => 'Cita cancelada',
     ],
 
     'appointmentCopySms' => [

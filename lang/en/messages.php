@@ -33,6 +33,20 @@ return [
         'taglineSub' => "It happens. Enter your email and we'll get you back on the road.",
     ],
 
+    'verifyEmailPage' => [
+        'eyebrow' => 'One more step',
+        'title' => 'Verify your email address',
+        'subtitle' => 'We sent a verification link to :email. Open it to activate your account and see your check-ins.',
+        'resend' => 'Resend the link',
+        'sent' => "We've sent a new verification link. It can take a minute to arrive.",
+        'spamHint' => "Can't find it? Check your spam folder.",
+        'wrongEmailPrompt' => 'Wrong email address?',
+        'wrongEmailLink' => 'Change it on your profile',
+        'logout' => 'Sign out',
+        'tagline' => 'Fresh from our fields to your dock.',
+        'taglineSub' => 'Confirming your email keeps your check-in history tied to you, and lets us reach you about your appointments.',
+    ],
+
     'resetPassword' => [
         'eyebrow' => 'Password reset',
         'title' => 'Set a new password',
@@ -100,10 +114,6 @@ return [
         'nudgeLicenseExpiredTitle' => 'Your license has expired',
         'nudgeLicenseExpiredBody' => 'Update your expiration date so check-in stays quick and hassle-free.',
         'nudgeLicenseExpiredCta' => 'Update license',
-        'nudgeVerifyEmailTitle' => 'Verify your email',
-        'nudgeVerifyEmailBody' => 'Confirm your email address to keep your account secure.',
-        'nudgeVerifyEmailCta' => 'Resend link',
-        'nudgeVerifyEmailSent' => 'Verification link sent',
     ],
 
     'accountNav' => [
@@ -112,6 +122,8 @@ return [
         'profile' => 'Profile',
         'settings' => 'Settings',
         'emailVerified' => 'Email verified',
+        'emailUnverified' => 'Email not verified',
+        'verifyNow' => 'Verify now',
         'licenseOnFile' => 'License on file',
     ],
 
@@ -243,6 +255,31 @@ return [
 
     'appointmentCopySms' => [
         'body' => ':app: your appointment is booked. Ref :reference. :url',
+    ],
+
+    'appointmentCancellationEmail' => [
+        'subject' => 'Cancelled: your appointment :reference at :location',
+        'preheader' => 'Your booking at :location has been cancelled.',
+        'eyebrow' => 'Cancelled',
+        'title' => 'Your appointment has been cancelled',
+        'intro' => 'The slot below has been released. If you still need to come in, book a new appointment.',
+    ],
+
+    'appointmentCancellationSms' => [
+        'body' => ':app: your appointment is cancelled. Ref :reference. :url',
+    ],
+
+    'appointmentCancel' => [
+        'title' => 'Cancel this appointment',
+        'body' => 'The slot will be released and the facility will be told. This cannot be undone.',
+        'reasonLabel' => 'Why are you cancelling?',
+        'reasonPlaceholder' => 'Load cancelled, truck in the shop, running late...',
+        'reasonRequired' => 'Please tell us why you are cancelling.',
+        'notCancellable' => 'This appointment can no longer be cancelled online. Please call the facility.',
+        'submit' => 'Cancel appointment',
+        'confirm' => 'Yes, cancel it',
+        'dismiss' => 'Keep appointment',
+        'cancelled' => 'Appointment cancelled',
     ],
 
     'recordDocumentEmail' => [

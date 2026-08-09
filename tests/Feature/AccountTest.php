@@ -22,6 +22,7 @@ it('renders the driver account for an authenticated user', function (): void {
         'name' => 'John Driver',
         'email' => 'john@example.com',
         'password' => 'secret-password',
+        'email_verified_at' => now(),
     ]);
 
     $this->actingAs($user)
@@ -39,6 +40,7 @@ it('reports whether the driver has a license on file for the hub chips and nudge
         'name' => 'No License',
         'email' => 'nolicense@example.com',
         'password' => 'secret-password',
+        'email_verified_at' => now(),
     ]);
 
     $this->actingAs($without)
@@ -51,6 +53,7 @@ it('reports whether the driver has a license on file for the hub chips and nudge
         'name' => 'Has License',
         'email' => 'haslicense@example.com',
         'password' => 'secret-password',
+        'email_verified_at' => now(),
         'drivers_license_number' => 'D1234567',
     ]);
 
@@ -65,6 +68,7 @@ it('flags an expired license so the overview can nudge the driver', function ():
         'name' => 'Expired License',
         'email' => 'expired@example.com',
         'password' => 'secret-password',
+        'email_verified_at' => now(),
         'drivers_license_number' => 'D1234567',
         'drivers_license_expiration_date' => now()->subDay()->format('Y-m-d'),
     ]);
@@ -79,6 +83,7 @@ it('flags an expired license so the overview can nudge the driver', function ():
         'name' => 'Valid License',
         'email' => 'valid@example.com',
         'password' => 'secret-password',
+        'email_verified_at' => now(),
         'drivers_license_number' => 'D7654321',
         'drivers_license_expiration_date' => now()->addYear()->format('Y-m-d'),
     ]);
@@ -95,6 +100,7 @@ it("surfaces the driver's next appointment and recent check-ins", function (): v
         'name' => 'John Driver',
         'email' => 'john@example.com',
         'password' => 'secret-password',
+        'email_verified_at' => now(),
     ]);
     $location = Location::factory()->create();
 
@@ -131,6 +137,7 @@ it('localises the next appointment month for the active locale', function (strin
         'name' => 'Jane Driver',
         'email' => 'jane@example.com',
         'password' => 'secret-password',
+        'email_verified_at' => now(),
     ]);
     $location = Location::factory()->create();
 

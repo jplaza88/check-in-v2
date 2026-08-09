@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AccountPdfController;
 use App\Http\Controllers\AccountSettingsController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\CheckInController;
@@ -49,23 +50,42 @@ Route::middleware('setLocale')->group(function (): void {
     Route::inertia('/terms', 'TermsOfService')->name('terms');
 
     /**
-     * Authenticated driver account
+     * Authenticated driver account, reachable before the email is verified.
+     *
+     * Deliberately outside the verified group below, so a driver who mistyped
+     * their address on registration can still correct it or walk away. The
+     * profile update nulls email_verified_at and re-sends the link, which makes
+     * this the self-service way out of an unverifiable account; without it every
+     * typo becomes a support ticket. Fortify's own user/profile-information,
+     * user/password and logout endpoints carry no verified middleware either,
+     * for the same reason.
      */
     Route::middleware('auth')->group(function (): void {
-        Route::get('/account', [AccountController::class, 'index'])->name('account');
         Route::get('/account/profile', [AccountController::class, 'editProfile'])->name('account.profile');
+
+        // Named for the account rather than the settings, because that is what it
+        // destroys. Throttled harder than the preference saves: it is irreversible,
+        // and the password check makes it worth guessing at. Ungated on purpose:
+        // erasure should never be conditional on verifying an address.
+        Route::middleware('throttle:6,1')
+            ->delete('/account', [AccountSettingsController::class, 'destroy'])
+            ->name('account.destroy');
+    });
+
+    /**
+     * The rest of the account surface, gated on a verified email.
+     *
+     * Nothing here is meaningful until then: ClaimPendingRecordsAction only
+     * attaches the driver's guest check-in or appointment once the Verified
+     * event fires, so an unverified account genuinely has no history to show.
+     */
+    Route::middleware(['auth', 'verified'])->group(function (): void {
+        Route::get('/account', [AccountController::class, 'index'])->name('account');
         Route::get('/account/settings', [AccountSettingsController::class, 'index'])->name('account.settings');
 
         Route::middleware('throttle:30,1')
             ->patch('/account/settings', [AccountSettingsController::class, 'update'])
             ->name('account.settings.update');
-
-        // Named for the account rather than the settings, because that is what it
-        // destroys. Throttled harder than the preference saves: it is irreversible,
-        // and the password check makes it worth guessing at.
-        Route::middleware('throttle:6,1')
-            ->delete('/account', [AccountSettingsController::class, 'destroy'])
-            ->name('account.destroy');
 
         Route::get('/account/history', [AccountController::class, 'history'])
             ->name('account.history');
@@ -80,22 +100,29 @@ Route::middleware('setLocale')->group(function (): void {
 
         // Rendering is bounded work behind a cache, but still worth throttling.
         Route::middleware('throttle:10,1')->group(function (): void {
-            Route::get('/account/history/check-in/{uuid}/pdf', [AccountController::class, 'checkInPdf'])
+            Route::get('/account/history/check-in/{uuid}/pdf', [AccountPdfController::class, 'checkIn'])
                 ->whereUuid('uuid')
                 ->name('account.history.checkIn.pdf');
 
-            Route::get('/account/history/appointment/{uuid}/pdf', [AccountController::class, 'appointmentPdf'])
+            Route::get('/account/history/appointment/{uuid}/pdf', [AccountPdfController::class, 'appointment'])
                 ->whereUuid('uuid')
                 ->name('account.history.appointment.pdf');
         });
 
+        // Irreversible and it mails the dock, so throttled like the other
+        // state-changing account actions rather than like a page view.
+        Route::middleware('throttle:6,1')
+            ->post('/account/history/appointment/{uuid}/cancel', [AccountController::class, 'cancelAppointment'])
+            ->whereUuid('uuid')
+            ->name('account.history.appointment.cancel');
+
         // Tighter: each one queues a render and sends mail.
         Route::middleware('throttle:5,1')->group(function (): void {
-            Route::post('/account/history/check-in/{uuid}/email', [AccountController::class, 'emailCheckInPdf'])
+            Route::post('/account/history/check-in/{uuid}/email', [AccountPdfController::class, 'emailCheckIn'])
                 ->whereUuid('uuid')
                 ->name('account.history.checkIn.email');
 
-            Route::post('/account/history/appointment/{uuid}/email', [AccountController::class, 'emailAppointmentPdf'])
+            Route::post('/account/history/appointment/{uuid}/email', [AccountPdfController::class, 'emailAppointment'])
                 ->whereUuid('uuid')
                 ->name('account.history.appointment.email');
         });

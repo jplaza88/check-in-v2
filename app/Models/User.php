@@ -71,6 +71,11 @@ final class User extends Authenticatable implements MustVerifyEmail
      */
     #[Override]
     protected $attributes = [
+        // Listed for the same reason as the rest: hasVerifiedEmail() is now on
+        // the hot path via the "verified" middleware, and a freshly-created
+        // model that never round-tripped through the database would otherwise
+        // throw on the missing attribute rather than answer "not verified".
+        'email_verified_at' => null,
         'cellphone' => null,
         'drivers_license_number' => null,
         'drivers_license_state' => null,

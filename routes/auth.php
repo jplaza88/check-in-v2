@@ -2,7 +2,9 @@
 
 declare(strict_types=1);
 
+use App\Auth\HomeRedirect;
 use App\Auth\RegistrationGate;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,4 +42,17 @@ Route::middleware(['guest', 'setLocale'])->group(function (): void {
         'token' => $token,
         'email' => request('email'),
     ]))->name('password.reset');
+});
+
+/*
+| Signed in but not yet verified. This is where the "verified" middleware sends
+| drivers, and it has to exist for that middleware to work at all: Fortify runs
+| with views => false, so it registers only the POST resend and the signed GET
+| link, never this prompt. Deliberately not behind "verified" itself.
+*/
+Route::middleware(['auth', 'setLocale'])->group(function (): void {
+    Route::get('/email/verify', fn (Request $request) => $request->user()->hasVerifiedEmail()
+        ? redirect()->intended(HomeRedirect::for())
+        : inertia('Auth/VerifyEmail', ['status' => session('status')]))
+        ->name('verification.notice');
 });
